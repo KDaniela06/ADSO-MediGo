@@ -1,6 +1,6 @@
 # Referencias visuales de MediGo
 
-Estas imágenes son las referencias recibidas para reproducir las vistas. Se conservan sin edición y se agrupan por módulo:
+Estas imágenes son las referencias recibidas para reproducir las vistas. Se agrupan por módulo para servir como guía de implementación visual:
 
 - `auth/`: inicio de sesión y registro de paciente.
 - `patient/`: panel principal y perfil del paciente.
