@@ -4,6 +4,10 @@
 
 El contexto maestro declara un diseño físico inicial aprobado de 15 tablas, pero no proporciona el diagrama ni nombres/columnas físicos completos. Esta documentación registra las entidades confirmadas y las reglas conocidas; no es un DDL definitivo. En particular, no inventa los nombres de las cuatro tablas de disponibilidad/excepciones ni el nombre de la tabla de auditoría.
 
+## Esquema concreto del registro de pacientes
+
+La propuesta física de `users`, `patients` y `account_tokens` necesaria para US-PAT-01 se define en [USER_REGISTRATION_SCHEMA.md](USER_REGISTRATION_SCHEMA.md) y se implementa mediante la migración del issue #12. El resto del inventario de 15 entidades conserva los pendientes indicados en este documento.
+
 ## Inventario declarado
 
 1. `users`
@@ -63,4 +67,5 @@ Las cardinalidades opcionales y nombres de FK deben confirmarse en el diseño f�
 ## Decisiones pendientes antes de migrar
 
 Recuperar el documento físico aprobado, confirmar cuatro nombres de tablas de horarios, tabla de auditoría, campos/FK/índices, estrategia para historial de cambios de citas y constraints que MySQL soportará. No generar migraciones finales hasta resolverlos.
+
 
