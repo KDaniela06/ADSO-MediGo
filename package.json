@@ -2,11 +2,11 @@
   "name": "medigo",
   "version": "1.0.0",
   "private": true,
-  "description": "Plataforma web para la gestiÃ³n de citas mÃ©dicas MediGo.",
+  "description": "Plataforma web para la gestión de citas médicas MediGo.",
   "main": "src/server.js",
   "scripts": {
     "start": "npm run build:css && node src/server.js",
-    "dev": "concurrently \"nodemon src/server.js\" \"npm run watch:css\"",
+    "dev": "concurrently \"nodemon --watch src src/server.js\" \"npm run watch:css\"",
     "build:css": "tailwindcss -i ./public/css/input.css -o ./public/css/app.css --minify",
     "watch:css": "tailwindcss -i ./public/css/input.css -o ./public/css/app.css --watch",
     "test": "jest --runInBand",
