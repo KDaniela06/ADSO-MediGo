@@ -2,13 +2,12 @@
 
 ## Estado
 
-No se encontraron pruebas, Jest ni scripts de test. No se ejecutaron pruebas en esta documentación porque no existe aplicación/configuración que probar.
+El esqueleto de la aplicación incluye Jest y una prueba de humo HTTP para la página inicial. `npm test` ejecuta la suite.
 
 ## Enfoque previsto
 
 - Jest para pruebas unitarias de servicios/reglas y pruebas de integración pequeñas.
-- CI básico con GitHub Actions al abrir y actualizar PRs dirigidos a `develop`; como mínimo instalar dependencias y ejecutar `npm test` una vez esté configurado.
-- Supertest aparece en el documento de historias, pero no en la lista tecnológica aprobada original; confirmar antes de agregarlo como dependencia.
+- CI básico con GitHub Actions en PRs dirigidos a `develop`; instala dependencias y ejecuta `npm test`.
 - Separar `tests/unit` y `tests/integration` cuando se cree la estructura aprobada.
 - Nombres descriptivos en inglés; datos ficticios, sin información de pacientes reales.
 - No probar funciones que todavía no existen ni declarar resultados sin ejecutar los comandos.
@@ -25,5 +24,5 @@ No se encontraron pruebas, Jest ni scripts de test. No se ejecutaron pruebas en 
 
 ## Criterios de calidad
 
-Probar resultados esperados y límites temporales; fijar reloj en casos dependientes de hora; asegurar transacciones y concurrencia en integración; mantener mensajes visibles en español y nombres técnicos en inglés. Definir configuración y comandos reales después de incorporar `package.json` y Jest. La configuración CI es un issue de Sprint 1; todavía no hay pruebas automáticas ejecutándose en GitHub.
+Probar resultados esperados y límites temporales; fijar reloj en casos dependientes de hora; asegurar transacciones y concurrencia en integración; mantener mensajes visibles en español y nombres técnicos en inglés. El repositorio incluye `package.json` y Jest; el workflow básico se agrega en el issue #11. El proyecto aún no tiene `package-lock.json`, así que CI instala las versiones compatibles definidas en `package.json`.
 
