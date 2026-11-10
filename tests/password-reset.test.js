@@ -96,6 +96,7 @@ describe("patient password reset", () => {
       expiresAt: new Date(now.getTime() + TOKEN_TTL_MS)
     };
     const user = {
+      id: 7,
       role: "PATIENT",
       status: "ACTIVE",
       emailVerifiedAt: now,
