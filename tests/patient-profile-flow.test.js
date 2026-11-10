@@ -105,12 +105,16 @@ describe("patient profile web flow", () => {
 
   test("validates changes and keeps the current email until the new one is confirmed", async () => {
     const cookie = await login();
-    const page = await getForm("/perfil");
+    const pageResponse = await fetch(`${baseUrl}/perfil`, { headers: { cookie } });
+    const pageHtml = await pageResponse.text();
+    const token = pageHtml.match(/name="_csrf" value="([^"]+)"/)?.[1];
+    expect(pageResponse.status).toBe(200);
+    expect(token).toBeTruthy();
     const response = await fetch(`${baseUrl}/perfil`, {
       method: "POST",
       headers: { cookie, "content-type": "application/x-www-form-urlencoded" },
       body: new URLSearchParams({
-        _csrf: page.token,
+        _csrf: token,
         firstName: "Ana María",
         lastName: "Gómez",
         phone: "+573009998877",
