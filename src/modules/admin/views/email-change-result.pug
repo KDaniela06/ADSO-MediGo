@@ -1,0 +1,9 @@
+extends ../../../views/shared/layout.pug
+
+block content
+  main(class="mx-auto min-h-screen max-w-xl px-4 py-12")
+    section(class="rounded-2xl bg-white p-6 text-center shadow-sm ring-1 ring-slate-200 sm:p-8")
+      span(class="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-emerald-100 text-2xl text-emerald-700", aria-hidden="true") ✓
+      h1(class="mt-4 text-2xl font-bold text-medigo-navy") Correo actualizado
+      p(class="mt-3 text-sm text-slate-600")= message
+      a(class="mt-6 inline-flex rounded-lg bg-medigo-blue px-5 py-3 text-sm font-semibold text-white hover:bg-medigo-navy", href="/") Volver a MediGo
