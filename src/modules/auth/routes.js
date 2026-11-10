@@ -17,7 +17,7 @@ const VERIFICATION_MESSAGES = {
 function createAuthRouter({ sequelize = null, models = null, emailSender = null } = {}) {
   const router = Router();
 
-  const roleHome = { PATIENT: "/paciente", DOCTOR: "/medico/cambiar-contrasena", ADMIN: "/administrador/mi-cuenta" };
+  const roleHome = { PATIENT: "/paciente", DOCTOR: "/medico", ADMIN: "/administrador/mi-cuenta" };
 
   router.get("/iniciar-sesion", (request, response) => {
     response.set("Cache-Control", "no-store");

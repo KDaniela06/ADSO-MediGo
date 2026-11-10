@@ -4,6 +4,12 @@
 - Añadí la consulta de la próxima cita del paciente autenticado y los estados sin cita y error.
 - Incorporé pruebas del servicio y actualicé la documentación de rutas y validaciones.
 
+## 2026-11-10 — Panel principal del médico (US-DOC-01)
+
+- Preparé el resumen de jornada con citas de hoy, en curso, atendidas y la próxima cita.
+- Protegí el panel para médicos autenticados y mostré únicamente las citas asignadas a su cuenta.
+- Seguí el mockup compartido, ajusté el destino del inicio de sesión médico y añadí pruebas y documentación.
+
 # Registro de cambios
 
 Los cambios se registran en orden descendente. No se atribuyen funcionalidades de aplicación a cambios que solo añaden documentación.

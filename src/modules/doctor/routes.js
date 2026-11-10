@@ -2,9 +2,25 @@ const { Router } = require("express");
 const { requireAuthenticatedUser, requireRole } = require("../auth/middleware/authorization");
 const { validatePasswordChange } = require("../auth/validators/change-password");
 const { changeDoctorPassword } = require("./services/change-password");
+const { getDoctorDashboard } = require("./services/dashboard");
 
 function createDoctorRouter({ sequelize = null, models = null } = {}) {
   const router = Router();
+
+  router.get(
+    "/medico",
+    requireAuthenticatedUser({ models }),
+    requireRole("DOCTOR"),
+    async (request, response) => {
+      response.set("Cache-Control", "no-store");
+      const dashboard = await getDoctorDashboard({ models, userId: request.currentUser.id });
+      const statusCode = dashboard.status === "error" ? 503 : 200;
+      return response.status(statusCode).render("doctor/views/dashboard", {
+        title: "Panel médico",
+        dashboard
+      });
+    }
+  );
 
   router.get(
     "/medico/cambiar-contrasena",
