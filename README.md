@@ -37,6 +37,10 @@ El código está organizado por módulos dentro de `src/modules/` (`auth`, `pati
 
 Comandos disponibles: `npm start` construye el CSS y levanta el servidor; `npm test` ejecuta Jest; `npm run build:css` genera el CSS de producción.
 
+## Registro de pacientes
+
+El esquema propuesto para el registro está documentado en [USER_REGISTRATION_SCHEMA](docs/USER_REGISTRATION_SCHEMA.md). Con MySQL configurado en `.env`, ejecuta `npm run db:migrate` una vez para crear las tablas `users`, `patients` y `account_tokens`. La verificación por correo se incorpora en el issue #13.
+
 ## Flujo de contribución
 
 Trabajaremos un issue a la vez: rama desde `develop`, commits pequeños y frecuentes, pruebas/CI básico y PR hacia `develop`. El siguiente issue comienza cuando el PR actual esté abierto para revisión. No se cambiarán historias sin consultar primero.

@@ -8,6 +8,7 @@
     "start": "npm run build:css && node src/server.js",
     "dev": "concurrently \"nodemon --watch src src/server.js\" \"npm run watch:css\"",
     "build:css": "tailwindcss -i ./public/css/input.css -o ./public/css/app.css --minify",
+    "db:migrate": "node scripts/migrate.js",
     "watch:css": "tailwindcss -i ./public/css/input.css -o ./public/css/app.css --watch",
     "test": "jest --runInBand",
     "test:watch": "jest --watch"

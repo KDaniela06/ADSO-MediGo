@@ -1,37 +1,27 @@
 # Migraciones y datos iniciales
 
-## Estado
+## Estado actual
 
-No se encontraron Sequelize, configuración MySQL, modelos, migraciones o seeders en el repositorio inspeccionado. Este documento establece el procedimiento previsto; no indica que haya migraciones ejecutables.
+El issue #12 incluye una migración Sequelize para las tablas del flujo de registro de pacientes: `users`, `patients` y `account_tokens`. El runner registra cada migración aplicada en `schema_migrations`. Las otras tablas del inventario todavía no tienen migraciones.
 
-## Orden de implementación sugerido
+El diseño físico propuesto para esas tres tablas está en [USER_REGISTRATION_SCHEMA.md](USER_REGISTRATION_SCHEMA.md), sujeto a revisión en el PR del issue #12.
 
-1. Confirmar el diseño físico completo y los nombres pendientes de tablas.
-2. Crear tablas base: `users`, `specialties`.
-3. Crear perfiles `patients` y `doctors` con claves foráneas.
-4. Crear disponibilidad semanal, detalles y excepciones según el diseño aprobado.
-5. Crear `appointments` e índices/constraints para consistencia y concurrencia.
-6. Crear `consultations` y `consultation_addenda`.
-7. Crear `account_tokens`, `whatsapp_conversations`, `notification_outbox` y auditoría.
-8. Crear seeders exclusivamente para catálogos seguros; definir bootstrap administrativo sin credenciales predeterminadas publicadas.
+## Ejecutar la migración
 
-El orden definitivo depende de las claves foráneas del esquema original.
+1. Configura `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER` y `DB_PASSWORD` en `.env`.
+2. Ejecuta `npm run db:migrate`.
 
-## Prácticas
+El runner omite migraciones ya registradas. La migración exporta `down(queryInterface)` para rollback manual; el runner no aplica rollbacks. No se generan datos personales de pacientes en seeders y no se incluyen credenciales iniciales.
+
+## Convenciones
 
 - Una migración pequeña y reversible por cambio de esquema.
-- Nombres de archivos y código en inglés; descripciones de documentación en español.
-- No modificar migraciones ya aplicadas para simular cambios; añadir migración correctiva.
-- Mantener claves foráneas, unicidad, índices y tipos consistentes con MySQL.
-- No almacenar datos reales de pacientes en seeders.
-- No incluir contraseñas, tokens, códigos ni secretos en migraciones o fixtures.
-- Revisar cuidadosamente operaciones destructivas sobre datos antes de aplicar en cualquier entorno compartido.
+- Nombres técnicos en inglés y documentación funcional en español.
+- No editar migraciones aplicadas para simular cambios; agregar una migración correctiva.
+- Mantener claves foráneas, índices y restricciones únicas en la base de datos.
+- No almacenar contraseñas, tokens originales ni secretos en fixtures o migraciones.
+- Revisar cuidadosamente operaciones destructivas antes de ejecutarlas en un entorno compartido.
 
-## Datos iniciales
+## Próximos pasos
 
-Las especialidades de catálogo podrán sembrarse solo cuando exista una lista aprobada. El usuario administrador inicial debe crearse por procedimiento seguro de despliegue/configuración, no mediante registro público ni con una contraseña fija documentada.
-
-## Ejecución
-
-Los comandos se documentarán aquí cuando exista `package.json` y se haya elegido/configurado Sequelize CLI. Actualmente no hay comandos de migración disponibles.
-
+Completar las migraciones restantes cuando se implementen sus historias y se definan las columnas físicas correspondientes. Crear seeders solo para catálogos aprobados. El usuario administrador inicial se configurará por un procedimiento seguro de despliegue, nunca con una contraseña fija publicada.
