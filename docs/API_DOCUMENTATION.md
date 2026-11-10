@@ -78,6 +78,15 @@ La jornada se calcula según `America/Bogota`. Si no hay citas se muestra un est
 
 Las fechas se filtran y presentan en `America/Bogota`. El acceso a iniciar atención se muestra solo para citas confirmadas dentro de su bloque programado. No hay acciones para cancelar o reprogramar citas.
 
+## Pacientes asociados al médico — issue #28
+
+| Método y ruta | Acceso | Comportamiento |
+|---|---|---|
+| `GET /medico/pacientes` | Médico autenticado | Lista pacientes únicos que aparecen en citas asignadas al médico. Acepta búsqueda opcional `q` por nombre, identificación, teléfono o ciudad. |
+| `GET /medico/pacientes/:patientId` | Médico autenticado | Muestra datos básicos solo si existe una cita que asocia al paciente con ese médico; en otro caso devuelve 404. |
+
+La vista muestra información mínima de contacto y cantidad/fecha de citas asociadas. No presenta observaciones ni historia clínica. Los nombres se buscan sin distinguir mayúsculas ni tildes; los resultados se escapan en las vistas Pug.
+
 ## Cambio de contraseña del médico — issue #33
 
 | Método y ruta | Acceso | Comportamiento |

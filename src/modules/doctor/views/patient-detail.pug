@@ -1,0 +1,54 @@
+extends ../../../views/shared/layout.pug
+
+block content
+  .min-h-screen.bg-slate-50.text-slate-800(class="md:flex")
+    aside(class="bg-medigo-navy text-white md:min-h-screen md:w-64 md:shrink-0")
+      .flex.items-center.gap-3.px-5.py-4(class="md:flex-col md:items-start md:px-6 md:py-8")
+        a(href="/medico", aria-label="MediGo, inicio", class="text-2xl font-extrabold tracking-tight") Medi#[span(class="text-medigo-cyan") Go]
+        nav(aria-label="Navegación principal", class="ml-auto flex gap-2 overflow-x-auto text-sm md:ml-0 md:mt-10 md:w-full md:flex-col md:gap-1")
+          a(href="/medico", class="whitespace-nowrap rounded-lg px-3 py-2 hover:bg-white/10") Inicio
+          a(href="/medico/citas", class="whitespace-nowrap rounded-lg px-3 py-2 hover:bg-white/10") Mis citas
+          a(href="/medico/pacientes", aria-current="page", class="whitespace-nowrap rounded-lg bg-medigo-blue px-3 py-2 font-semibold") Mis pacientes
+          a(href="/medico/agenda", class="whitespace-nowrap rounded-lg px-3 py-2 hover:bg-white/10") Mi agenda
+          a(href="/medico/perfil", class="whitespace-nowrap rounded-lg px-3 py-2 hover:bg-white/10") Mi perfil
+        form(action="/cerrar-sesion", method="post", class="hidden md:mt-auto md:block md:w-full")
+          input(type="hidden", name="_csrf", value=csrfToken)
+          button(type="submit", class="mt-8 w-full rounded-lg px-3 py-2 text-left text-sm text-sky-100 hover:bg-white/10") Cerrar sesión
+
+    main(class="mx-auto w-full max-w-4xl px-4 py-6 sm:px-6 md:py-10")
+      a(href="/medico/pacientes", class="text-sm font-semibold text-medigo-blue hover:underline") ← Volver a mis pacientes
+      h1(class="mt-2 text-2xl font-bold text-medigo-navy sm:text-3xl") #{title}
+      if message
+        p(role="alert", class="mt-5 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900") #{message}
+      else if patient
+        section(class="mt-5 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7")
+          .flex.items-center.gap-4
+            span(aria-hidden="true", class="flex h-14 w-14 items-center justify-center rounded-full bg-sky-100 text-xl font-bold text-medigo-blue") #{patient.name.slice(0, 1).toUpperCase()}
+            div
+              h2(class="text-xl font-bold text-medigo-navy") #{patient.name}
+              p(class="text-sm text-slate-600") Paciente asociado a tu agenda
+          dl(class="mt-6 grid gap-4 border-t border-slate-100 pt-5 sm:grid-cols-2")
+            if patient.documentNumber
+              div
+                dt(class="text-xs font-semibold uppercase tracking-wide text-slate-500") Identificación
+                dd(class="mt-1 text-sm text-slate-800") #{patient.documentType} #{patient.documentNumber}
+            if patient.phone
+              div
+                dt(class="text-xs font-semibold uppercase tracking-wide text-slate-500") Teléfono
+                dd(class="mt-1 text-sm text-slate-800") #{patient.phone}
+            if patient.city
+              div
+                dt(class="text-xs font-semibold uppercase tracking-wide text-slate-500") Ciudad
+                dd(class="mt-1 text-sm text-slate-800") #{patient.city}
+            div
+              dt(class="text-xs font-semibold uppercase tracking-wide text-slate-500") Citas asociadas
+              dd(class="mt-1 text-sm text-slate-800") #{patient.appointmentCount}
+            if patient.lastAppointment
+              div
+                dt(class="text-xs font-semibold uppercase tracking-wide text-slate-500") Última cita
+                dd(class="mt-1 text-sm text-slate-800") #{patient.lastAppointment.date}
+          p(class="mt-6 rounded-xl bg-sky-50 p-4 text-sm text-slate-700") Esta vista muestra únicamente datos básicos de contacto y asociación. No incluye historia clínica ni observaciones de consultas.
+
+      form(action="/cerrar-sesion", method="post", class="mt-6 md:hidden")
+        input(type="hidden", name="_csrf", value=csrfToken)
+        button(type="submit", class="w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-700") Cerrar sesión

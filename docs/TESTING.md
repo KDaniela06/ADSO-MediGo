@@ -21,6 +21,7 @@ La aplicación incluye Jest y pruebas HTTP de humo para la página inicial y los
 | Cambio de contraseña | Confirmación de contraseña actual; mínimo de ocho caracteres; confirmación coincidente; autorización por rol; invalidación de enlaces pendientes; no exposición de contraseñas en mensajes. |
 | Panel principal del paciente | Cita futura más cercana del paciente autenticado; estado vacío si todavía no hay modelo o citas; error de consulta; datos de paciente y médico. |
 | Panel principal del médico | Citas del día y resumen por estado, próxima cita, aislamiento por médico y rango diario de America/Bogota; estados vacío y error. |
+| Pacientes asociados al médico | Pacientes únicos con citas del médico autenticado; búsqueda por campos básicos; detalle de paciente asociado; acceso por rol; no exposición de historia clínica ni observaciones. |
 | Citas asignadas del médico | Filtros válidos de fecha y estado; aislamiento por médico; detalle autorizado; acción de inicio solo dentro del bloque confirmado; sin cancelar ni reprogramar. |
 | Cuenta de administrador | Edición de campos propios; identificación y rol de solo lectura; correo pendiente hasta verificar; contraseña actual y nueva; autorización ADMIN; confirmación de correo de un solo uso; sin creación de administradores desde la cuenta. |
 | Cambio de contraseña de médico | Verificación de contraseña actual; nueva clave mínima; confirmación; autorización exclusiva para médicos; conservación del rol; errores sin datos sensibles; protección CSRF. |

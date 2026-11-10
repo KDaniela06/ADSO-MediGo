@@ -1,3 +1,9 @@
+## 2026-11-10 — Pacientes asociados al médico (US-DOC-03)
+
+- Añadí una lista con búsqueda por nombre, identificación, teléfono o ciudad y un detalle de información básica.
+- Limité ambas consultas a pacientes asociados a citas del médico autenticado; no incluí observaciones ni historia clínica.
+- Añadí pruebas y documenté las rutas y los casos de privacidad.
+
 ## 2026-11-10 — Citas asignadas del médico (US-DOC-02)
 
 - Añadí el listado con filtros de fecha y estado, y una vista de detalle que solo encuentra citas asignadas al médico que inició sesión.
