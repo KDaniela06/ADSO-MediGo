@@ -2,6 +2,12 @@
 
 Los cambios se registran en orden descendente. No se atribuyen funcionalidades de aplicación a cambios que solo añaden documentación.
 
+## 2026-11-10 — Cambio de contraseña de médico (US-DOC-08)
+
+- Se añadió el formulario y la ruta protegida para que un médico autenticado actualice su contraseña.
+- Se valida la contraseña actual, la nueva con mínimo de ocho caracteres y su confirmación; el rol permanece sin cambios.
+- Se reutilizó la verificación compartida de contraseña y se agregaron pruebas de servicio y del flujo web.
+
 ## 2026-11-10 — Cambio de contraseña del paciente (US-PAT-12)
 
 - Se añadió el formulario accesible desde el perfil para solicitar la contraseña actual, una nueva de mínimo ocho caracteres y su confirmación.
