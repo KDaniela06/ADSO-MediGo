@@ -48,7 +48,7 @@ La propuesta ya usada por el registro de pacientes se mantiene como referencia.
 | `first_name` | `VARCHAR(100)` | Obligatorio |
 | `last_name` | `VARCHAR(100)` | Obligatorio |
 | `email` | `VARCHAR(254)` | Obligatorio; minúsculas y único |
-| `pending_email` | `VARCHAR(254)` | Opcional; único entre cambios pendientes; solo se vuelve vigente al confirmar el enlace |\n
+| `pending_email` | `VARCHAR(254)` | Opcional; único entre cambios pendientes; solo se vuelve vigente al confirmar el enlace |
 | `phone` | `VARCHAR(30)` | Obligatorio |
 | `password_hash` | `VARCHAR(255)` | Obligatorio |
 | `role` | `ENUM('PATIENT','DOCTOR','ADMIN')` | Obligatorio |
