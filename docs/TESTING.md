@@ -19,6 +19,7 @@ La aplicación incluye Jest y pruebas HTTP de humo para la página inicial y los
 | Registro | Registro válido; menor de 18 rechazado; documento duplicado rechazado. |
 | Recuperación de contraseña | Mensaje genérico para correos desconocidos; hash y vencimiento de 30 minutos; token de un solo uso; límites de reenvío; contraseña y confirmación; enlaces usados o vencidos; protección CSRF. |
 | Cambio de contraseña | Confirmación de contraseña actual; mínimo de ocho caracteres; confirmación coincidente; autorización por rol; invalidación de enlaces pendientes; no exposición de contraseñas en mensajes. |
+| Cuenta de administrador | Edición de campos propios; identificación y rol de solo lectura; correo pendiente hasta verificar; contraseña actual y nueva; autorización ADMIN; confirmación de correo de un solo uso; sin creación de administradores desde la cuenta. |
 | Cambio de contraseña de médico | Verificación de contraseña actual; nueva clave mínima; confirmación; autorización exclusiva para médicos; conservación del rol; errores sin datos sensibles; protección CSRF. |
 | Perfil de paciente | Acceso autenticado; identificación no editable; campos de contacto validados; correo vigente conservado hasta verificar el nuevo; tokens de cambio usados o vencidos rechazados. |
 | Verificación de correo | Token enviado y almacenado como hash; activación válida; enlace vencido o usado; límites de reenvío. |
