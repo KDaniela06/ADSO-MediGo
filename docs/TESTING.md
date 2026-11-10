@@ -25,6 +25,6 @@ El esqueleto de la aplicación incluye Jest y una prueba de humo HTTP para la p�
 
 ## Criterios de calidad
 
-Probar resultados esperados y límites temporales; fijar reloj en casos dependientes de hora; asegurar transacciones y concurrencia en integración; mantener mensajes visibles en español y nombres técnicos en inglés. El repositorio incluye `package.json` y Jest; el workflow básico se agrega en el issue #11. El proyecto aún no tiene `package-lock.json`, así que CI instala las versiones compatibles definidas en `package.json`.
+Probar resultados esperados y límites temporales; fijar reloj en casos dependientes de hora; asegurar transacciones y concurrencia en integración; mantener mensajes visibles en español y nombres técnicos en inglés. El repositorio incluye Jest y `package-lock.json`. CI usa `npm ci` para instalar las mismas versiones en cada ejecución y luego ejecuta `npm test`. Para repetir estos pasos localmente, ejecuta `npm ci` y después `npm test`.
 
 
