@@ -1,7 +1,9 @@
 const { Router } = require("express");
 const { requireAuthenticatedUser, requireRole } = require("../auth/middleware/authorization");
+const { validatePatientProfile } = require("./validators/profile");
+const { confirmPatientEmailChange, getPatientProfile, updatePatientProfile } = require("./services/profile");
 
-function createPatientRouter({ models } = {}) {
+function createPatientRouter({ sequelize = null, models, emailSender = null } = {}) {
   const router = Router();
 
   router.get(
