@@ -37,6 +37,10 @@ El código está organizado por módulos dentro de `src/modules/` (`auth`, `pati
 
 Comandos disponibles: `npm start` construye el CSS y levanta el servidor; `npm test` ejecuta Jest; `npm run build:css` genera el CSS de producción.
 
+La página inicial puede abrirse sin MySQL. Para registrar e iniciar sesión, configura MySQL con las variables de `.env.example` y ejecuta `npm run db:migrate`. El acceso solo funciona para pacientes activos que hayan verificado su correo.
+
+Las sesiones en memoria están destinadas al desarrollo local. Antes de publicar la aplicación se debe configurar una tienda de sesiones persistente y un `SESSION_SECRET` propio.
+
 ## Registro de pacientes
 
 El esquema propuesto para el registro está documentado en [USER_REGISTRATION_SCHEMA](docs/USER_REGISTRATION_SCHEMA.md). Con MySQL configurado en `.env`, ejecuta `npm run db:migrate` para crear las tablas de registro y el índice de límites de verificación. Para entregar correo, configura `APP_BASE_URL` y los valores SMTP de `.env.example`. El paciente permanece sin acceso hasta verificar su correo.
