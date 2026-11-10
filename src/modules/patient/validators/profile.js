@@ -3,6 +3,7 @@ function validatePatientProfile(input) {
     firstName: String(input.firstName || "").trim(),
     lastName: String(input.lastName || "").trim(),
     phone: String(input.phone || "").trim(),
+    city: String(input.city || "").trim(),
     email: String(input.email || "").trim().toLowerCase()
   };
   const errors = {};
@@ -10,7 +11,7 @@ function validatePatientProfile(input) {
   for (const field of ["firstName", "lastName", "phone", "email"]) {
     if (!values[field]) errors[field] = "Este campo es obligatorio.";
   }
-  for (const [field, maxLength] of [["firstName", 100], ["lastName", 100], ["phone", 30], ["email", 254]]) {
+  for (const [field, maxLength] of [["firstName", 100], ["lastName", 100], ["phone", 30], ["email", 254], ["city", 100]]) {
     if (values[field].length > maxLength) {
       errors[field] = `Este campo no puede superar ${maxLength} caracteres.`;
     }
