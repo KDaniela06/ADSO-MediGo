@@ -4,7 +4,9 @@
 
 Los issues #12 y #13 incluyen migraciones Sequelize para las tablas del registro y verificación de pacientes: `users`, `patients`, `account_tokens` y `notification_outbox`, más el índice compuesto para aplicar los límites de reenvío. El runner registra cada migración aplicada en `schema_migrations`. Las otras tablas del inventario todavía no tienen migraciones.
 
-El diseño físico propuesto para esas tres tablas está en [USER_REGISTRATION_SCHEMA.md](USER_REGISTRATION_SCHEMA.md), sujeto a revisión en el PR del issue #12.\nLa historia #22 incorpora la migración `202611100002-add-patient-profile-email-change`: añade `users.pending_email`, su índice único y el propósito `EMAIL_CHANGE` a `account_tokens`. El correo vigente no se reemplaza hasta que el paciente confirme el enlace.\n
+El diseño físico propuesto para esas tres tablas está en [USER_REGISTRATION_SCHEMA.md](USER_REGISTRATION_SCHEMA.md), sujeto a revisión en el PR del issue #12.
+La historia #22 incorpora la migración `202611100002-add-patient-profile-email-change`: añade `users.pending_email`, su índice único y el propósito `EMAIL_CHANGE` a `account_tokens`. El correo vigente no se reemplaza hasta que el paciente confirme el enlace.
+
 
 ## Ejecutar la migración
 
