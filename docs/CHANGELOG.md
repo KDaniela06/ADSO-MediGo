@@ -6,7 +6,7 @@ Los cambios se registran en orden descendente. No se atribuyen funcionalidades d
 
 - Se añadió la pantalla para actualizar datos propios, con identificación y rol de solo lectura.
 - El correo nuevo queda pendiente hasta confirmar un enlace de un solo uso; también se añadió el formulario para cambiar contraseña.
-- Se protegieron las operaciones por sesión y rol ADMIN, y se añadieron pruebas y documentación. La cuenta no permite crear otros administradores.
+- Se protegieron las operaciones por sesión y rol ADMIN, y se añadieron pruebas y documentación. El inicio de sesión ahora dirige médicos y administradores a sus espacios protegidos. La cuenta no permite crear otros administradores.
 
 ## 2026-11-10 — Cambio de contraseña de médico (US-DOC-08)
 
