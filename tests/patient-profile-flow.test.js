@@ -98,7 +98,7 @@ describe("patient profile web flow", () => {
     expect(response.status).toBe(200);
     expect(html).toContain("Mi perfil");
     expect(html).toContain("123456789");
-    expect(html).toContain("readonly");
+    expect(html).not.toContain('name="documentNumber"');
     expect(html).toContain("ana@example.com");
     expect(html).toContain("name=\"phone\"");
   });
