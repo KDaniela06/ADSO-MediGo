@@ -1,71 +1,51 @@
 # Diseño de datos
 
-## Estado de la especificación
+## Estado
 
-El contexto maestro declara un diseño físico inicial aprobado de 15 tablas, pero no proporciona el diagrama ni nombres/columnas físicos completos. Esta documentación registra las entidades confirmadas y las reglas conocidas; no es un DDL definitivo. En particular, no inventa los nombres de las cuatro tablas de disponibilidad/excepciones ni el nombre de la tabla de auditoría.
+El diseño físico propuesto para las 15 tablas fue aprobado por la autora al fusionar el PR #55. El detalle de columnas, relaciones, restricciones y decisiones está en [DATABASE_PHYSICAL_PROPOSAL.md](DATABASE_PHYSICAL_PROPOSAL.md).
 
-## Esquema concreto del registro de pacientes
+El modelo se elaboró con las historias de usuario, reglas de negocio y mockups disponibles. No se encontró un diagrama físico previo; por eso se conserva como diseño del proyecto acordado, no como transcripción de un artefacto externo. Las historias se mantienen sin cambios.
 
-La propuesta física de `users`, `patients` y `account_tokens` necesaria para US-PAT-01 se define en [USER_REGISTRATION_SCHEMA.md](USER_REGISTRATION_SCHEMA.md) y se implementa mediante la migración del issue #12. El resto del inventario de 15 entidades conserva los pendientes indicados en este documento.
-
-## Inventario declarado
+## Inventario aprobado
 
 1. `users`
 2. `patients`
 3. `doctors`
 4. `specialties`
-5. Tabla de bloques de disponibilidad semanal (nombre por recuperar)
-6. Tabla de detalle/días de disponibilidad (nombre por recuperar)
-7. Tabla de excepciones de horario (nombre por recuperar)
-8. Tabla de detalle de excepciones (nombre por recuperar)
+5. `doctor_weekly_schedules`
+6. `doctor_weekly_schedule_blocks`
+7. `doctor_schedule_exceptions`
+8. `doctor_schedule_exception_blocks`
 9. `appointments`
 10. `consultations`
 11. `consultation_addenda`
 12. `account_tokens`
 13. `whatsapp_conversations`
 14. `notification_outbox`
-15. Tabla de auditoría (nombre por recuperar)
+15. `audit_logs`
 
-## Entidades y datos confirmados
+## Relaciones principales
 
-| Entidad | Datos/propósito conocidos |
-|---|---|
-| `users` | Identidad compartida, tipo/número de documento, nombres/apellidos, correo/teléfono, hash de contraseña, rol, estado, verificación de correo y fechas. Documento compuesto único y correo único. |
-| `patients` | Información específica y relación con un usuario. El contexto no detalla columnas adicionales. |
-| `doctors` | Perfil profesional relacionado con usuario y especialidad: registro profesional y descripción/fotografía opcionales, estado. |
-| `specialties` | Catálogo de especialidades y estado. |
-| Disponibilidad (4 tablas) | Bloques semanales, días/detalles y excepciones por periodo. Nombres y columnas exactos pendientes. |
-| `appointments` | Cita y relaciones con paciente, médico y horario; estado y fechas de atención requeridos por reglas. Columnas exactas pendientes. |
-| `consultations` | Atención ligada a cita; observación original y ciclo de atención. |
-| `consultation_addenda` | Aclaraciones inmutables relacionadas a consulta, autor, contenido y fecha/hora. |
-| `account_tokens` | Hash del token, propósito, expiración, uso y control de límites. Nunca token original. |
-| `whatsapp_conversations` | Estado conversacional con vencimiento por inactividad. |
-| `notification_outbox` | Destinatario, tipo, canal, estado, intentos, creación/envío y último error. |
-| Auditoría | Acción sensible y responsable. Tabla y columnas exactas pendientes. |
-
-## Relaciones confirmadas
-
-- `users` 1:0..1 `patients` y `users` 1:0..1 `doctors`.
-- `specialties` 1:N `doctors`.
-- `patients` 1:N `appointments`; `doctors` 1:N `appointments`.
+- `users` 1:0..1 `patients` y 1:0..1 `doctors`.
+- `specialties` 1:N `doctors` y 1:N `appointments`.
+- `doctors` 1:N `doctor_weekly_schedules` y 1:N `doctor_schedule_exceptions`.
+- Las configuraciones semanales y excepciones tienen sus respectivos bloques de detalle.
+- `patients` y `doctors` 1:N `appointments`.
 - `appointments` 1:0..1 `consultations`; `consultations` 1:N `consultation_addenda`.
-- Usuario y tokens de cuenta; paciente y conversaciones WhatsApp.
-- Usuarios relacionados con notificaciones y registros de auditoría.
-- Citas relacionadas con disponibilidad e historial de cambios.
+- `users` 1:N `account_tokens` y 1:N `audit_logs`.
+- `patients` 1:N `whatsapp_conversations`; los avisos se registran en `notification_outbox`.
 
-Las cardinalidades opcionales y nombres de FK deben confirmarse en el diseño físico original.
+## Reglas de persistencia
 
-## Integridad y persistencia
+- MySQL con InnoDB y `utf8mb4`; la versión mínima se define antes de implementar restricciones dependientes de versión.
+- Instantes persistidos en UTC con precisión de milisegundos; la interfaz los presenta en `America/Bogota`.
+- Unicidad para correo, identificación compuesta, perfil por usuario, registro profesional y WhatsApp vinculado.
+- Las operaciones de reserva y reprogramación usan transacciones y validación de concurrencia en base de datos.
+- `audit_logs` conserva actor y cambios operativos permitidos; nunca guarda contraseñas, tokens, códigos ni observaciones clínicas.
+- Las observaciones clínicas son visibles solo para el médico autorizado; la aplicación aplica autorización en servidor.
+- Contraseñas, tokens y códigos de verificación se almacenan mediante hashes seguros, nunca en texto plano.
+- Este diseño no incorpora diagnósticos, prescripciones ni una historia clínica completa.
 
-- Claves foráneas y restricciones únicas para correo e identificación compuesta.
-- Índices para búsquedas frecuentes, con diseño final basado en consultas reales.
-- Validación centralizada de estados y valores permitidos.
-- Transacciones para reservar/reprogramar/cancelar y operaciones administrativas multi-registro.
-- Protección contra doble reserva concurrente en la base de datos, no solo en lógica de aplicación.
-- No confiar únicamente en validaciones ORM para invariantes críticas.
+## Implementación
 
-## Decisiones pendientes antes de migrar
-
-Recuperar el documento físico aprobado, confirmar cuatro nombres de tablas de horarios, tabla de auditoría, campos/FK/índices, estrategia para historial de cambios de citas y constraints que MySQL soportará. No generar migraciones finales hasta resolverlos.
-
-
+El diseño lógico aprobado no equivale a que las 15 tablas estén implementadas. Las migraciones se agregan por issues funcionales en ramas separadas y pasan por PR a `develop`. Las tablas de registro y verificación de cuenta se documentan en [USER_REGISTRATION_SCHEMA.md](USER_REGISTRATION_SCHEMA.md) y fueron abordadas en los issues #12 y #13.
