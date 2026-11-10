@@ -35,7 +35,11 @@ describe("administrator account pages", () => {
       },
       AccountToken: {
         update: jest.fn().mockResolvedValue([1]),
-        create: jest.fn().mockImplementation(async (values) => ({ id: 50, ...values })),
+        create: jest.fn().mockImplementation(async (values) => {
+        createdToken = { id: 50, ...values };
+        createdTokenHash = values.tokenHash;
+        return createdToken;
+      }),
         findOne: jest.fn().mockImplementation(async ({ where }) => {
           return where.tokenHash === createdTokenHash ? createdToken : null;
         })
@@ -88,6 +92,7 @@ describe("administrator account pages", () => {
     expect(anonymous.status).toBe(303);
     expect(anonymous.headers.get("location")).toBe("/iniciar-sesion");
 
+    user.role = "PATIENT";
     const cookie = await login();
     user.role = "ADMIN";
     const page = await getPage("/administrador/mi-cuenta", cookie);
@@ -126,9 +131,9 @@ describe("administrator account pages", () => {
 
     const sent = emailSender.sendEmailChangeVerification.mock.calls.at(-1)[0];
     const rawToken = new URL(sent.url).pathname.split("/").at(-1);
-    const record = models.AccountToken.create.mock.results.at(-1).value;
-    createdToken = { ...record, userId: user.id, usedAt: null, expiresAt: new Date(Date.now() + 60_000) };
-    createdTokenHash = record.tokenHash;
+    createdToken.userId = user.id;
+    createdToken.usedAt = null;
+    createdToken.expiresAt = new Date(Date.now() + 60_000);
 
     const confirmPage = await getPage(new URL(sent.url).pathname, cookie);
     const confirmed = await fetch(`${baseUrl}${new URL(sent.url).pathname}`, {
