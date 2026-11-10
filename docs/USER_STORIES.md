@@ -60,12 +60,15 @@ El inventario consolidado está en [MediTurno_35_Historias_de_Usuario.md](MediTu
 
 ## Estado y trazabilidad
 
-Las historias pertenecen a Sprint 0 y requieren revisión/aprobación indicada en la fuente. Ya tienen issues individuales en GitHub, con su contenido copiado sin cambios y una asignación propuesta a sprint. No existen todavía ramas de desarrollo, pull requests, commits funcionales ni implementación. No marcar historias como implementadas o verificadas sin evidencia.
+Las 35 historias conservan sus identificadores y criterios en el documento fuente, sin cambios. Se revisó el documento consolidado durante el cierre del Sprint 0. Las decisiones de alcance aprobadas se registran aquí; esto no afirma una aprobación general ni una implementación de las 35 historias.
 
-## Diferencias que requieren resolver antes de implementar
+## Decisiones de alcance aprobadas
 
-- El documento fuente usa **MediTurno** en su título, pero la autora confirmó que el nombre oficial del producto es **MediGo**. Mantener MediGo en documentación de proyecto; no editar el archivo fuente de historias sin autorización.
-- La fuente menciona **Supertest**, zona horaria `America/Bogota` con instantes almacenados en UTC y protección CSRF. Estos detalles no aparecen en el contexto maestro original. Confirmar su aprobación y alcance, especialmente la nueva dependencia Supertest.
-- La historia US-PAT-14 propone verificación mediante documento dentro del flujo del bot; confirmar el mecanismo antes de implementarlo para no tratar el documento como único factor de autenticación.
-- Algunas historias mencionan dashboard/operaciones administrativas que deben seguir respetando la restricción de no exponer observaciones clínicas al administrador.
-
+- El nombre del producto es **MediGo**. El título histórico de la fuente se conserva sin editar.
+- El inicio de sesión del alcance usa correo y contraseña. El acceso con Google que aparece en el mockup no se implementa por ahora.
+- CI básico con Jest; no se agrega Supertest.
+- Los instantes se almacenan en UTC y se presentan en la zona `America/Bogota`.
+- Se conserva protección CSRF.
+- El flujo de WhatsApp requiere un número previamente vinculado y verificado; el documento no se usa como único factor para operar el bot.
+- Las observaciones clínicas solo son accesibles para el médico autorizado; el administrador no las consulta.
+- Estas decisiones aclaran la implementación y no modifican el texto ni los criterios de aceptación de las historias. Si una historia requiere cambiarse, se consulta antes a la autora.
