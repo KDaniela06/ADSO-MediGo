@@ -1,14 +1,72 @@
 extends ../../../views/shared/layout.pug
 
 block content
-  main(class="mx-auto min-h-screen max-w-5xl px-4 py-10 sm:px-6")
-    header(class="flex items-center justify-between border-b border-slate-200 pb-5")
-      a(class="text-2xl font-extrabold text-medigo-navy", href="/") Medi#[span(class="text-medigo-cyan") Go]
-      form(action="/cerrar-sesion", method="post")
+  .min-h-screen.bg-slate-50.text-slate-800(class="md:flex")
+    aside(class="bg-medigo-navy text-white md:min-h-screen md:w-64 md:shrink-0")
+      .flex.items-center.gap-3.px-5.py-4(class="md:flex-col md:items-start md:px-6 md:py-8")
+        a(href="/paciente", aria-label="MediGo, inicio", class="text-2xl font-extrabold tracking-tight") Medi#[span(class="text-medigo-cyan") Go]
+        nav(aria-label="Navegación principal", class="ml-auto flex gap-2 overflow-x-auto text-sm md:ml-0 md:mt-10 md:w-full md:flex-col md:gap-1")
+          a(href="/paciente", aria-current="page", class="whitespace-nowrap rounded-lg bg-medigo-blue px-3 py-2 font-semibold") Inicio
+          a(href="/mis-citas", class="whitespace-nowrap rounded-lg px-3 py-2 hover:bg-white/10") Mis citas
+          a(href="/perfil", class="whitespace-nowrap rounded-lg px-3 py-2 hover:bg-white/10") Mi perfil
+          a(href="/whatsapp", class="whitespace-nowrap rounded-lg px-3 py-2 hover:bg-white/10") WhatsApp
+        form(action="/cerrar-sesion", method="post", class="hidden md:mt-auto md:block md:w-full")
+          input(type="hidden", name="_csrf", value=csrfToken)
+          button(type="submit", class="mt-8 w-full rounded-lg px-3 py-2 text-left text-sm text-sky-100 hover:bg-white/10") Cerrar sesión
+
+    main(class="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 md:py-10")
+      header(class="mb-6 flex items-center justify-between")
+        div
+          p(class="text-sm font-semibold uppercase tracking-wider text-medigo-blue") Área de paciente
+          h1(class="mt-1 text-2xl font-bold text-medigo-navy sm:text-3xl") Hola, #{currentUser.firstName}
+          p(class="mt-1 text-sm text-slate-600") Tu salud, en buenas manos
+        div(class="hidden items-center gap-3 rounded-full bg-white px-3 py-2 shadow-sm sm:flex")
+          span(class="flex h-9 w-9 items-center justify-center rounded-full bg-sky-100 font-bold text-medigo-blue") #{(currentUser.firstName || "P").slice(0, 1).toUpperCase()}
+          span(class="text-sm font-semibold") #{currentUser.firstName}
+
+      section(aria-label="Accesos rápidos", class="grid grid-cols-2 gap-3 sm:grid-cols-4")
+        a(href="/citas/reservar", class="group rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md")
+          span(aria-hidden="true", class="text-2xl") ＋
+          span(class="mt-2 block font-semibold text-medigo-navy") Reservar cita
+        a(href="/mis-citas", class="group rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md")
+          span(aria-hidden="true", class="text-2xl") ▣
+          span(class="mt-2 block font-semibold text-medigo-navy") Mis citas
+        a(href="/historial", class="group rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md")
+          span(aria-hidden="true", class="text-2xl") ▤
+          span(class="mt-2 block font-semibold text-medigo-navy") Historial
+        a(href="/perfil", class="group rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md")
+          span(aria-hidden="true", class="text-2xl") ◉
+          span(class="mt-2 block font-semibold text-medigo-navy") Mi perfil
+
+      .mt-6.grid.gap-5(class="lg:grid-cols-3")
+        section(aria-labelledby="next-appointment-title", class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm lg:col-span-2 sm:p-6")
+          .flex.items-center.justify-between
+            h2#next-appointment-title(class="text-xl font-bold text-medigo-navy") Próximas citas
+            a(href="/mis-citas", class="text-sm font-semibold text-medigo-blue hover:underline") Ver todas →
+          if dashboard && dashboard.status === "ready" && dashboard.appointment
+            article(class="mt-5 flex flex-col gap-4 rounded-xl bg-sky-50 p-4 sm:flex-row sm:items-center")
+              div(class="min-w-20 rounded-xl bg-white px-3 py-2 text-center text-sm font-semibold capitalize text-medigo-blue shadow-sm")
+                span(class="block") #{dashboard.appointment.date}
+                span(class="mt-1 block text-slate-600") #{dashboard.appointment.time}
+              div(class="flex-1")
+                h3(class="font-bold text-medigo-navy") #{dashboard.appointment.specialtyName}
+                p(class="mt-1 text-sm text-slate-600") Dr(a). #{dashboard.appointment.doctorName}
+              span(class="w-fit rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-800") #{dashboard.appointment.status}
+          else if dashboard && dashboard.status === "error"
+            p(role="alert", class="mt-5 rounded-xl bg-amber-50 p-4 text-sm text-amber-900") No pudimos cargar tus citas. Inténtalo de nuevo más tarde.
+          else
+            div(class="mt-5 rounded-xl bg-sky-50 p-5")
+              h3(class="font-semibold text-medigo-navy") Aún no tienes citas próximas
+              p(class="mt-1 text-sm text-slate-600") Cuando reserves una cita, podrás consultar aquí su fecha y los datos del médico.
+              a(href="/citas/reservar", class="mt-4 inline-flex rounded-lg bg-medigo-blue px-4 py-2 text-sm font-semibold text-white hover:bg-medigo-navy") Reservar una cita
+
+        section(aria-labelledby="whatsapp-title", class="flex flex-col justify-between rounded-2xl bg-cyan-50 p-5 sm:p-6")
+          div
+            span(aria-hidden="true", class="text-3xl") ☎
+            h2#whatsapp-title(class="mt-3 text-xl font-bold text-medigo-navy") ¿Necesitas ayuda?
+            p(class="mt-2 text-sm text-slate-700") Chatea con nuestro asistente en WhatsApp.
+          a(href="/whatsapp", class="mt-5 inline-flex w-fit items-center rounded-lg bg-medigo-blue px-4 py-2.5 text-sm font-semibold text-white hover:bg-medigo-navy") Abrir WhatsApp ↗
+
+      form(action="/cerrar-sesion", method="post", class="mt-6 md:hidden")
         input(type="hidden", name="_csrf", value=csrfToken)
-        button(class="rounded-lg border border-medigo-blue px-4 py-2 text-sm font-semibold text-medigo-blue hover:bg-sky-50", type="submit") Cerrar sesión
-    section(class="mt-10 rounded-2xl bg-gradient-to-r from-medigo-navy to-medigo-blue p-8 text-white sm:p-10")
-      p(class="text-sm font-semibold uppercase tracking-wider text-sky-100") Área de paciente
-      h1(class="mt-2 text-3xl font-bold") Hola, #{currentUser.firstName}
-      p(class="mt-3 max-w-xl text-sky-50") Iniciaste sesión en MediGo. Aquí encontrarás tus opciones para gestionar tu cuenta y tus citas.
-    a(class="mt-6 inline-flex rounded-lg bg-white px-5 py-3 font-semibold text-medigo-blue shadow ring-1 ring-slate-200 hover:bg-sky-50", href="/perfil") Consultar y editar mi perfil
+        button(type="submit", class="w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-700") Cerrar sesión
