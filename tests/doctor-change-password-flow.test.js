@@ -99,8 +99,8 @@ describe("doctor change password pages", () => {
   });
 
   test("does not allow a patient to use the doctor password route", async () => {
-    const cookie = await login("new-password-456");
     user.role = "PATIENT";
+    const cookie = await login("new-password-456");
     const response = await fetch(`${baseUrl}/medico/cambiar-contrasena`, { headers: { cookie } });
     expect(response.status).toBe(403);
     expect(user.role).toBe("PATIENT");
