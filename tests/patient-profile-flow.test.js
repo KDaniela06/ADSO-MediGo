@@ -32,7 +32,7 @@ describe("patient profile web flow", () => {
         }),
         findByPk: jest.fn().mockResolvedValue(user)
       },
-      Patient: { findOne: jest.fn().mockResolvedValue({ dateOfBirth: "1995-05-01" }) },
+      Patient: { findOne: jest.fn().mockResolvedValue({ dateOfBirth: "1995-05-01", city: "Bogotá", save: jest.fn().mockResolvedValue(undefined) }) },
       AccountToken: {
         count: jest.fn().mockResolvedValue(0),
         findOne: jest.fn().mockResolvedValue(null),
@@ -118,7 +118,8 @@ describe("patient profile web flow", () => {
         firstName: "Ana María",
         lastName: "Gómez",
         phone: "+573009998877",
-        email: "ana.nueva@example.com"
+        email: "ana.nueva@example.com",
+        city: "Medellín"
       }).toString()
     });
     const html = await response.text();
