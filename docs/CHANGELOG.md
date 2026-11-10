@@ -2,6 +2,13 @@
 
 Los cambios se registran en orden descendente. No se atribuyen funcionalidades de aplicación a cambios que solo añaden documentación.
 
+## 2026-11-10 — Perfil del paciente (US-PAT-11)
+
+- Se añadió la pantalla, siguiendo el mockup, para consultar identificación y datos de contacto, incluida ciudad opcional; la identificación queda de solo lectura.
+- Se incorporó la edición de nombres y teléfono con validaciones y autorización por sesión y rol.
+- El cambio de correo queda pendiente hasta confirmar un enlace de un solo uso; se añadieron migraciones para reservar la dirección nueva y guardar la ciudad opcional.
+- Se añadieron pruebas de servicio y del flujo web, y se documentaron rutas y esquema.
+
 ## 2026-11-10 — Recuperación de contraseña (US-PAT-04)
 
 - Se añadieron formularios para pedir un enlace y establecer una contraseña nueva.

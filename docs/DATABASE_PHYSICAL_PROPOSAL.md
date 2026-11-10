@@ -1,6 +1,6 @@
 # Propuesta de diseño físico de la base de datos
 
-> **Estado: diseño físico propuesto aprobado por la autora.** Se elaboró a partir de las historias de usuario, reglas de negocio y vistas disponibles en `design/mockups/`; no se encontró un diagrama físico previo con los nombres y columnas originales. La autora aprobó esta propuesta al fusionar el PR #55. Este documento no cambia las historias ni crea migraciones.
+> **Estado: diseño físico propuesto aprobado por la autora.** Se elaboró a partir de las historias de usuario, reglas de negocio y vistas disponibles en `design/mockups/`; no se encontró un diagrama físico previo con los nombres y columnas originales. La autora aprobó la propuesta base al fusionar el PR #55. Las historias #22 y posteriores pueden añadir cambios incrementales de esquema mediante sus migraciones sin modificar los criterios originales.
 
 ## Criterios usados
 
@@ -48,6 +48,7 @@ La propuesta ya usada por el registro de pacientes se mantiene como referencia.
 | `first_name` | `VARCHAR(100)` | Obligatorio |
 | `last_name` | `VARCHAR(100)` | Obligatorio |
 | `email` | `VARCHAR(254)` | Obligatorio; minúsculas y único |
+| `pending_email` | `VARCHAR(254)` | Opcional; único entre cambios pendientes; solo se vuelve vigente al confirmar el enlace |
 | `phone` | `VARCHAR(30)` | Obligatorio |
 | `password_hash` | `VARCHAR(255)` | Obligatorio |
 | `role` | `ENUM('PATIENT','DOCTOR','ADMIN')` | Obligatorio |
@@ -208,7 +209,7 @@ Una cita tiene como máximo una consulta. La observación original queda inmutab
 |---|---|---|
 | `id` | `BIGINT UNSIGNED` | PK |
 | `user_id` | `BIGINT UNSIGNED` | FK a `users.id` |
-| `purpose` | `ENUM('EMAIL_VERIFICATION','PASSWORD_RESET','DOCTOR_INVITATION')` | Obligatorio |
+| `purpose` | `ENUM('EMAIL_VERIFICATION','PASSWORD_RESET','EMAIL_CHANGE','DOCTOR_INVITATION')` | Obligatorio |
 | `token_hash` | `CHAR(64)` | Único; SHA-256 |
 | `expires_at` | `DATETIME(3)` | Obligatorio |
 | `used_at` | `DATETIME(3)` | Opcional |

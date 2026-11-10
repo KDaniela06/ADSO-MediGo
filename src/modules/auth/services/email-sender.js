@@ -38,6 +38,18 @@ function createEmailSender(environment = process.env) {
       });
     },
 
+    async sendEmailChangeVerification({ to, firstName, url, expiresInHours }) {
+      const safeName = escapeHtml(firstName || "paciente");
+      const safeUrl = escapeHtml(url);
+      await transporter.sendMail({
+        from: environment.SMTP_FROM,
+        to,
+        subject: "Confirma tu nuevo correo en MediGo",
+        text: `Hola ${firstName || ""}. Confirma tu nuevo correo en este enlace: ${url}. El enlace vence en ${expiresInHours} horas. Si no solicitaste este cambio, ignora este mensaje.`,
+        html: `<p>Hola ${safeName},</p><p>Recibimos una solicitud para cambiar el correo de tu cuenta de MediGo.</p><p><a href="${safeUrl}">Confirmar nuevo correo</a></p><p>El enlace vence en ${expiresInHours} horas y solo se puede utilizar una vez.</p><p>Si no solicitaste este cambio, ignora este mensaje.</p>`
+      });
+    },
+
     async sendPasswordResetEmail({ to, firstName, url, expiresInMinutes }) {
       const safeName = escapeHtml(firstName || "paciente");
       const safeUrl = escapeHtml(url);

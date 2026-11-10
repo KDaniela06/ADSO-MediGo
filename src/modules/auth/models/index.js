@@ -8,6 +8,7 @@ function initializeAuthModels(sequelize) {
     firstName: { type: DataTypes.STRING(100), allowNull: false, field: "first_name" },
     lastName: { type: DataTypes.STRING(100), allowNull: false, field: "last_name" },
     email: { type: DataTypes.STRING(254), allowNull: false, unique: true },
+    pendingEmail: { type: DataTypes.STRING(254), allowNull: true, unique: true, field: "pending_email" },
     phone: { type: DataTypes.STRING(30), allowNull: false },
     passwordHash: { type: DataTypes.STRING(255), allowNull: false, field: "password_hash" },
     role: { type: DataTypes.ENUM("PATIENT", "DOCTOR", "ADMIN"), allowNull: false },
@@ -29,6 +30,7 @@ function initializeAuthModels(sequelize) {
       references: { model: "users", key: "id" }
     },
     dateOfBirth: { type: DataTypes.DATEONLY, allowNull: false, field: "date_of_birth" },
+    city: { type: DataTypes.STRING(100), allowNull: true },
     termsAcceptedAt: { type: DataTypes.DATE(3), allowNull: false, field: "terms_accepted_at" },
     termsVersion: { type: DataTypes.STRING(32), allowNull: false, field: "terms_version" },
     privacyAcceptedAt: { type: DataTypes.DATE(3), allowNull: false, field: "privacy_accepted_at" },
@@ -43,7 +45,7 @@ function initializeAuthModels(sequelize) {
       field: "user_id",
       references: { model: "users", key: "id" }
     },
-    purpose: { type: DataTypes.ENUM("EMAIL_VERIFICATION", "PASSWORD_RESET"), allowNull: false },
+    purpose: { type: DataTypes.ENUM("EMAIL_VERIFICATION", "PASSWORD_RESET", "EMAIL_CHANGE"), allowNull: false },
     tokenHash: { type: DataTypes.CHAR(64), allowNull: false, unique: true, field: "token_hash" },
     expiresAt: { type: DataTypes.DATE(3), allowNull: false, field: "expires_at" },
     usedAt: { type: DataTypes.DATE(3), allowNull: true, field: "used_at" }

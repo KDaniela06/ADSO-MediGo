@@ -15,7 +15,8 @@ Los nombres y tipos son una propuesta concreta para revisión dentro del PR del 
 | `document_number` | `VARCHAR(30)` | Obligatorio; normalizado en servidor |
 | `first_name` | `VARCHAR(100)` | Obligatorio |
 | `last_name` | `VARCHAR(100)` | Obligatorio |
-| `email` | `VARCHAR(254)` | Obligatorio; guardar en minúsculas |
+| `email` | `VARCHAR(254)` | Obligatorio; guardar en minúsculas y único |
+| `pending_email` | `VARCHAR(254)` | Opcional y único; se activa al confirmar el enlace de cambio |
 | `phone` | `VARCHAR(30)` | Obligatorio |
 | `password_hash` | `VARCHAR(255)` | Obligatorio; nunca almacenar contraseña plana |
 | `role` | `ENUM('PATIENT','DOCTOR','ADMIN')` | Obligatorio |
@@ -33,6 +34,7 @@ Restricciones: `UNIQUE(document_type, document_number)` y `UNIQUE(email)`. La ap
 | `id` | `BIGINT UNSIGNED` | PK, autoincremental |
 | `user_id` | `BIGINT UNSIGNED` | Obligatorio, FK a `users.id`, único |
 | `date_of_birth` | `DATE` | Obligatorio; mínimo 18 años validado en servidor |
+| `city` | `VARCHAR(100)` | Opcional; editable desde el perfil |
 | `terms_accepted_at` | `DATETIME(3)` | Obligatorio |
 | `terms_version` | `VARCHAR(32)` | Obligatorio |
 | `privacy_accepted_at` | `DATETIME(3)` | Obligatorio |
@@ -48,13 +50,13 @@ La aceptación de las condiciones y de la política se registra con fecha y vers
 |---|---|---|
 | `id` | `BIGINT UNSIGNED` | PK, autoincremental |
 | `user_id` | `BIGINT UNSIGNED` | Obligatorio, FK a `users.id` |
-| `purpose` | `ENUM('EMAIL_VERIFICATION','PASSWORD_RESET')` | Obligatorio |
+| `purpose` | `ENUM('EMAIL_VERIFICATION','PASSWORD_RESET','EMAIL_CHANGE')` | Obligatorio |
 | `token_hash` | `CHAR(64)` | Obligatorio, único; SHA-256 del token aleatorio |
 | `expires_at` | `DATETIME(3)` | Obligatorio |
 | `used_at` | `DATETIME(3)` | Nulo mientras no se use |
 | `created_at` | `DATETIME(3)` | Obligatorio |
 
-El token original se genera con un generador criptográfico, se entrega solo al usuario por el transporte SMTP configurado y no se guarda en la base de datos. La validez de 24 horas se controla con `expires_at`.
+El token original se genera con un generador criptográfico, se entrega solo al usuario por el transporte SMTP configurado y no se guarda en la base de datos. La validez de 24 horas se controla con `expires_at`. El propósito `EMAIL_CHANGE` permite confirmar una nueva dirección sin reemplazar el correo actual antes de tiempo.
 
 El índice compuesto `(user_id, purpose, created_at)` permite contar solicitudes de reenvío por propósito durante la última hora. El registro de token se escribe antes de enviar el correo; así un fallo de entrega tampoco reinicia el límite.
 
