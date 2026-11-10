@@ -1,3 +1,9 @@
+## 2026-11-10 — Panel principal del paciente (US-PAT-05)
+
+- Rediseñé el panel para seguir el mockup compartido, con navegación adaptable, accesos principales y un espacio de ayuda por WhatsApp.
+- Añadí la consulta de la próxima cita del paciente autenticado y los estados sin cita y error.
+- Incorporé pruebas del servicio y actualicé la documentación de rutas y validaciones.
+
 # Registro de cambios
 
 Los cambios se registran en orden descendente. No se atribuyen funcionalidades de aplicación a cambios que solo añaden documentación.
