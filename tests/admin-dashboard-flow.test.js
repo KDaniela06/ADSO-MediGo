@@ -30,7 +30,7 @@ describe("administrator dashboard page", () => {
     };
     server = createApp({ models }).listen(0);
     await new Promise((resolve) => server.once("listening", resolve));
-    baseUrl = \`http://127.0.0.1:\${server.address().port}\`;
+    baseUrl = `http://127.0.0.1:${server.address().port}`;
   });
 
   afterAll(async () => {
@@ -38,11 +38,11 @@ describe("administrator dashboard page", () => {
   });
 
   async function login() {
-    const page = await fetch(\`\${baseUrl}/iniciar-sesion\`);
+    const page = await fetch(`${baseUrl}/iniciar-sesion`);
     const html = await page.text();
     const cookie = page.headers.get("set-cookie").split(";")[0];
     const token = html.match(/name="_csrf" value="([^"]+)"/)?.[1];
-    const response = await fetch(\`\${baseUrl}/iniciar-sesion\`, {
+    const response = await fetch(`${baseUrl}/iniciar-sesion`, {
       method: "POST",
       headers: { cookie, "content-type": "application/x-www-form-urlencoded" },
       body: new URLSearchParams({ _csrf: token, email: user.email, password }).toString(),
@@ -54,10 +54,10 @@ describe("administrator dashboard page", () => {
   }
 
   test("requires an administrator and shows privacy-safe indicators and shortcuts", async () => {
-    const anonymous = await fetch(\`\${baseUrl}/administrador\`, { redirect: "manual" });
+    const anonymous = await fetch(`${baseUrl}/administrador`, { redirect: "manual" });
     expect(anonymous.status).toBe(303);
     const cookie = await login();
-    const response = await fetch(\`\${baseUrl}/administrador\`, { headers: { cookie } });
+    const response = await fetch(`${baseUrl}/administrador`, { headers: { cookie } });
     const html = await response.text();
     expect(response.status).toBe(200);
     expect(response.headers.get("cache-control")).toContain("no-store");
@@ -74,7 +74,7 @@ describe("administrator dashboard page", () => {
   test("rejects non-administrator accounts", async () => {
     const cookie = await login();
     user.role = "PATIENT";
-    const response = await fetch(\`\${baseUrl}/administrador\`, { headers: { cookie } });
+    const response = await fetch(`${baseUrl}/administrador`, { headers: { cookie } });
     expect(response.status).toBe(403);
     user.role = "ADMIN";
   });
