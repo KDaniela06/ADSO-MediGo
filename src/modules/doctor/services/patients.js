@@ -1,5 +1,3 @@
-const { Op } = require("sequelize");
-
 const TIME_ZONE = "America/Bogota";
 
 function plain(record) {
