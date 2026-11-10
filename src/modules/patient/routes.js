@@ -1,6 +1,8 @@
 const { Router } = require("express");
 const { requireAuthenticatedUser, requireRole } = require("../auth/middleware/authorization");
 const { validatePatientProfile } = require("./validators/profile");
+const { validatePatientPasswordChange } = require("./validators/change-password");
+const { changePatientPassword } = require("./services/change-password");
 const { confirmPatientEmailChange, getPatientProfile, updatePatientProfile } = require("./services/profile");
 
 function createPatientRouter({ sequelize = null, models, emailSender = null } = {}) {
@@ -131,6 +133,56 @@ function createPatientRouter({ sequelize = null, models, emailSender = null } = 
       });
     }
   });
+
+  router.get(
+    "/cambiar-contrasena",
+    requireAuthenticatedUser({ models }),
+    requireRole("PATIENT"),
+    (request, response) => {
+      response.set("Cache-Control", "no-store");
+      return response.status(200).render("patient/views/change-password", {
+        title: "Cambiar contraseña", errors: {}, message: null
+      });
+    }
+  );
+
+  router.post(
+    "/cambiar-contrasena",
+    requireAuthenticatedUser({ models }),
+    requireRole("PATIENT"),
+    async (request, response) => {
+      response.set("Cache-Control", "no-store");
+      const { errors, isValid } = validatePatientPasswordChange(request.body || {});
+      if (!isValid) return response.status(422).render("patient/views/change-password", {
+        title: "Cambiar contraseña", errors, message: null
+      });
+      if (!sequelize || !models) return response.status(503).render("patient/views/change-password", {
+        title: "Cambiar contraseña", errors: {},
+        message: "No fue posible cambiar la contraseña en este momento. Inténtalo más tarde."
+      });
+
+      try {
+        const result = await changePatientPassword({
+          sequelize, models, userId: request.currentUser.id,
+          currentPassword: request.body.currentPassword,
+          newPassword: request.body.newPassword
+        });
+        if (result.status === "changed") return response.status(200).render("patient/views/change-password", {
+          title: "Contraseña actualizada", errors: {},
+          message: "Tu contraseña se actualizó correctamente."
+        });
+        return response.status(400).render("patient/views/change-password", {
+          title: "Cambiar contraseña", errors: {},
+          message: "No pudimos cambiar la contraseña. Revisa los datos e inténtalo de nuevo."
+        });
+      } catch {
+        return response.status(503).render("patient/views/change-password", {
+          title: "Cambiar contraseña", errors: {},
+          message: "No fue posible cambiar la contraseña en este momento. Inténtalo más tarde."
+        });
+      }
+    }
+  );
 
   return router;
 }
