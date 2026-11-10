@@ -2,6 +2,13 @@
 
 Los cambios se registran en orden descendente. No se atribuyen funcionalidades de aplicación a cambios que solo añaden documentación.
 
+## 2026-11-10 — Cierre de planificación del Sprint 0
+
+- Se documentó como aprobado el diseño físico propuesto de 15 tablas a partir de historias, reglas de negocio y mockups revisados.
+- Se registraron las decisiones aprobadas de autenticación, pruebas, zona horaria, CSRF, verificación de WhatsApp y acceso a observaciones clínicas.
+- Se completó la revisión visual de las siete vistas recibidas y se aclaró que Google no forma parte del alcance actual.
+- No se modificó el documento fuente de historias ni se añadieron migraciones.
+
 ## 2026-11-10 — Verificación de correo (US-PAT-02)
 
 - Se añadió envío de enlaces de verificación por SMTP configurable y activación de cuentas con token de un solo uso, vencimiento de 24 horas y almacenamiento únicamente del hash.
