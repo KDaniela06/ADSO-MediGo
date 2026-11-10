@@ -94,7 +94,7 @@ Este sprint agrupa la verificación final de integración, seguridad, CI, prueba
 2. Hacer commits pequeños y frecuentes con mensajes técnicos en inglés.
 3. Ejecutar las pruebas básicas pertinentes y revisar el CI del PR.
 4. Abrir un PR hacia `develop` y enlazar el issue.
-5. No comenzar el siguiente issue hasta abrir el PR actual para revisión.
+5. No comenzar el siguiente issue hasta que la autora haya revisado y fusionado el PR actual.
 6. Consultar a la autora antes de cambiar una historia o sus criterios.
 
 ## Conteo
