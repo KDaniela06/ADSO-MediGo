@@ -51,13 +51,6 @@ async function updatePatientProfile({ sequelize, models, userId, input, emailSen
     user.phone = phone;
 
     if (!emailChanged) {
-      if (user.pendingEmail) {
-        await AccountToken.update({ usedAt: now }, {
-          where: { userId: user.id, purpose: EMAIL_CHANGE_PURPOSE, usedAt: null },
-          transaction
-        });
-        user.pendingEmail = null;
-      }
       await user.save({ transaction });
       return { status: "saved" };
     }
