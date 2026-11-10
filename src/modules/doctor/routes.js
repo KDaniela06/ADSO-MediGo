@@ -5,6 +5,7 @@ const { changeDoctorPassword } = require("./services/change-password");
 const { getDoctorDashboard } = require("./services/dashboard");
 const { getDoctorAppointment, getDoctorAppointments, APPOINTMENT_STATUSES } = require("./services/appointments");
 const { validateAppointmentFilters } = require("./validators/appointments");
+const { getDoctorPatient, getDoctorPatients } = require("./services/patients");
 
 function createDoctorRouter({ sequelize = null, models = null } = {}) {
   const router = Router();
@@ -45,6 +46,48 @@ function createDoctorRouter({ sequelize = null, models = null } = {}) {
         filters: result.filters,
         errors: {},
         appointmentStatuses: APPOINTMENT_STATUSES
+      });
+    }
+  );
+
+  router.get(
+    "/medico/pacientes",
+    requireAuthenticatedUser({ models }),
+    requireRole("DOCTOR"),
+    async (request, response) => {
+      response.set("Cache-Control", "no-store");
+      const search = String(request.query?.q || "").trim().slice(0, 80);
+      const result = await getDoctorPatients({ models, userId: request.currentUser.id, search });
+      const statusCode = result.status === "error" ? 503 : 200;
+      return response.status(statusCode).render("doctor/views/patients", {
+        title: "Mis pacientes",
+        status: result.status,
+        search: result.search,
+        patients: result.patients
+      });
+    }
+  );
+
+  router.get(
+    "/medico/pacientes/:patientId",
+    requireAuthenticatedUser({ models }),
+    requireRole("DOCTOR"),
+    async (request, response) => {
+      response.set("Cache-Control", "no-store");
+      const result = await getDoctorPatient({
+        models, userId: request.currentUser.id, patientId: request.params.patientId
+      });
+      const statusCode = result.status === "ready" ? 200
+        : result.status === "not_found" ? 404 : 503;
+      const message = result.status === "not_found"
+        ? "No encontramos un paciente asociado a tus citas."
+        : result.status === "unavailable" || result.status === "error"
+          ? "No fue posible cargar la información en este momento."
+          : null;
+      return response.status(statusCode).render("doctor/views/patient-detail", {
+        title: result.status === "ready" ? "Detalle del paciente" : "Paciente no disponible",
+        patient: result.patient || null,
+        message
       });
     }
   );
