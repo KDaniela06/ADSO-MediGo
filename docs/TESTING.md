@@ -24,12 +24,13 @@ La aplicación incluye Jest y pruebas HTTP de humo para la página inicial y los
 | Pacientes asociados al médico | Pacientes únicos con citas del médico autenticado; búsqueda por campos básicos; detalle de paciente asociado; acceso por rol; no exposición de historia clínica ni observaciones. |
 | Agenda y perfil del médico | Agenda semanal de solo lectura; perfil propio; teléfono validado; descripción con límite; fotografía solo por URL HTTPS; especialidad y registro de solo lectura; autorización por rol y estados de agenda vacía/no configurada. |
 | Citas asignadas del médico | Filtros válidos de fecha y estado; aislamiento por médico; detalle autorizado; acción de inicio solo dentro del bloque confirmado; sin cancelar ni reprogramar. |
+| Panel principal del administrador | Conteo de pacientes y médicos activos; citas de hoy y atendidas; resumen semanal agregado; accesos de administración; autorización ADMIN; estados vacío, error y no disponible; sin acceso a notas clínicas. |
 | Cuenta de administrador | Edición de campos propios; identificación y rol de solo lectura; correo pendiente hasta verificar; contraseña actual y nueva; autorización ADMIN; confirmación de correo de un solo uso; sin creación de administradores desde la cuenta. |
 | Cambio de contraseña de médico | Verificación de contraseña actual; nueva clave mínima; confirmación; autorización exclusiva para médicos; conservación del rol; errores sin datos sensibles; protección CSRF. |
 | Perfil de paciente | Acceso autenticado; identificación no editable; campos de contacto validados; correo vigente conservado hasta verificar el nuevo; tokens de cambio usados o vencidos rechazados. |
 | Verificación de correo | Token enviado y almacenado como hash; activación válida; enlace vencido o usado; límites de reenvío. |
 | Citas | Reserva libre; horario ocupado rechazado; anticipación menor de 30 minutos rechazada; segunda cita futura confirmada rechazada; cancelación según ventana. |
-| Inicio de sesión por rol | Paciente, médico y administrador activos con correo verificado; redirección a página permitida; cuenta inactiva o no verificada rechazada. |
+| Inicio de sesión por rol | Paciente, médico y administrador activos con correo verificado; redirección a página permitida (panel de administrador para ADMIN); cuenta inactiva o no verificada rechazada. |
 | Seguridad | Credenciales inválidas con respuesta genérica; cuenta no verificada rechazada; sesión protegida; CSRF obligatorio; cierre de sesión y rutas por rol. |
 | Consulta | Inicio dentro de horario permitido; rechazo fuera de ventana; observación original preservada tras finalizar. |
 | WhatsApp | Código incorrecto/vencido; número no vinculado rechazado. |

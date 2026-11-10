@@ -1,3 +1,10 @@
+## 2026-11-10 — Panel principal del administrador (US-ADM-01)
+
+- Añadí indicadores agregados de pacientes, médicos activos, citas de hoy y citas atendidas.
+- Incorporé el resumen semanal y accesos a usuarios, médicos, especialidades, horarios, excepciones y citas.
+- Dejé la consulta protegida para ADMIN y excluí información clínica de los indicadores.
+- Añadí pruebas del servicio, permisos y pantalla, y actualicé la documentación.
+
 ## 2026-11-10 — Agenda y perfil del médico (US-DOC-07)
 
 - Añadí la consulta de agenda semanal en modo solo lectura, con estados claros cuando todavía no hay horario configurado.

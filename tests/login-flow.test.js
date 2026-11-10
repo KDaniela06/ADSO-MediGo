@@ -92,7 +92,7 @@ describe("patient login flow", () => {
   test("sends doctors and administrators to their own protected pages", async () => {
     for (const [role, path] of [
       ["DOCTOR", "/medico"],
-      ["ADMIN", "/administrador/mi-cuenta"]
+      ["ADMIN", "/administrador"]
     ]) {
       user.role = role;
       const form = await getLoginForm();

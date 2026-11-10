@@ -5,10 +5,21 @@ const { confirmAccountEmailChange } = require("../auth/services/account-email-ch
 const { validatePasswordChange } = require("../auth/validators/change-password");
 const { getAdminAccount, updateAdminAccount } = require("./services/account");
 const { validateAdminAccount } = require("./validators/account");
+const { getAdminDashboard } = require("./services/dashboard");
 
 function createAdminRouter({ sequelize = null, models = null, emailSender = null } = {}) {
   const router = Router();
   const requireAdmin = [requireAuthenticatedUser({ models }), requireRole("ADMIN")];
+
+  router.get("/administrador", ...requireAdmin, async (request, response) => {
+    response.set("Cache-Control", "no-store");
+    const dashboard = await getAdminDashboard({ models });
+    const statusCode = dashboard.status === "error" ? 503 : 200;
+    return response.status(statusCode).render("admin/views/dashboard", {
+      title: "Panel de administración",
+      dashboard
+    });
+  });
 
   router.get("/administrador/mi-cuenta", ...requireAdmin, async (request, response) => {
     response.set("Cache-Control", "no-store");

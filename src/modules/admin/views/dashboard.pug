@@ -1,0 +1,138 @@
+extends ../../../views/shared/layout.pug
+
+block content
+  .min-h-screen.bg-slate-100.text-slate-800(class="lg:flex")
+    aside(class="bg-medigo-navy text-white lg:flex lg:w-64 lg:flex-col lg:shrink-0")
+      a(class="flex items-center gap-3 px-6 py-5 text-2xl font-extrabold", href="/administrador", aria-label="MediGo, inicio")
+        span(class="flex h-11 w-11 items-center justify-center rounded-xl bg-medigo-cyan text-2xl", aria-hidden="true") ✚
+        span Medi#[span(class="text-medigo-cyan") Go]
+      nav(class="flex gap-1 overflow-x-auto px-3 pb-3 lg:block lg:flex-1 lg:space-y-1 lg:px-3 lg:py-5", aria-label="Navegación de administrador")
+        a(class="flex shrink-0 items-center gap-3 rounded-xl bg-medigo-cyan px-4 py-3 text-sm font-semibold text-white", href="/administrador", aria-current="page")
+          span(class="w-5 text-center", aria-hidden="true") ⌂
+          span Inicio
+        a(class="flex shrink-0 items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-sky-100 hover:bg-white/10", href="/administrador/usuarios")
+          span(class="w-5 text-center", aria-hidden="true") ♙
+          span Usuarios
+        a(class="flex shrink-0 items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-sky-100 hover:bg-white/10", href="/administrador/medicos")
+          span(class="w-5 text-center", aria-hidden="true") ⚕
+          span Médicos
+        a(class="flex shrink-0 items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-sky-100 hover:bg-white/10", href="/administrador/especialidades")
+          span(class="w-5 text-center", aria-hidden="true") ▦
+          span Especialidades
+        a(class="flex shrink-0 items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-sky-100 hover:bg-white/10", href="/administrador/horarios")
+          span(class="w-5 text-center", aria-hidden="true") ◷
+          span Horarios
+        a(class="flex shrink-0 items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-sky-100 hover:bg-white/10", href="/administrador/excepciones")
+          span(class="w-5 text-center", aria-hidden="true") ▤
+          span Excepciones
+        a(class="flex shrink-0 items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-sky-100 hover:bg-white/10", href="/administrador/citas")
+          span(class="w-5 text-center", aria-hidden="true") ▣
+          span Citas
+        a(class="flex shrink-0 items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-sky-100 hover:bg-white/10", href="/administrador/mi-cuenta")
+          span(class="w-5 text-center", aria-hidden="true") ◉
+          span Mi cuenta
+      form(class="hidden border-t border-white/15 p-4 lg:block", action="/cerrar-sesion", method="post")
+        input(type="hidden", name="_csrf", value=csrfToken)
+        button(class="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-sm font-medium text-sky-100 hover:bg-white/10", type="submit")
+          span(class="w-5 text-center", aria-hidden="true") ⇥
+          span Cerrar sesión
+
+    section(class="min-w-0 flex-1")
+      header(class="flex h-16 items-center justify-end gap-4 border-b border-slate-200 bg-white px-5 sm:px-8")
+        form(class="lg:hidden", action="/cerrar-sesion", method="post")
+          input(type="hidden", name="_csrf", value=csrfToken)
+          button(class="rounded-lg border border-medigo-blue px-3 py-2 text-xs font-semibold text-medigo-blue", type="submit") Salir
+        a(class="flex items-center gap-2 text-sm font-semibold text-medigo-navy", href="/administrador/mi-cuenta")
+          span(class="flex h-9 w-9 items-center justify-center rounded-full bg-medigo-blue text-sm font-semibold text-white") #{(currentUser.firstName || "A")[0]}#{(currentUser.lastName || "")[0] || ""}
+          span(class="hidden sm:block") #{currentUser.firstName || "Admin"} #{currentUser.lastName || ""}
+          span(class="text-slate-500", aria-hidden="true") ▾
+
+      main(class="mx-auto max-w-7xl px-4 py-7 sm:px-8")
+        header(class="mb-6")
+          p(class="text-sm font-semibold uppercase tracking-wide text-medigo-blue") MediGo
+          h1(class="mt-1 text-2xl font-bold text-medigo-navy sm:text-3xl") Panel de administración
+          p(class="mt-1 text-sm text-slate-600") Resumen general del sistema
+
+        if dashboard.status === "error"
+          p(role="alert", class="mb-5 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900") No pudimos cargar los indicadores. Inténtalo de nuevo más tarde.
+        else if dashboard.status === "unavailable"
+          p(role="status", class="mb-5 rounded-xl border border-sky-200 bg-sky-50 p-4 text-sm text-sky-900") Los indicadores todavía no están disponibles.
+
+        - const counts = dashboard.counts
+        section(aria-label="Indicadores del sistema", class="grid gap-3 sm:grid-cols-2 xl:grid-cols-4")
+          article(class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm")
+            div(class="flex items-center justify-between")
+              p(class="text-sm font-medium text-slate-600") Pacientes
+              span(class="flex h-10 w-10 items-center justify-center rounded-xl bg-sky-50 text-lg text-medigo-blue", aria-hidden="true") ♙
+            p(class="mt-3 text-3xl font-bold text-medigo-navy")= counts.patients
+            p(class="mt-1 text-xs text-slate-500") Registrados en MediGo
+          article(class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm")
+            div(class="flex items-center justify-between")
+              p(class="text-sm font-medium text-slate-600") Médicos activos
+              span(class="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-50 text-lg text-indigo-700", aria-hidden="true") ⚕
+            p(class="mt-3 text-3xl font-bold text-medigo-navy")= counts.activeDoctors
+            p(class="mt-1 text-xs text-slate-500") Cuentas habilitadas
+          article(class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm")
+            div(class="flex items-center justify-between")
+              p(class="text-sm font-medium text-slate-600") Citas de hoy
+              span(class="flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-50 text-lg text-cyan-800", aria-hidden="true") ▣
+            p(class="mt-3 text-3xl font-bold text-medigo-navy")= counts.appointmentsToday
+            p(class="mt-1 text-xs text-slate-500") Hora local de Colombia
+          article(class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm")
+            div(class="flex items-center justify-between")
+              p(class="text-sm font-medium text-slate-600") Consultas atendidas hoy
+              span(class="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-lg text-emerald-700", aria-hidden="true") ✓
+            p(class="mt-3 text-3xl font-bold text-medigo-navy")= counts.attendedToday
+            p(class="mt-1 text-xs text-slate-500") Según el estado de la cita
+
+        .mt-5.grid.gap-5(class="xl:grid-cols-3")
+          section(aria-labelledby="weekly-title", class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm xl:col-span-2 sm:p-6")
+            div(class="flex items-center justify-between")
+              div
+                h2#weekly-title(class="text-lg font-bold text-medigo-navy") Citas por semana
+                p(class="mt-1 text-sm text-slate-500") Distribución de citas registradas, sin datos clínicos.
+              a(href="/administrador/citas", class="text-sm font-semibold text-medigo-blue hover:underline") Ver citas →
+            if dashboard.weeklyAppointments.some((day) => day.count > 0)
+              ul(class="mt-5 grid grid-cols-7 gap-2 sm:gap-4")
+                each day in dashboard.weeklyAppointments
+                  li(class="min-w-0 text-center")
+                    progress(max=dashboard.weeklyScale, value=day.count, aria-label=day.label + ": " + day.count + " citas", class="h-2 w-full accent-medigo-blue")
+                    p(class="mt-2 text-xs font-semibold text-slate-600")= day.label
+                    p(class="text-xs text-slate-500")= day.count
+            else
+              p(class="mt-5 rounded-xl bg-slate-50 p-4 text-sm text-slate-600") Todavía no hay citas registradas esta semana.
+
+          section(aria-labelledby="shortcuts-title", class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6")
+            h2#shortcuts-title(class="text-lg font-bold text-medigo-navy") Accesos rápidos
+            p(class="mt-1 text-sm text-slate-500") Administración del sistema
+            ul(class="mt-4 space-y-2")
+              li
+                a(href="/administrador/usuarios", class="flex items-center gap-3 rounded-xl bg-sky-50 px-3 py-3 text-sm font-semibold text-medigo-navy hover:bg-sky-100")
+                  span(class="text-medigo-blue", aria-hidden="true") ♙
+                  span Gestionar usuarios
+              li
+                a(href="/administrador/medicos", class="flex items-center gap-3 rounded-xl bg-sky-50 px-3 py-3 text-sm font-semibold text-medigo-navy hover:bg-sky-100")
+                  span(class="text-medigo-blue", aria-hidden="true") ⚕
+                  span Gestionar médicos
+              li
+                a(href="/administrador/especialidades", class="flex items-center gap-3 rounded-xl bg-sky-50 px-3 py-3 text-sm font-semibold text-medigo-navy hover:bg-sky-100")
+                  span(class="text-medigo-blue", aria-hidden="true") ▦
+                  span Ver especialidades
+              li
+                a(href="/administrador/horarios", class="flex items-center gap-3 rounded-xl bg-sky-50 px-3 py-3 text-sm font-semibold text-medigo-navy hover:bg-sky-100")
+                  span(class="text-medigo-blue", aria-hidden="true") ◷
+                  span Consultar horarios
+              li
+                a(href="/administrador/excepciones", class="flex items-center gap-3 rounded-xl bg-sky-50 px-3 py-3 text-sm font-semibold text-medigo-navy hover:bg-sky-100")
+                  span(class="text-medigo-blue", aria-hidden="true") ▤
+                  span Ver excepciones
+              li
+                a(href="/administrador/citas", class="flex items-center gap-3 rounded-xl bg-sky-50 px-3 py-3 text-sm font-semibold text-medigo-navy hover:bg-sky-100")
+                  span(class="text-medigo-blue", aria-hidden="true") ▣
+                  span Gestionar citas
+
+        if dashboard.status === "empty"
+          p(role="status", class="mt-5 rounded-xl bg-sky-50 p-4 text-sm text-slate-700") Aún no hay actividad para mostrar en el sistema.
+        form(action="/cerrar-sesion", method="post", class="mt-6 lg:hidden")
+          input(type="hidden", name="_csrf", value=csrfToken)
+          button(type="submit", class="w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-700") Cerrar sesión
