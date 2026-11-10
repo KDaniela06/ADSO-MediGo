@@ -34,6 +34,7 @@ Restricciones: `UNIQUE(document_type, document_number)` y `UNIQUE(email)`. La ap
 | `id` | `BIGINT UNSIGNED` | PK, autoincremental |
 | `user_id` | `BIGINT UNSIGNED` | Obligatorio, FK a `users.id`, único |
 | `date_of_birth` | `DATE` | Obligatorio; mínimo 18 años validado en servidor |
+| `city` | `VARCHAR(100)` | Opcional; editable desde el perfil |
 | `terms_accepted_at` | `DATETIME(3)` | Obligatorio |
 | `terms_version` | `VARCHAR(32)` | Obligatorio |
 | `privacy_accepted_at` | `DATETIME(3)` | Obligatorio |
