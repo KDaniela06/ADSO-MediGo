@@ -30,7 +30,7 @@ No se permite registro público de administradores. Las cuentas médicas son cre
 
 | Tecnología | Uso previsto |
 |---|---|
-| Node.js y JavaScript | Entorno y lenguaje principal. La versión 24.15.0 se anotó durante la planificación; debe verificarse en el entorno de desarrollo. |
+| Node.js y JavaScript | Entorno y lenguaje principal. La versión 24.15.0 se verificó en el entorno de desarrollo y quedó fijada en `.nvmrc` y en el requisito de `package.json`. |
 | Express.js | Servidor HTTP y rutas. |
 | Pug | Plantillas renderizadas en servidor. |
 | Tailwind CSS | Estilos de la interfaz. |
