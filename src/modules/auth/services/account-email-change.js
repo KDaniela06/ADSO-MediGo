@@ -22,6 +22,13 @@ async function requestAccountEmailChange({ sequelize, models, userId, role, emai
 
     if (normalizedEmail === String(user.email || "").trim().toLowerCase()) {
       Object.assign(user, updates);
+      if (user.pendingEmail) {
+        await AccountToken.update({ usedAt: now }, {
+          where: { userId: user.id, purpose: EMAIL_CHANGE_PURPOSE, usedAt: null },
+          transaction
+        });
+        user.pendingEmail = null;
+      }
       await user.save({ transaction });
       return { status: "saved" };
     }
