@@ -5,6 +5,7 @@ const PURPOSE = "EMAIL_VERIFICATION";
 const TOKEN_TTL_MS = 24 * 60 * 60 * 1000;
 const RESEND_WAIT_MS = 60 * 1000;
 const HOURLY_REQUEST_LIMIT = 5;
+const MAX_DELIVERY_ATTEMPTS = 3;
 
 function hashToken(token) {
   return createHash("sha256").update(token).digest("hex");
@@ -15,7 +16,7 @@ function verificationUrl(token, baseUrl) {
 }
 
 async function requestEmailVerification({ sequelize, models, email, emailSender, baseUrl, now = new Date() }) {
-  const { User, AccountToken } = models;
+  const { User, AccountToken, NotificationOutbox } = models;
   const normalizedEmail = String(email || "").trim().toLowerCase();
   const request = await sequelize.transaction(async (transaction) => {
     const user = await User.findOne({
@@ -50,16 +51,25 @@ async function requestEmailVerification({ sequelize, models, email, emailSender,
     });
 
     const token = randomBytes(32).toString("base64url");
-    await AccountToken.create({
+    const accountToken = await AccountToken.create({
       userId: user.id,
       purpose: PURPOSE,
       tokenHash: hashToken(token),
       expiresAt: new Date(now.getTime() + TOKEN_TTL_MS),
       usedAt: null
     }, { transaction });
+    const notification = await NotificationOutbox.create({
+      accountTokenId: accountToken.id,
+      recipient: user.email,
+      notificationType: PURPOSE,
+      channel: "EMAIL",
+      status: "PENDING",
+      attempts: 0
+    }, { transaction });
 
     return {
       status: "issued",
+      notificationId: notification.id,
       token,
       recipient: user.email,
       firstName: user.firstName
@@ -67,20 +77,41 @@ async function requestEmailVerification({ sequelize, models, email, emailSender,
   });
 
   if (request.status !== "issued") return { status: "accepted" };
-  if (!emailSender) return { status: "delivery_failed" };
-
-  try {
-    await emailSender.sendVerificationEmail({
-      to: request.recipient,
-      firstName: request.firstName,
-      url: verificationUrl(request.token, baseUrl),
-      expiresInHours: 24
-    });
-    return { status: "sent" };
-  } catch {
-    // The token row remains so failed delivery still consumes the resend quota.
+  if (!emailSender) {
+    await NotificationOutbox.update({ status: "FAILED", lastError: "SMTP_NOT_CONFIGURED" }, { where: { id: request.notificationId } });
     return { status: "delivery_failed" };
   }
+
+  let attempts = 0;
+  let delivered = false;
+  while (attempts < MAX_DELIVERY_ATTEMPTS) {
+    attempts += 1;
+    try {
+      await emailSender.sendVerificationEmail({
+        to: request.recipient,
+        firstName: request.firstName,
+        url: verificationUrl(request.token, baseUrl),
+        expiresInHours: 24
+      });
+      delivered = true;
+      break;
+    } catch {
+      // Retry the same outbox item and token; do not log message or transport details.
+    }
+  }
+
+  if (delivered) {
+    await NotificationOutbox.update({ status: "SENT", attempts, sentAt: new Date(), lastError: null }, {
+      where: { id: request.notificationId }
+    });
+    return { status: "sent" };
+  }
+
+  await NotificationOutbox.update({ status: "FAILED", attempts, lastError: "SMTP_DELIVERY_FAILED" }, {
+    where: { id: request.notificationId }
+  });
+  // The token row remains so failed delivery still consumes the resend quota.
+  return { status: "delivery_failed" };
 }
 
 async function verifyEmailToken({ sequelize, models, token, now = new Date() }) {
@@ -115,6 +146,7 @@ async function verifyEmailToken({ sequelize, models, token, now = new Date() }) 
 
 module.exports = {
   HOURLY_REQUEST_LIMIT,
+  MAX_DELIVERY_ATTEMPTS,
   PURPOSE,
   RESEND_WAIT_MS,
   TOKEN_TTL_MS,
