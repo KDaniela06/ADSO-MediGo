@@ -2,7 +2,7 @@
 
 ## Estado actual
 
-Los issues #12 y #13 incluyen migraciones Sequelize para las tablas del registro y verificación de pacientes: `users`, `patients`, `account_tokens`, más el índice compuesto para aplicar los límites de reenvío. El runner registra cada migración aplicada en `schema_migrations`. Las otras tablas del inventario todavía no tienen migraciones.
+Los issues #12 y #13 incluyen migraciones Sequelize para las tablas del registro y verificación de pacientes: `users`, `patients`, `account_tokens` y `notification_outbox`, más el índice compuesto para aplicar los límites de reenvío. El runner registra cada migración aplicada en `schema_migrations`. Las otras tablas del inventario todavía no tienen migraciones.
 
 El diseño físico propuesto para esas tres tablas está en [USER_REGISTRATION_SCHEMA.md](USER_REGISTRATION_SCHEMA.md), sujeto a revisión en el PR del issue #12.
 
