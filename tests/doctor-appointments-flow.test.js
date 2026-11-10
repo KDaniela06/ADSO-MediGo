@@ -45,7 +45,7 @@ describe("doctor appointments web flow", () => {
       Specialty: {},
       Appointment: {
         findAll: jest.fn().mockResolvedValue([appointment]),
-        findOne: jest.fn().mockImplementation(async ({ where }) => where.id === appointment.id ? appointment : null)
+        findOne: jest.fn().mockImplementation(async ({ where }) => String(where.id) === String(appointment.id) ? appointment : null)
       }
     };
     server = createApp({ models }).listen(0);
