@@ -21,8 +21,12 @@ describe("email verification", () => {
       update: jest.fn().mockResolvedValue([0]),
       create: jest.fn().mockImplementation(async (values) => {
         accountToken.createdValues = values;
-        return values;
+        return { id: 12, ...values };
       })
+    };
+    const NotificationOutbox = {
+      create: jest.fn().mockResolvedValue({ id: 21 }),
+      update: jest.fn().mockResolvedValue([1])
     };
     const userModel = { findOne: jest.fn().mockResolvedValue(user) };
     const sequelize = { transaction: jest.fn((callback) => callback(transaction)) };
@@ -30,7 +34,7 @@ describe("email verification", () => {
 
     const result = await requestEmailVerification({
       sequelize,
-      models: { User: userModel, AccountToken: accountToken },
+      models: { User: userModel, AccountToken: accountToken, NotificationOutbox },
       email: "PATIENT@example.com",
       emailSender,
       baseUrl: "https://medigo.example",
@@ -45,6 +49,14 @@ describe("email verification", () => {
     const rawToken = sentUrl.pathname.split("/").at(-1);
     expect(accountToken.createdValues.tokenHash).toBe(hashToken(rawToken));
     expect(accountToken.createdValues.tokenHash).not.toBe(rawToken);
+    expect(NotificationOutbox.create).toHaveBeenCalledWith(expect.objectContaining({
+      accountTokenId: 12,
+      status: "PENDING",
+      channel: "EMAIL"
+    }), { transaction });
+    expect(NotificationOutbox.update).toHaveBeenCalledWith(expect.objectContaining({ status: "SENT", attempts: 1 }), {
+      where: { id: 21 }
+    });
   });
 
   test("does not send when the hourly request limit is reached", async () => {
@@ -61,7 +73,8 @@ describe("email verification", () => {
       sequelize,
       models: {
         User: { findOne: jest.fn().mockResolvedValue({ id: 8, status: "PENDING_VERIFICATION" }) },
-        AccountToken: accountToken
+        AccountToken: accountToken,
+        NotificationOutbox: { create: jest.fn(), update: jest.fn() }
       },
       email: "patient@example.com",
       emailSender,
@@ -88,7 +101,8 @@ describe("email verification", () => {
       sequelize,
       models: {
         User: { findOne: jest.fn().mockResolvedValue({ id: 8, status: "PENDING_VERIFICATION" }) },
-        AccountToken: accountToken
+        AccountToken: accountToken,
+        NotificationOutbox: { create: jest.fn(), update: jest.fn() }
       },
       email: "patient@example.com",
       emailSender,
@@ -106,7 +120,11 @@ describe("email verification", () => {
       count: jest.fn().mockResolvedValue(0),
       findOne: jest.fn().mockResolvedValue(null),
       update: jest.fn().mockResolvedValue([0]),
-      create: jest.fn().mockResolvedValue({})
+      create: jest.fn().mockResolvedValue({ id: 12 })
+    };
+    const NotificationOutbox = {
+      create: jest.fn().mockResolvedValue({ id: 21 }),
+      update: jest.fn().mockResolvedValue([1])
     };
     const sequelize = { transaction: jest.fn((callback) => callback(makeTransaction())) };
 
@@ -114,7 +132,8 @@ describe("email verification", () => {
       sequelize,
       models: {
         User: { findOne: jest.fn().mockResolvedValue({ id: 8, email: "patient@example.com", status: "PENDING_VERIFICATION" }) },
-        AccountToken: accountToken
+        AccountToken: accountToken,
+        NotificationOutbox
       },
       email: "patient@example.com",
       emailSender: null,
@@ -124,6 +143,46 @@ describe("email verification", () => {
 
     expect(result).toEqual({ status: "delivery_failed" });
     expect(accountToken.create).toHaveBeenCalledTimes(1);
+    expect(NotificationOutbox.update).toHaveBeenCalledWith(expect.objectContaining({
+      status: "FAILED",
+      lastError: "SMTP_NOT_CONFIGURED"
+    }), { where: { id: 21 } });
+  });
+
+  test("retries email delivery at most three times and records failure", async () => {
+    const accountToken = {
+      count: jest.fn().mockResolvedValue(0),
+      findOne: jest.fn().mockResolvedValue(null),
+      update: jest.fn().mockResolvedValue([0]),
+      create: jest.fn().mockResolvedValue({ id: 12 })
+    };
+    const NotificationOutbox = {
+      create: jest.fn().mockResolvedValue({ id: 21 }),
+      update: jest.fn().mockResolvedValue([1])
+    };
+    const emailSender = { sendVerificationEmail: jest.fn().mockRejectedValue(new Error("smtp private detail")) };
+    const sequelize = { transaction: jest.fn((callback) => callback(makeTransaction())) };
+
+    const result = await requestEmailVerification({
+      sequelize,
+      models: {
+        User: { findOne: jest.fn().mockResolvedValue({ id: 8, email: "patient@example.com", status: "PENDING_VERIFICATION" }) },
+        AccountToken: accountToken,
+        NotificationOutbox
+      },
+      email: "patient@example.com",
+      emailSender,
+      baseUrl: "https://medigo.example",
+      now
+    });
+
+    expect(result).toEqual({ status: "delivery_failed" });
+    expect(emailSender.sendVerificationEmail).toHaveBeenCalledTimes(3);
+    expect(NotificationOutbox.update).toHaveBeenCalledWith(expect.objectContaining({
+      status: "FAILED",
+      attempts: 3,
+      lastError: "SMTP_DELIVERY_FAILED"
+    }), { where: { id: 21 } });
   });
 
   test("activates a pending user once and marks the token used", async () => {
