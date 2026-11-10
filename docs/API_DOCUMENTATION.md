@@ -27,11 +27,11 @@ Los tokens son aleatorios, vencen en 24 horas y solo su hash SHA-256 se persiste
 | Método y ruta | Acceso | Comportamiento |
 |---|---|---|
 | `GET /iniciar-sesion` | Público | Muestra el formulario de correo y contraseña. |
-| `POST /iniciar-sesion` | Público | Acepta pacientes activos con correo verificado; los errores usan un mensaje genérico y el éxito redirige a `/paciente`. |
+| `POST /iniciar-sesion` | Público | Acepta cuentas activas con correo verificado; los errores usan un mensaje genérico y el éxito redirige al espacio habilitado para su rol. |
 | `GET /paciente` | Paciente autenticado | Comprueba la sesión y el estado actual de la cuenta antes de mostrar el espacio inicial del paciente. |
 | `POST /cerrar-sesion` | Sesión autenticada | Invalida la sesión del servidor y elimina la cookie. |
 
-Los formularios POST están protegidos con token CSRF. La cookie de sesión es HttpOnly y SameSite=Lax; en producción exige HTTPS, un secreto propio y una tienda persistente configurada. El almacenamiento en memoria se limita al desarrollo local.
+Los pacientes llegan a `/paciente`, los médicos a `/medico/cambiar-contrasena` y los administradores a `/administrador/mi-cuenta`. Los formularios POST están protegidos con token CSRF. La cookie de sesión es HttpOnly y SameSite=Lax; en producción exige HTTPS, un secreto propio y una tienda persistente configurada. El almacenamiento en memoria se limita al desarrollo local.
 
 ## Recuperación de contraseña — issue #15
 
