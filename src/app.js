@@ -8,7 +8,7 @@ const { createDatabaseConnection } = require("./config/database");
 const { createSessionMiddleware, csrfSynchronisedProtection, generateToken } = require("./config/session");
 const { createPatientRouter } = require("./modules/patient/routes");
 const { createDoctorRouter } = require("./modules/doctor/routes");
-const adminRoutes = require("./modules/admin/routes");
+const { createAdminRouter } = require("./modules/admin/routes");
 
 function createApp({
   sequelize: providedSequelize,
@@ -37,7 +37,7 @@ function createApp({
   app.use(createAuthRouter({ sequelize, models: authModels, emailSender }));
   app.use(createPatientRouter({ sequelize, models: authModels, emailSender }));
   app.use(createDoctorRouter({ sequelize, models: authModels }));
-  app.use(adminRoutes);
+  app.use(createAdminRouter({ sequelize, models: authModels, emailSender }));
 
   app.use((error, request, response, next) => {
     if (error.code !== "EBADCSRFTOKEN") return next(error);
