@@ -15,7 +15,8 @@ Los nombres y tipos son una propuesta concreta para revisión dentro del PR del 
 | `document_number` | `VARCHAR(30)` | Obligatorio; normalizado en servidor |
 | `first_name` | `VARCHAR(100)` | Obligatorio |
 | `last_name` | `VARCHAR(100)` | Obligatorio |
-| `email` | `VARCHAR(254)` | Obligatorio; guardar en minúsculas y único |\n| `pending_email` | `VARCHAR(254)` | Opcional y único; se activa al confirmar el enlace de cambio |
+| `email` | `VARCHAR(254)` | Obligatorio; guardar en minúsculas y único |
+| `pending_email` | `VARCHAR(254)` | Opcional y único; se activa al confirmar el enlace de cambio |
 | `phone` | `VARCHAR(30)` | Obligatorio |
 | `password_hash` | `VARCHAR(255)` | Obligatorio; nunca almacenar contraseña plana |
 | `role` | `ENUM('PATIENT','DOCTOR','ADMIN')` | Obligatorio |
