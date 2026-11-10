@@ -33,6 +33,14 @@ Los tokens son aleatorios, vencen en 24 horas y solo su hash SHA-256 se persiste
 
 Los pacientes llegan a `/paciente`, los médicos a `/medico/cambiar-contrasena` y los administradores a `/administrador/mi-cuenta`. Los formularios POST están protegidos con token CSRF. La cookie de sesión es HttpOnly y SameSite=Lax; en producción exige HTTPS, un secreto propio y una tienda persistente configurada. El almacenamiento en memoria se limita al desarrollo local.
 
+## Panel principal del paciente — issue #16
+
+| Método y ruta | Acceso | Comportamiento |
+|---|---|---|
+| `GET /paciente` | Paciente autenticado | Muestra accesos principales y la próxima cita activa del paciente de la sesión. Presenta estado vacío si no hay cita y un mensaje de error si la consulta falla. |
+
+La búsqueda se limita al paciente autenticado y ordena sus citas futuras por fecha. La página usa la zona `America/Bogota` para mostrar fecha y hora. Los accesos a reserva, citas e historial enlazan con funcionalidades planificadas en historias posteriores.
+
 ## Recuperación de contraseña — issue #15
 
 | Método y ruta | Acceso | Comportamiento |
