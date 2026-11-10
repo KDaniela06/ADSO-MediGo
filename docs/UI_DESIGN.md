@@ -26,7 +26,14 @@ Interfaz minimalista, limpia, profesional y moderna; formularios claros, espacio
 
 Autenticación; dashboard por rol; exploración/reserva de citas; citas e historial; agenda y consulta médica; perfiles; gestión administrativa de pacientes, médicos, especialidades, horarios y citas; flujos de verificación de correo y WhatsApp.
 
-El contexto maestro menciona mockups de estas áreas, pero no se encontraron archivos de mockup en el repositorio proporcionado. Deben recuperarse para realizar una revisión visual y asociarlos con historias.
+Los mockups recibidos están organizados en `design/mockups/` y se revisaron visualmente durante el Sprint 0:
+
+- `auth/login.jpg` y `auth/patient-registration.jpg`
+- `patient/dashboard.jpg` y `patient/profile.jpg`
+- `doctor/dashboard.jpg` y `doctor/profile.jpg`
+- `admin/dashboard.jpg`
+
+La revisión confirma pantallas para autenticación, registro, paneles por rol y perfiles de paciente y médico. Los campos visibles de registro/perfil se relacionan con el modelo de datos aprobado en [DATABASE_PHYSICAL_PROPOSAL.md](DATABASE_PHYSICAL_PROPOSAL.md). El mockup de inicio de sesión incluye acceso con Google; esta opción queda fuera del alcance aprobado y no se implementará por ahora. Las imágenes se conservan como referencia visual para comparar la interfaz implementada.
 
 ## Accesibilidad y contenido
 
