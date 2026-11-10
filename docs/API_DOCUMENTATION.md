@@ -53,6 +53,15 @@ El token aleatorio se guarda solo como hash SHA-256, vence en 30 minutos y se in
 
 El cambio guarda una nueva clave scrypt con sal aleatoria e invalida enlaces pendientes de recuperación de esa cuenta. La ruta exige sesión y rol de paciente; el formulario POST usa protección CSRF y no se almacena en caché.
 
+## Cambio de contraseña del médico — issue #33
+
+| Método y ruta | Acceso | Comportamiento |
+|---|---|---|
+| `GET /medico/cambiar-contrasena` | Médico autenticado | Muestra el formulario de cambio de contraseña. |
+| `POST /medico/cambiar-contrasena` | Médico autenticado | Exige contraseña actual, nueva de mínimo ocho caracteres y confirmación coincidente. Verifica la clave actual y conserva el rol del médico. |
+
+El cambio guarda una nueva clave scrypt con sal aleatoria e invalida enlaces pendientes de recuperación. La ruta exige sesión activa, correo verificado, rol de médico y protección CSRF. Los mensajes no incluyen contraseñas ni información del error interno.
+
 ## Perfil del paciente — issue #22
 
 | Método y ruta | Acceso | Comportamiento |

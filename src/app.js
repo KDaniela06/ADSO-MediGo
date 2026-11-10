@@ -7,7 +7,7 @@ const { createEmailSender } = require("./modules/auth/services/email-sender");
 const { createDatabaseConnection } = require("./config/database");
 const { createSessionMiddleware, csrfSynchronisedProtection, generateToken } = require("./config/session");
 const { createPatientRouter } = require("./modules/patient/routes");
-const doctorRoutes = require("./modules/doctor/routes");
+const { createDoctorRouter } = require("./modules/doctor/routes");
 const adminRoutes = require("./modules/admin/routes");
 
 function createApp({
@@ -36,7 +36,7 @@ function createApp({
   app.use(homeRoutes);
   app.use(createAuthRouter({ sequelize, models: authModels, emailSender }));
   app.use(createPatientRouter({ sequelize, models: authModels, emailSender }));
-  app.use(doctorRoutes);
+  app.use(createDoctorRouter({ sequelize, models: authModels }));
   app.use(adminRoutes);
 
   app.use((error, request, response, next) => {
