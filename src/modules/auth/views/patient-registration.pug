@@ -29,6 +29,7 @@ block content
           if successMessage
             p(class="mt-4 rounded-lg bg-emerald-50 px-4 py-3 text-sm text-emerald-900", role="status")= successMessage
           form(class="mt-5 space-y-2.5", action="/registro", method="post", novalidate)
+            input(type="hidden", name="_csrf", value=csrfToken)
             label(class="sr-only", for="firstName") Nombres
             input(class="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm outline-none placeholder:text-slate-600 focus:border-medigo-blue focus:ring-2 focus:ring-medigo-blue/20", id="firstName", name="firstName", placeholder="♙  Nombres", autocomplete="given-name", required, value=values && values.firstName)
             if errors && errors.firstName

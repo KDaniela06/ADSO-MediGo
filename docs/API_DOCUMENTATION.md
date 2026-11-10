@@ -22,6 +22,17 @@ La contraseña se guarda como hash scrypt con sal aleatoria. Las tablas base se 
 
 Los tokens son aleatorios, vencen en 24 horas y solo su hash SHA-256 se persiste. SMTP se configura con las variables `SMTP_*`. El registro de notificación se crea en `notification_outbox` antes de enviar; el transporte hace hasta tres intentos y los reenvíos fallidos también consumen el límite.
 
+## Inicio y cierre de sesión — issue #14
+
+| Método y ruta | Acceso | Comportamiento |
+|---|---|---|
+| `GET /iniciar-sesion` | Público | Muestra el formulario de correo y contraseña. |
+| `POST /iniciar-sesion` | Público | Acepta pacientes activos con correo verificado; los errores usan un mensaje genérico y el éxito redirige a `/paciente`. |
+| `GET /paciente` | Paciente autenticado | Comprueba la sesión y el estado actual de la cuenta antes de mostrar el espacio inicial del paciente. |
+| `POST /cerrar-sesion` | Sesión autenticada | Invalida la sesión del servidor y elimina la cookie. |
+
+Los formularios POST están protegidos con token CSRF. La cookie de sesión es HttpOnly y SameSite=Lax; en producción exige HTTPS, un secreto propio y una tienda persistente configurada. El almacenamiento en memoria se limita al desarrollo local.
+
 ## Dominios previstos
 
 | Dominio | Operaciones previstas | Acceso general |

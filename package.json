@@ -22,7 +22,9 @@
     "mysql2": "^3.14.1",
     "nodemailer": "^10.4.0",
     "pug": "^3.0.3",
-    "sequelize": "^6.37.7"
+    "sequelize": "^6.37.7",
+    "express-session": "^1.19.0",
+    "csrf-sync": "^4.2.1"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.21",

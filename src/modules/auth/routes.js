@@ -1,6 +1,7 @@
 const { Router } = require("express");
 const { validatePatientRegistration } = require("./validators/patient-registration");
 const { registerPatient } = require("./services/patient-registration");
+const { authenticatePatient } = require("./services/authentication");
 const { requestEmailVerification, verifyEmailToken } = require("./services/email-verification");
 
 const VERIFICATION_MESSAGES = {
@@ -14,6 +15,85 @@ const VERIFICATION_MESSAGES = {
 
 function createAuthRouter({ sequelize = null, models = null, emailSender = null } = {}) {
   const router = Router();
+
+  router.get("/iniciar-sesion", (request, response) => {
+    response.set("Cache-Control", "no-store");
+    if (request.session?.userId) return response.redirect(303, "/paciente");
+    return response.status(200).render("auth/views/login", {
+      title: "Iniciar sesión",
+      email: "",
+      loginError: null
+    });
+  });
+
+  router.post("/iniciar-sesion", async (request, response) => {
+    response.set("Cache-Control", "no-store");
+    const email = String(request.body?.email || "").trim().toLowerCase();
+    const password = String(request.body?.password || "");
+    const validEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+    if (!validEmail || !password) {
+      return response.status(401).render("auth/views/login", {
+        title: "Iniciar sesión",
+        email,
+        loginError: "No pudimos iniciar sesión con esos datos. Revisa tu correo y contraseña."
+      });
+    }
+    if (!models) {
+      return response.status(503).render("auth/views/login", {
+        title: "Iniciar sesión",
+        email,
+        loginError: "El inicio de sesión no está disponible en este momento."
+      });
+    }
+
+    try {
+      const account = await authenticatePatient({ models, email, password });
+      if (!account) {
+        return response.status(401).render("auth/views/login", {
+          title: "Iniciar sesión",
+          email,
+          loginError: "No pudimos iniciar sesión con esos datos. Revisa tu correo y contraseña."
+        });
+      }
+
+      await new Promise((resolve, reject) => {
+        request.session.regenerate((error) => (error ? reject(error) : resolve()));
+      });
+      request.session.userId = account.id;
+      if (request.body.rememberMe === "on") {
+        request.session.cookie.maxAge = 30 * 24 * 60 * 60 * 1000;
+      }
+      await new Promise((resolve, reject) => {
+        request.session.save((error) => (error ? reject(error) : resolve()));
+      });
+      return response.redirect(303, "/paciente");
+    } catch {
+      return response.status(503).render("auth/views/login", {
+        title: "Iniciar sesión",
+        email,
+        loginError: "El inicio de sesión no está disponible en este momento."
+      });
+    }
+  });
+
+  router.post("/cerrar-sesion", (request, response) => {
+    response.set("Cache-Control", "no-store");
+    if (!request.session) return response.redirect(303, "/");
+
+    return request.session.destroy((error) => {
+      if (error) {
+        return response.status(503).send("No fue posible cerrar la sesión. Inténtalo de nuevo.");
+      }
+      response.clearCookie("medigo.sid", {
+        path: "/",
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax"
+      });
+      return response.redirect(303, "/");
+    });
+  });
 
   router.get("/registro", (request, response) => {
     response.render("auth/views/patient-registration", {
