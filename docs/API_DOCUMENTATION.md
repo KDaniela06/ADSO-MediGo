@@ -31,7 +31,7 @@ Los tokens son aleatorios, vencen en 24 horas y solo su hash SHA-256 se persiste
 | `GET /paciente` | Paciente autenticado | Comprueba la sesión y el estado actual de la cuenta antes de mostrar el espacio inicial del paciente. |
 | `POST /cerrar-sesion` | Sesión autenticada | Invalida la sesión del servidor y elimina la cookie. |
 
-Los pacientes llegan a `/paciente`, los médicos a `/medico` y los administradores a `/administrador/mi-cuenta`. Los formularios POST están protegidos con token CSRF. La cookie de sesión es HttpOnly y SameSite=Lax; en producción exige HTTPS, un secreto propio y una tienda persistente configurada. El almacenamiento en memoria se limita al desarrollo local.
+Los pacientes llegan a `/paciente`, los médicos a `/medico` y los administradores a `/administrador`. Los formularios POST están protegidos con token CSRF. La cookie de sesión es HttpOnly y SameSite=Lax; en producción exige HTTPS, un secreto propio y una tienda persistente configurada. El almacenamiento en memoria se limita al desarrollo local.
 
 ## Panel principal del paciente — issue #16
 
@@ -130,6 +130,14 @@ Al solicitar un correo nuevo, se conserva el correo vigente y se guarda la direc
 | `POST /administrador/confirmar-cambio-correo/:token` | Público, token requerido y CSRF | Cambia el correo solo con un token vigente de un solo uso asociado a una cuenta ADMIN activa. |
 
 El enlace vence en 24 horas y el token se almacena solo como hash SHA-256. Las rutas de cuenta y contraseña exigen sesión y rol ADMIN. El formulario no permite cambiar identificación o rol ni crear otros administradores.
+
+## Panel principal del administrador — issue #34
+
+| Método y ruta | Acceso | Comportamiento |
+|---|---|---|
+| `GET /administrador` | Administrador autenticado | Muestra conteos de pacientes, médicos activos, citas del día y citas atendidas del día, junto con accesos a usuarios, médicos, especialidades, horarios, excepciones y citas. |
+
+Los conteos se consultan como agregados, y la vista semanal solo carga fechas y cantidades. No se consultan ni se presentan notas clínicas. El día de reporte se calcula en `America/Bogota`; la página indica estados vacíos, sin configuración y error, y no se almacena en caché. Al iniciar sesión, la cuenta ADMIN llega a este panel.
 
 ## Dominios previstos
 
