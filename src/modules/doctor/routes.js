@@ -32,7 +32,7 @@ function createDoctorRouter({ sequelize = null, models = null } = {}) {
       response.set("Cache-Control", "no-store");
       const { values, errors, isValid } = validateAppointmentFilters(request.query || {});
       if (!isValid) return response.status(422).render("doctor/views/appointments", {
-        title: "Mis citas", status: "invalid", appointments: [], filters: values, errors
+        title: "Mis citas", status: "invalid", appointments: [], filters: values, errors, appointmentStatuses: APPOINTMENT_STATUSES
       });
       const result = await getDoctorAppointments({
         models, userId: request.currentUser.id, filters: values
