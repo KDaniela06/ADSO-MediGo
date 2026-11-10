@@ -3,6 +3,8 @@ const { requireAuthenticatedUser, requireRole } = require("../auth/middleware/au
 const { validatePasswordChange } = require("../auth/validators/change-password");
 const { changeDoctorPassword } = require("./services/change-password");
 const { getDoctorDashboard } = require("./services/dashboard");
+const { getDoctorAppointment, getDoctorAppointments, APPOINTMENT_STATUSES } = require("./services/appointments");
+const { validateAppointmentFilters } = require("./validators/appointments");
 
 function createDoctorRouter({ sequelize = null, models = null } = {}) {
   const router = Router();
@@ -18,6 +20,60 @@ function createDoctorRouter({ sequelize = null, models = null } = {}) {
       return response.status(statusCode).render("doctor/views/dashboard", {
         title: "Panel médico",
         dashboard
+      });
+    }
+  );
+
+  router.get(
+    "/medico/citas",
+    requireAuthenticatedUser({ models }),
+    requireRole("DOCTOR"),
+    async (request, response) => {
+      response.set("Cache-Control", "no-store");
+      const { values, errors, isValid } = validateAppointmentFilters(request.query || {});
+      if (!isValid) return response.status(422).render("doctor/views/appointments", {
+        title: "Mis citas", status: "invalid", appointments: [], filters: values, errors
+      });
+      const result = await getDoctorAppointments({
+        models, userId: request.currentUser.id, filters: values
+      });
+      const statusCode = result.status === "error" ? 503 : 200;
+      return response.status(statusCode).render("doctor/views/appointments", {
+        title: "Mis citas",
+        status: result.status,
+        appointments: result.appointments,
+        filters: result.filters,
+        errors: {},
+        appointmentStatuses: APPOINTMENT_STATUSES
+      });
+    }
+  );
+
+  router.get(
+    "/medico/citas/:appointmentId",
+    requireAuthenticatedUser({ models }),
+    requireRole("DOCTOR"),
+    async (request, response) => {
+      response.set("Cache-Control", "no-store");
+      if (!/^\d+$/.test(String(request.params.appointmentId))) {
+        return response.status(404).render("doctor/views/appointment-detail", {
+          title: "Cita no encontrada", appointment: null, message: "No encontramos esta cita asignada."
+        });
+      }
+      const result = await getDoctorAppointment({
+        models, userId: request.currentUser.id, appointmentId: request.params.appointmentId
+      });
+      const statusCode = result.status === "ready" ? 200
+        : result.status === "not_found" ? 404 : 503;
+      const message = result.status === "not_found"
+        ? "No encontramos esta cita asignada."
+        : result.status === "unavailable" || result.status === "error"
+          ? "No fue posible cargar la cita en este momento."
+          : null;
+      return response.status(statusCode).render("doctor/views/appointment-detail", {
+        title: result.status === "ready" ? "Detalle de cita" : "Cita no disponible",
+        appointment: result.appointment || null,
+        message
       });
     }
   );
