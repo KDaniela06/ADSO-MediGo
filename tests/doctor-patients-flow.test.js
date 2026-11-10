@@ -98,7 +98,7 @@ describe("doctor patients web flow", () => {
     expect(response.status).toBe(200);
     expect(html).toContain("Detalle del paciente");
     expect(html).toContain("Teléfono");
-    expect(html).not.toContain("observaciones de consultas");
+    expect(html).toContain("No incluye historia clínica ni observaciones de consultas.");
 
     const missing = await fetch(`${baseUrl}/medico/pacientes/999`, { headers: { cookie } });
     expect(missing.status).toBe(404);
