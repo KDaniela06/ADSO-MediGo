@@ -20,7 +20,7 @@ describe("administrator account pages", () => {
       pendingEmail: null,
       phone: "+573001112233",
       passwordHash: await hashPassword("old-password-123"),
-      role: "PATIENT",
+      role: "ADMIN",
       status: "ACTIVE",
       emailVerifiedAt: new Date(),
       save: jest.fn().mockImplementation(async function save() {})
@@ -93,9 +93,7 @@ describe("administrator account pages", () => {
     expect(anonymous.status).toBe(303);
     expect(anonymous.headers.get("location")).toBe("/iniciar-sesion");
 
-    user.role = "PATIENT";
     const cookie = await login();
-    user.role = "ADMIN";
     const page = await getPage("/administrador/mi-cuenta", cookie);
     expect(page.response.status).toBe(200);
     expect(page.html).toContain("Mi cuenta");
@@ -106,9 +104,7 @@ describe("administrator account pages", () => {
   });
 
   test("updates personal details and confirms a new email before replacing the current one", async () => {
-    user.role = "PATIENT";
     const cookie = await login();
-    user.role = "ADMIN";
     const page = await getPage("/administrador/mi-cuenta", cookie);
     const response = await fetch(`${baseUrl}/administrador/mi-cuenta`, {
       method: "POST",
@@ -152,9 +148,7 @@ describe("administrator account pages", () => {
   });
 
   test("changes the administrator password without changing the role", async () => {
-    user.role = "PATIENT";
     const cookie = await login();
-    user.role = "ADMIN";
     const page = await getPage("/administrador/cambiar-contrasena", cookie);
     const response = await fetch(`${baseUrl}/administrador/cambiar-contrasena`, {
       method: "POST",
