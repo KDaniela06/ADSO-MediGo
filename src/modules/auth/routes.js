@@ -28,8 +28,8 @@ function createAuthRouter({ sequelize = null, models = null, emailSender = null 
 
   router.post("/iniciar-sesion", async (request, response) => {
     response.set("Cache-Control", "no-store");
-    const email = String(request.body.email || "").trim().toLowerCase();
-    const password = String(request.body.password || "");
+    const email = String(request.body?.email || "").trim().toLowerCase();
+    const password = String(request.body?.password || "");
     const validEmail = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email);
 
     if (!validEmail || !password) {
