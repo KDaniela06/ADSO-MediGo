@@ -1,3 +1,10 @@
+## 2026-11-10 — Citas asignadas del médico (US-DOC-02)
+
+- Añadí el listado con filtros de fecha y estado, y una vista de detalle que solo encuentra citas asignadas al médico que inició sesión.
+- Agregué las tablas de especialidades, médicos y citas según el diseño físico aprobado.
+- La opción para iniciar atención solo aparece para una cita confirmada dentro de su horario. No añadí acciones para cancelar ni reprogramar.
+- Dejé pruebas de filtros, autorización y aislamiento, y actualicé la documentación.
+
 ## 2026-11-10 — Panel principal del paciente (US-PAT-05)
 
 - Rediseñé el panel para seguir el mockup compartido, con navegación adaptable, accesos principales y un espacio de ayuda por WhatsApp.
