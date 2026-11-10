@@ -2,7 +2,7 @@
 
 ## Estado
 
-El esqueleto de la aplicación incluye Jest y una prueba de humo HTTP para la página inicial. `npm test` ejecuta la suite.
+La aplicación incluye Jest y pruebas HTTP de humo para la página inicial y los flujos de autenticación disponibles. `npm test` ejecuta la suite.
 
 ## Enfoque previsto
 
@@ -19,7 +19,7 @@ El esqueleto de la aplicación incluye Jest y una prueba de humo HTTP para la p�
 | Registro | Registro válido; menor de 18 rechazado; documento duplicado rechazado. |
 | Verificación de correo | Token enviado y almacenado como hash; activación válida; enlace vencido o usado; límites de reenvío. |
 | Citas | Reserva libre; horario ocupado rechazado; anticipación menor de 30 minutos rechazada; segunda cita futura confirmada rechazada; cancelación según ventana. |
-| Seguridad | Credenciales inválidas; token vencido o usado rechazado. |
+| Seguridad | Credenciales inválidas con respuesta genérica; cuenta no verificada rechazada; sesión protegida; CSRF obligatorio; cierre de sesión y rutas por rol. |
 | Consulta | Inicio dentro de horario permitido; rechazo fuera de ventana; observación original preservada tras finalizar. |
 | WhatsApp | Código incorrecto/vencido; número no vinculado rechazado. |
 
