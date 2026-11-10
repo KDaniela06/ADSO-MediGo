@@ -28,6 +28,11 @@ function makeModels(userOverrides = {}) {
     save: jest.fn().mockResolvedValue(undefined),
     ...userOverrides
   };
+  const patient = {
+    dateOfBirth: "1995-05-01",
+    city: "Bogotá",
+    save: jest.fn().mockResolvedValue(undefined)
+  };
   const AccountToken = {
     create: jest.fn().mockResolvedValue({ id: 15 }),
     findOne: jest.fn(),
@@ -39,12 +44,13 @@ function makeModels(userOverrides = {}) {
   };
   return {
     user,
+    patient,
     models: {
       User: {
         findByPk: jest.fn().mockResolvedValue(user),
         findOne: jest.fn().mockResolvedValue(null)
       },
-      Patient: { findOne: jest.fn().mockResolvedValue({ dateOfBirth: "1995-05-01" }) },
+      Patient: { findOne: jest.fn().mockResolvedValue(patient) },
       AccountToken,
       NotificationOutbox
     }
@@ -93,12 +99,13 @@ describe("patient profile", () => {
     expect(profile).toMatchObject({
       email: "ana@example.com",
       documentNumber: undefined,
-      dateOfBirth: "1995-05-01"
+      dateOfBirth: "1995-05-01",
+      city: "Bogotá"
     });
   });
 
   test("updates contact details while preserving identification and pending email", async () => {
-    const { models, user } = makeModels({ pendingEmail: "ana.new@example.com" });
+    const { models, user, patient } = makeModels({ pendingEmail: "ana.new@example.com" });
     const result = await updatePatientProfile({
       sequelize: makeSequelize(),
       models,
@@ -107,7 +114,8 @@ describe("patient profile", () => {
         firstName: "Ana María",
         lastName: "Gómez",
         phone: "+573009998877",
-        email: "ana@example.com"
+        email: "ana@example.com",
+        city: "Medellín"
       },
       emailSender: null,
       baseUrl: "https://medigo.example",
@@ -117,6 +125,8 @@ describe("patient profile", () => {
     expect(result).toEqual({ status: "saved" });
     expect(user.firstName).toBe("Ana María");
     expect(user.phone).toBe("+573009998877");
+    expect(patient.city).toBe("Medellín");
+    expect(patient.save).toHaveBeenCalledWith({ transaction });
     expect(user.pendingEmail).toBe("ana.new@example.com");
     expect(user.documentNumber).toBeUndefined();
     expect(models.AccountToken.update).not.toHaveBeenCalled();
@@ -134,7 +144,8 @@ describe("patient profile", () => {
         firstName: "Ana",
         lastName: "Gómez",
         phone: "+573001112233",
-        email: "ANA.NEW@example.com"
+        email: "ANA.NEW@example.com",
+        city: "Bogotá"
       },
       emailSender,
       baseUrl: "https://medigo.example",
