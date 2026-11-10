@@ -35,7 +35,7 @@ function createApp({
 
   app.use(homeRoutes);
   app.use(createAuthRouter({ sequelize, models: authModels, emailSender }));
-  app.use(createPatientRouter({ models: authModels }));
+  app.use(createPatientRouter({ sequelize, models: authModels, emailSender }));
   app.use(doctorRoutes);
   app.use(adminRoutes);
 
