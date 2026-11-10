@@ -48,4 +48,4 @@ El modelo se elaboró con las historias de usuario, reglas de negocio y mockups 
 
 ## Implementación
 
-El diseño lógico aprobado no equivale a que las 15 tablas estén implementadas. Las migraciones se agregan por issues funcionales en ramas separadas y pasan por PR a `develop`. Las tablas de registro y verificación de cuenta se documentan en [USER_REGISTRATION_SCHEMA.md](USER_REGISTRATION_SCHEMA.md) y fueron abordadas en los issues #12 y #13.
+El diseño lógico aprobado no equivale a que las 15 tablas estén implementadas. Las migraciones se agregan por issues funcionales en ramas separadas y pasan por PR a `develop`. Las tablas de registro y verificación de cuenta se documentan en [USER_REGISTRATION_SCHEMA.md](USER_REGISTRATION_SCHEMA.md) y fueron abordadas en los issues #12 y #13. La historia #27 incorporó las tablas base `specialties`, `doctors` y `appointments`; las otras tablas se implementarán en sus historias correspondientes.

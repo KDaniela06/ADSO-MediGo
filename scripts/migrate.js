@@ -19,6 +19,10 @@ const migrations = [
   {
     name: "202611100003-add-patient-city",
     migration: require("../src/database/migrations/202611100003-add-patient-city")
+  },
+  {
+    name: "202611100004-create-doctor-appointments",
+    migration: require("../src/database/migrations/202611100004-create-doctor-appointments")
   }
 ];
 

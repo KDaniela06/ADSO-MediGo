@@ -1,0 +1,52 @@
+extends ../../../views/shared/layout.pug
+
+block content
+  .min-h-screen.bg-slate-50.text-slate-800(class="md:flex")
+    aside(class="bg-medigo-navy text-white md:min-h-screen md:w-64 md:shrink-0")
+      .flex.items-center.gap-3.px-5.py-4(class="md:flex-col md:items-start md:px-6 md:py-8")
+        a(href="/medico", aria-label="MediGo, inicio", class="text-2xl font-extrabold tracking-tight") Medi#[span(class="text-medigo-cyan") Go]
+        nav(aria-label="Navegación principal", class="ml-auto flex gap-2 overflow-x-auto text-sm md:ml-0 md:mt-10 md:w-full md:flex-col md:gap-1")
+          a(href="/medico", class="whitespace-nowrap rounded-lg px-3 py-2 hover:bg-white/10") Inicio
+          a(href="/medico/citas", aria-current="page", class="whitespace-nowrap rounded-lg bg-medigo-blue px-3 py-2 font-semibold") Mis citas
+          a(href="/medico/pacientes", class="whitespace-nowrap rounded-lg px-3 py-2 hover:bg-white/10") Mis pacientes
+          a(href="/medico/agenda", class="whitespace-nowrap rounded-lg px-3 py-2 hover:bg-white/10") Mi agenda
+          a(href="/medico/perfil", class="whitespace-nowrap rounded-lg px-3 py-2 hover:bg-white/10") Mi perfil
+        form(action="/cerrar-sesion", method="post", class="hidden md:mt-auto md:block md:w-full")
+          input(type="hidden", name="_csrf", value=csrfToken)
+          button(type="submit", class="mt-8 w-full rounded-lg px-3 py-2 text-left text-sm text-sky-100 hover:bg-white/10") Cerrar sesión
+
+    main(class="mx-auto w-full max-w-4xl px-4 py-6 sm:px-6 md:py-10")
+      a(href="/medico/citas", class="text-sm font-semibold text-medigo-blue hover:underline") ← Volver a mis citas
+      h1(class="mt-2 text-2xl font-bold text-medigo-navy sm:text-3xl") #{title}
+      if message
+        p(role="alert", class="mt-5 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900") #{message}
+      else if appointment
+        section(class="mt-5 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7")
+          .flex.flex-col.gap-4(class="sm:flex-row sm:items-start sm:justify-between")
+            div
+              p(class="text-sm font-semibold text-medigo-blue") #{appointment.date} · #{appointment.time}
+              h2(class="mt-2 text-xl font-bold text-medigo-navy") #{appointment.patientName}
+              p(class="mt-2 text-sm text-slate-600") Especialidad: #{appointment.specialty}
+              if appointment.documentNumber
+                p(class="mt-2 text-sm text-slate-600") Identificación: #{appointment.documentType} #{appointment.documentNumber}
+              if appointment.phone
+                p(class="mt-2 text-sm text-slate-600") Teléfono: #{appointment.phone}
+            if appointment.status === "IN_PROGRESS"
+              span(class="w-fit rounded-full bg-sky-100 px-3 py-1 text-xs font-bold text-sky-800") En curso
+            else if appointment.status === "ATTENDED"
+              span(class="w-fit rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-700") Atendida
+            else if appointment.status === "CANCELLED"
+              span(class="w-fit rounded-full bg-rose-100 px-3 py-1 text-xs font-bold text-rose-800") Cancelada
+            else if appointment.status === "NO_SHOW"
+              span(class="w-fit rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-800") No asistió
+            else
+              span(class="w-fit rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-800") Confirmada
+          if appointment.canStart
+            a(href="/medico/consultas/iniciar/#{appointment.id}", class="mt-6 inline-flex rounded-lg bg-medigo-blue px-4 py-2.5 text-sm font-semibold text-white hover:bg-medigo-navy") Iniciar atención
+          else if appointment.status === "CONFIRMED"
+            p(class="mt-5 rounded-xl bg-sky-50 p-4 text-sm text-slate-700") La atención se habilitará desde la hora programada y antes de finalizar el bloque.
+          p(class="mt-5 text-xs text-slate-500") No puedes cancelar ni reprogramar citas médicas desde esta pantalla.
+
+      form(action="/cerrar-sesion", method="post", class="mt-6 md:hidden")
+        input(type="hidden", name="_csrf", value=csrfToken)
+        button(type="submit", class="w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-700") Cerrar sesión

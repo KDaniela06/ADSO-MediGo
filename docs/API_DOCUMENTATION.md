@@ -69,6 +69,15 @@ El cambio guarda una nueva clave scrypt con sal aleatoria e invalida enlaces pen
 
 La jornada se calcula según `America/Bogota`. Si no hay citas se muestra un estado vacío. El acceso está protegido por sesión y rol DOCTOR.
 
+## Citas asignadas del médico — issue #27
+
+| Método y ruta | Acceso | Comportamiento |
+|---|---|---|
+| `GET /medico/citas` | Médico autenticado | Lista solo las citas asignadas al médico de la sesión. Acepta filtros opcionales `date=YYYY-MM-DD` y `status`. |
+| `GET /medico/citas/:appointmentId` | Médico autenticado | Muestra datos necesarios para atender solo cuando la cita pertenece al médico autenticado; una cita ajena devuelve 404. |
+
+Las fechas se filtran y presentan en `America/Bogota`. El acceso a iniciar atención se muestra solo para citas confirmadas dentro de su bloque programado. No hay acciones para cancelar o reprogramar citas.
+
 ## Cambio de contraseña del médico — issue #33
 
 | Método y ruta | Acceso | Comportamiento |
