@@ -3,6 +3,7 @@ const { validatePatientRegistration } = require("./validators/patient-registrati
 const { registerPatient } = require("./services/patient-registration");
 const { authenticatePatient } = require("./services/authentication");
 const { requestEmailVerification, verifyEmailToken } = require("./services/email-verification");
+const { requestPasswordReset, resetPatientPassword } = require("./services/password-reset");
 
 const VERIFICATION_MESSAGES = {
   verified: "Tu correo fue verificado. Tu cuenta ya está activa.",
@@ -93,6 +94,102 @@ function createAuthRouter({ sequelize = null, models = null, emailSender = null 
       });
       return response.redirect(303, "/");
     });
+  });
+
+
+  router.get("/recuperar-contrasena", (request, response) => {
+    response.set("Cache-Control", "no-store");
+    return response.status(200).render("auth/views/password-reset-request", {
+      title: "Recuperar contraseña",
+      email: "",
+      message: null
+    });
+  });
+
+  router.post("/recuperar-contrasena", async (request, response) => {
+    response.set({ "Cache-Control": "no-store", "Referrer-Policy": "no-referrer" });
+    const email = String(request.body?.email || "").trim().toLowerCase();
+    if (sequelize && models && /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) {
+      try {
+        await requestPasswordReset({
+          sequelize,
+          models,
+          email,
+          emailSender,
+          baseUrl: process.env.APP_BASE_URL || "http://localhost:3000"
+        });
+      } catch {
+        // Keep unknown accounts, throttling, and delivery failures indistinguishable.
+      }
+    }
+    return response.status(200).render("auth/views/password-reset-request", {
+      title: "Solicitud recibida",
+      email: "",
+      message: "Si el correo corresponde a una cuenta activa, recibirás instrucciones para cambiar la contraseña."
+    });
+  });
+
+  router.get("/restablecer-contrasena/:token", (request, response) => {
+    response.set({ "Cache-Control": "no-store", "Referrer-Policy": "no-referrer" });
+    return response.status(200).render("auth/views/password-reset-form", {
+      title: "Crear nueva contraseña",
+      token: request.params.token,
+      errors: {},
+      message: null
+    });
+  });
+
+  router.post("/restablecer-contrasena/:token", async (request, response) => {
+    response.set({ "Cache-Control": "no-store", "Referrer-Policy": "no-referrer" });
+    const token = String(request.params.token || "");
+    const password = String(request.body?.password || "");
+    const passwordConfirmation = String(request.body?.passwordConfirmation || "");
+    const errors = {};
+    if (password.length < 8) errors.password = "La contraseña debe tener al menos 8 caracteres.";
+    if (passwordConfirmation !== password) errors.passwordConfirmation = "Las contraseñas no coinciden.";
+
+    if (Object.keys(errors).length) {
+      return response.status(422).render("auth/views/password-reset-form", {
+        title: "Crear nueva contraseña",
+        token,
+        errors,
+        message: null
+      });
+    }
+    if (!sequelize || !models) {
+      return response.status(503).render("auth/views/password-reset-form", {
+        title: "Crear nueva contraseña",
+        token,
+        errors: {},
+        message: "El cambio de contraseña no está disponible en este momento. Inténtalo más tarde."
+      });
+    }
+
+    try {
+      const result = await resetPatientPassword({ sequelize, models, token, password });
+      if (result.status === "reset") {
+        return response.status(200).render("auth/views/password-reset-result", {
+          title: "Contraseña actualizada",
+          message: "Tu contraseña se cambió correctamente. Ya puedes iniciar sesión."
+        });
+      }
+      const message = result.status === "expired"
+        ? "El enlace venció. Solicita uno nuevo para recuperar tu contraseña."
+        : "El enlace no es válido o ya fue utilizado. Solicita uno nuevo para recuperar tu contraseña.";
+      return response.status(400).render("auth/views/password-reset-form", {
+        title: "No se pudo cambiar la contraseña",
+        token,
+        errors: {},
+        message
+      });
+    } catch {
+      return response.status(503).render("auth/views/password-reset-form", {
+        title: "Crear nueva contraseña",
+        token,
+        errors: {},
+        message: "No pudimos cambiar la contraseña en este momento. Inténtalo más tarde."
+      });
+    }
   });
 
   router.get("/registro", (request, response) => {
