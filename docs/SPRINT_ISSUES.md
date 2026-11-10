@@ -2,7 +2,7 @@
 
 Este documento relaciona los issues de seguimiento con las tareas y las historias asignadas a cada sprint. Los IDs y criterios de las historias se mantienen en el documento fuente; este archivo solo organiza su ejecución.
 
-> **Planificación:** la distribución es una propuesta basada en el alcance documentado. No se definieron fechas ni duración. Sprint 0 continúa abierto hasta revisar los pendientes de planificación. En GitHub, los sprints están representados temporalmente mediante issues de seguimiento, no mediante milestones o iteraciones nativas.
+> **Planificación:** la distribución es una propuesta basada en el alcance documentado. No se definieron fechas ni duración. En GitHub, los sprints están representados mediante issues de seguimiento, no mediante milestones o iteraciones nativas.
 
 ## Sprint 0 — Cierre de planificación y documentación
 
@@ -13,7 +13,7 @@ Este documento relaciona los issues de seguimiento con las tareas y las historia
 - [#47 — Publicar documentación del alcance y flujo de trabajo](https://github.com/KDaniela06/ADSO-MediGo/issues/47)
 - [#49 — Mapear issues dentro de cada sprint](https://github.com/KDaniela06/ADSO-MediGo/issues/49)
 
-**Pendientes principales:** validar el diseño físico aprobado, revisar mockups y auditoría visual, y aprobar las decisiones de alcance antes de implementar las funcionalidades correspondientes.
+**Cierre preparado:** diseño físico aprobado y documentado; mockups revisados; decisiones de alcance aprobadas y registradas. Los PR #48, #50 y #55 están fusionados. El cierre del issue #1 se completará al fusionar el PR de documentación de cierre hacia `develop`.
 
 ## Sprint 1 — Estructura técnica y CI básico
 
