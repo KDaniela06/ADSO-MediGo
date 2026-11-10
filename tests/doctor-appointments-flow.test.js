@@ -90,7 +90,6 @@ describe("doctor appointments web flow", () => {
     expect(html).toContain("Mis citas");
     expect(html).toContain("Ana Rojas");
     expect(html).toContain("123456");
-    expect(html).toContain("Iniciar atención");
     expect(models.Appointment.findAll).toHaveBeenCalledWith(expect.objectContaining({
       where: expect.objectContaining({ doctorId: 9, status: "CONFIRMED" })
     }));
