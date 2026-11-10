@@ -48,7 +48,7 @@ function makeModels(userOverrides = {}) {
     models: {
       User: {
         findByPk: jest.fn().mockResolvedValue(user),
-        findOne: jest.fn().mockResolvedValue(null)
+        findOne: jest.fn().mockResolvedValue(user)
       },
       Patient: { findOne: jest.fn().mockResolvedValue(patient) },
       AccountToken,
