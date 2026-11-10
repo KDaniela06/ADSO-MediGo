@@ -62,6 +62,10 @@ El índice compuesto `(user_id, purpose, created_at)` permite contar solicitudes
 
 La creación debe insertar `users` y `patients` dentro de una misma transacción. Se asigna rol `PATIENT`, estado `PENDING_VERIFICATION` y `email_verified_at = NULL`; por tanto no puede iniciar sesión ni reservar hasta verificar el correo. Un error en cualquiera de las inserciones revierte ambas. Las restricciones únicas son la defensa final ante dos registros simultáneos con el mismo correo o documento.
 
+## `notification_outbox` para verificación
+
+La migración del issue #13 crea una fila de notificación en la misma transacción que el token. `account_token_id` es único y referencia el token asociado; el registro conserva destinatario, tipo, canal, estado, intentos, fecha de envío y un código de error genérico. No almacena el enlace ni el token original. El transporte SMTP intenta entregar hasta tres veces y actualiza el estado del outbox.
+
 ## Decisiones para revisión
 
 - Nombres de tablas y columnas en inglés, consistentes con el inventario existente.
