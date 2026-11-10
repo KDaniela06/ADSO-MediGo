@@ -29,6 +29,7 @@ describe("administrator account pages", () => {
       User: {
         findOne: jest.fn().mockImplementation(async ({ where }) => {
           if (where.email) return where.email === user.email ? user : null;
+          if (where.id) return where.id === user.id ? user : null;
           return null;
         }),
         findByPk: jest.fn().mockResolvedValue(user)
