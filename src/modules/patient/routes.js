@@ -4,6 +4,7 @@ const { validatePatientProfile } = require("./validators/profile");
 const { validatePatientPasswordChange } = require("./validators/change-password");
 const { changePatientPassword } = require("./services/change-password");
 const { confirmPatientEmailChange, getPatientProfile, updatePatientProfile } = require("./services/profile");
+const { getPatientDashboard } = require("./services/dashboard");
 
 function createPatientRouter({ sequelize = null, models, emailSender = null } = {}) {
   const router = Router();
@@ -12,9 +13,14 @@ function createPatientRouter({ sequelize = null, models, emailSender = null } = 
     "/paciente",
     requireAuthenticatedUser({ models }),
     requireRole("PATIENT"),
-    (request, response) => {
+    async (request, response) => {
       response.set("Cache-Control", "no-store");
-      return response.render("patient/views/dashboard", { title: "Mi espacio MediGo" });
+      const dashboard = await getPatientDashboard({ models, userId: request.currentUser.id });
+      const statusCode = dashboard.status === "error" ? 503 : 200;
+      return response.status(statusCode).render("patient/views/dashboard", {
+        title: "Mi espacio MediGo",
+        dashboard
+      });
     }
   );
 
