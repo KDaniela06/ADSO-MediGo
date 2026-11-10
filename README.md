@@ -28,7 +28,7 @@ Node.js, Express, Pug, Tailwind CSS, MySQL, Sequelize, Jest, JavaScript y Git/Gi
 
 ## Ejecución local
 
-1. Instala Node.js 20 o superior.
+1. Instala Node.js 24.15.0 (también indicado en `.nvmrc`).
 2. Copia `.env.example` a `.env` y ajusta las variables si vas a conectar MySQL.
 3. Ejecuta `npm install`.
 4. Ejecuta `npm run dev` y abre `http://localhost:3000`.
