@@ -54,7 +54,9 @@ La aceptación de las condiciones y de la política se registra con fecha y vers
 | `used_at` | `DATETIME(3)` | Nulo mientras no se use |
 | `created_at` | `DATETIME(3)` | Obligatorio |
 
-El token original se genera con un generador criptográfico, se entrega solo al usuario por el mecanismo de correo que se implementará en US-PAT-02 y no se guarda en la base de datos. La validez de 24 horas se controla con `expires_at`.
+El token original se genera con un generador criptográfico, se entrega solo al usuario por el transporte SMTP configurado y no se guarda en la base de datos. La validez de 24 horas se controla con `expires_at`.
+
+El índice compuesto `(user_id, purpose, created_at)` permite contar solicitudes de reenvío por propósito durante la última hora. El registro de token se escribe antes de enviar el correo; así un fallo de entrega tampoco reinicia el límite.
 
 ## Registro transaccional
 
