@@ -43,7 +43,7 @@ El esquema propuesto para el registro está documentado en [USER_REGISTRATION_SC
 
 ## Flujo de contribución
 
-Trabajaremos un issue a la vez: rama desde `develop`, commits pequeños y frecuentes, pruebas/CI básico y PR hacia `develop`. El siguiente issue comienza cuando el PR actual esté abierto para revisión. No se cambiarán historias sin consultar primero.
+Trabajaremos un issue a la vez: rama desde `develop`, commits pequeños y frecuentes, pruebas/CI básico y PR hacia `develop`. Empiezo el siguiente issue solo después de que el PR actual haya sido revisado y fusionado en `develop`. No se cambiarán historias sin consultar primero.
 
 ## Estado actual
 
