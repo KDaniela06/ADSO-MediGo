@@ -2,6 +2,12 @@
 
 Los cambios se registran en orden descendente. No se atribuyen funcionalidades de aplicación a cambios que solo añaden documentación.
 
+## 2026-11-10 — Cuenta del administrador (US-ADM-13)
+
+- Se añadió la pantalla para actualizar datos propios, con identificación y rol de solo lectura.
+- El correo nuevo queda pendiente hasta confirmar un enlace de un solo uso; también se añadió el formulario para cambiar contraseña.
+- Se protegieron las operaciones por sesión y rol ADMIN, y se añadieron pruebas y documentación. El inicio de sesión ahora dirige médicos y administradores a sus espacios protegidos. La cuenta no permite crear otros administradores.
+
 ## 2026-11-10 — Cambio de contraseña de médico (US-DOC-08)
 
 - Se añadió el formulario y la ruta protegida para que un médico autenticado actualice su contraseña.

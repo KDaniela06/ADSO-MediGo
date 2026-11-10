@@ -1,7 +1,7 @@
 const { Router } = require("express");
 const { validatePatientRegistration } = require("./validators/patient-registration");
 const { registerPatient } = require("./services/patient-registration");
-const { authenticatePatient } = require("./services/authentication");
+const { authenticateUser } = require("./services/authentication");
 const { requestEmailVerification, verifyEmailToken } = require("./services/email-verification");
 const { requestPasswordReset, resetPatientPassword } = require("./services/password-reset");
 
@@ -17,9 +17,11 @@ const VERIFICATION_MESSAGES = {
 function createAuthRouter({ sequelize = null, models = null, emailSender = null } = {}) {
   const router = Router();
 
+  const roleHome = { PATIENT: "/paciente", DOCTOR: "/medico/cambiar-contrasena", ADMIN: "/administrador/mi-cuenta" };
+
   router.get("/iniciar-sesion", (request, response) => {
     response.set("Cache-Control", "no-store");
-    if (request.session?.userId) return response.redirect(303, "/paciente");
+    if (request.session?.userId) return response.redirect(303, roleHome[request.session.role] || "/");
     return response.status(200).render("auth/views/login", {
       title: "Iniciar sesión",
       email: "",
@@ -49,7 +51,7 @@ function createAuthRouter({ sequelize = null, models = null, emailSender = null 
     }
 
     try {
-      const account = await authenticatePatient({ models, email, password });
+      const account = await authenticateUser({ models, email, password });
       if (!account) {
         return response.status(401).render("auth/views/login", {
           title: "Iniciar sesión",
@@ -62,13 +64,14 @@ function createAuthRouter({ sequelize = null, models = null, emailSender = null 
         request.session.regenerate((error) => (error ? reject(error) : resolve()));
       });
       request.session.userId = account.id;
+      request.session.role = account.role;
       if (request.body.rememberMe === "on") {
         request.session.cookie.maxAge = 30 * 24 * 60 * 60 * 1000;
       }
       await new Promise((resolve, reject) => {
         request.session.save((error) => (error ? reject(error) : resolve()));
       });
-      return response.redirect(303, "/paciente");
+      return response.redirect(303, roleHome[account.role] || "/");
     } catch {
       return response.status(503).render("auth/views/login", {
         title: "Iniciar sesión",

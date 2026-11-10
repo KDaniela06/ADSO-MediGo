@@ -1,4 +1,4 @@
-const { authenticatePatient, verifyPassword } = require("../src/modules/auth/services/authentication");
+const { authenticatePatient, authenticateUser, verifyPassword } = require("../src/modules/auth/services/authentication");
 const { hashPassword } = require("../src/modules/auth/services/patient-registration");
 
 describe("patient authentication", () => {
@@ -51,6 +51,28 @@ describe("patient authentication", () => {
         password: "secure-password-123"
       })).resolves.toBeNull();
     }
+  });
+
+  test("authenticates active verified doctor and administrator accounts", async () => {
+    const user = {
+      id: 29, firstName: "Carlos", lastName: "Méndez", role: "DOCTOR",
+      status: "ACTIVE", emailVerifiedAt: new Date(), passwordHash
+    };
+    const models = { User: { findOne: jest.fn().mockResolvedValue(user) } };
+
+    await expect(authenticateUser({
+      models, email: " DOCTOR@EXAMPLE.COM ", password: "secure-password-123"
+    })).resolves.toMatchObject({ id: 29, role: "DOCTOR" });
+
+    user.role = "ADMIN";
+    await expect(authenticateUser({
+      models, email: "admin@example.com", password: "secure-password-123"
+    })).resolves.toMatchObject({ id: 29, role: "ADMIN" });
+
+    user.status = "INACTIVE";
+    await expect(authenticateUser({
+      models, email: "admin@example.com", password: "secure-password-123"
+    })).resolves.toBeNull();
   });
 
   test("returns the same result for an unknown account and a wrong password", async () => {

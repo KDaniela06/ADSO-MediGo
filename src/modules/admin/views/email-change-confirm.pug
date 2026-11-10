@@ -1,0 +1,15 @@
+extends ../../../views/shared/layout.pug
+
+block content
+  main(class="mx-auto min-h-screen max-w-xl px-4 py-12")
+    section(class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200 sm:p-8")
+      p(class="text-sm font-semibold text-medigo-blue") MediGo · Cuenta de administrador
+      h1(class="mt-2 text-2xl font-bold text-medigo-navy") Confirmar nuevo correo
+      if message
+        p(class="mt-5 rounded-lg bg-sky-50 px-4 py-3 text-sm text-sky-900", role="status")= message
+      else
+        p(class="mt-3 text-sm text-slate-600") Confirma que quieres usar esta dirección en tu cuenta de administrador.
+      form(class="mt-6", action="/administrador/confirmar-cambio-correo/" + token, method="post")
+        input(type="hidden", name="_csrf", value=csrfToken)
+        button(class="w-full rounded-lg bg-medigo-blue px-4 py-3 text-sm font-semibold text-white hover:bg-medigo-navy", type="submit") Confirmar correo
+      a(class="mt-4 inline-flex text-sm font-semibold text-medigo-blue hover:underline", href="/") Volver a MediGo

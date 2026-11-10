@@ -89,6 +89,24 @@ describe("patient login flow", () => {
     expect(models.User.findByPk).toHaveBeenCalledWith(19, expect.any(Object));
   });
 
+  test("sends doctors and administrators to their own protected pages", async () => {
+    for (const [role, path] of [
+      ["DOCTOR", "/medico/cambiar-contrasena"],
+      ["ADMIN", "/administrador/mi-cuenta"]
+    ]) {
+      user.role = role;
+      const form = await getLoginForm();
+      const response = await submitLogin(form);
+      expect(response.status).toBe(303);
+      expect(response.headers.get("location")).toBe(path);
+
+      const cookie = response.headers.get("set-cookie").split(";")[0];
+      const page = await fetch(`${baseUrl}${path}`, { headers: { cookie } });
+      expect(page.status).toBe(200);
+      user.role = "PATIENT";
+    }
+  });
+
   test("uses one generic message for invalid credentials and unverified accounts", async () => {
     const form = await getLoginForm();
     const invalidResponse = await submitLogin({ ...form, submittedPassword: "wrong-password" });

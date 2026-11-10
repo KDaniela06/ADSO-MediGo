@@ -27,11 +27,11 @@ Los tokens son aleatorios, vencen en 24 horas y solo su hash SHA-256 se persiste
 | Método y ruta | Acceso | Comportamiento |
 |---|---|---|
 | `GET /iniciar-sesion` | Público | Muestra el formulario de correo y contraseña. |
-| `POST /iniciar-sesion` | Público | Acepta pacientes activos con correo verificado; los errores usan un mensaje genérico y el éxito redirige a `/paciente`. |
+| `POST /iniciar-sesion` | Público | Acepta cuentas activas con correo verificado; los errores usan un mensaje genérico y el éxito redirige al espacio habilitado para su rol. |
 | `GET /paciente` | Paciente autenticado | Comprueba la sesión y el estado actual de la cuenta antes de mostrar el espacio inicial del paciente. |
 | `POST /cerrar-sesion` | Sesión autenticada | Invalida la sesión del servidor y elimina la cookie. |
 
-Los formularios POST están protegidos con token CSRF. La cookie de sesión es HttpOnly y SameSite=Lax; en producción exige HTTPS, un secreto propio y una tienda persistente configurada. El almacenamiento en memoria se limita al desarrollo local.
+Los pacientes llegan a `/paciente`, los médicos a `/medico/cambiar-contrasena` y los administradores a `/administrador/mi-cuenta`. Los formularios POST están protegidos con token CSRF. La cookie de sesión es HttpOnly y SameSite=Lax; en producción exige HTTPS, un secreto propio y una tienda persistente configurada. El almacenamiento en memoria se limita al desarrollo local.
 
 ## Recuperación de contraseña — issue #15
 
@@ -74,6 +74,20 @@ El cambio guarda una nueva clave scrypt con sal aleatoria e invalida enlaces pen
 Al solicitar un correo nuevo, se conserva el correo vigente y se guarda la dirección nueva como pendiente. El paciente recibe allí un enlace que vence en 24 horas. El token se guarda como hash; al confirmarlo se actualiza el correo y se invalidan otros enlaces pendientes. Las rutas privadas validan sesión y rol en el servidor.
 
 
+## Cuenta del administrador — issue #46
+
+| Método y ruta | Acceso | Comportamiento |
+|---|---|---|
+| `GET /administrador/mi-cuenta` | Administrador autenticado | Muestra los datos de su propia cuenta; identificación y rol son de solo lectura. |
+| `POST /administrador/mi-cuenta` | Administrador autenticado | Valida nombres, teléfono y correo. Un correo nuevo queda pendiente hasta confirmar un enlace de un solo uso. |
+| `GET /administrador/cambiar-contrasena` | Administrador autenticado | Muestra el formulario de cambio de contraseña. |
+| `POST /administrador/cambiar-contrasena` | Administrador autenticado | Verifica la contraseña actual, la nueva (mínimo ocho caracteres) y su confirmación. |
+| `GET /administrador/confirmar-cambio-correo/:token` | Público, token requerido | Muestra la confirmación explícita; abrir el enlace no consume el token. |
+| `POST /administrador/confirmar-cambio-correo/:token` | Público, token requerido y CSRF | Cambia el correo solo con un token vigente de un solo uso asociado a una cuenta ADMIN activa. |
+
+El enlace vence en 24 horas y el token se almacena solo como hash SHA-256. Las rutas de cuenta y contraseña exigen sesión y rol ADMIN. El formulario no permite cambiar identificación o rol ni crear otros administradores.
+
+## Dominios previstos
 
 | Dominio | Operaciones previstas | Acceso general |
 |---|---|---|
