@@ -21,10 +21,10 @@ async function getPatientProfile({ models, userId }) {
   if (!user) return null;
   const patient = await models.Patient.findOne({
     where: { userId },
-    attributes: ["dateOfBirth"]
+    attributes: ["dateOfBirth", "city"]
   });
   const profile = typeof user.get === "function" ? user.get({ plain: true }) : user;
-  return { ...profile, dateOfBirth: patient?.dateOfBirth || null };
+  return { ...profile, dateOfBirth: patient?.dateOfBirth || null, city: patient?.city || "" };
 }
 
 async function updatePatientProfile({ sequelize, models, userId, input, emailSender, baseUrl, now = new Date() }) {
@@ -32,10 +32,15 @@ async function updatePatientProfile({ sequelize, models, userId, input, emailSen
   const firstName = String(input.firstName || "").trim();
   const lastName = String(input.lastName || "").trim();
   const phone = String(input.phone || "").trim();
+  const city = String(input.city || "").trim();
   const email = String(input.email || "").trim().toLowerCase();
   const result = await sequelize.transaction(async (transaction) => {
     const user = await User.findByPk(userId, { transaction, lock: transaction.LOCK.UPDATE });
     if (!user || user.role !== "PATIENT" || user.status !== "ACTIVE") return { status: "not_found" };
+    const patient = await models.Patient.findOne({
+      where: { userId: user.id }, transaction, lock: transaction.LOCK.UPDATE
+    });
+    if (!patient) return { status: "not_found" };
     const emailChanged = email !== String(user.email || "").trim().toLowerCase();
     if (emailChanged) {
       const existing = await User.findOne({
@@ -49,6 +54,8 @@ async function updatePatientProfile({ sequelize, models, userId, input, emailSen
     user.firstName = firstName;
     user.lastName = lastName;
     user.phone = phone;
+    patient.city = city || null;
+    await patient.save({ transaction });
 
     if (!emailChanged) {
       await user.save({ transaction });
