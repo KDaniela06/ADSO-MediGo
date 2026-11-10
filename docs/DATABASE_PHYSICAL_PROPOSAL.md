@@ -1,6 +1,6 @@
 # Propuesta de diseño físico de la base de datos
 
-> **Estado: propuesta para revisión.** Se elaboró a partir de las historias de usuario, reglas de negocio y vistas disponibles en `design/mockups/`. No se encontró un diagrama físico aprobado con los nombres y columnas originales. Este documento no cambia las historias ni autoriza todavía crear migraciones.
+> **Estado: diseño físico propuesto aprobado por la autora.** Se elaboró a partir de las historias de usuario, reglas de negocio y vistas disponibles en `design/mockups/`; no se encontró un diagrama físico previo con los nombres y columnas originales. La autora aprobó esta propuesta al fusionar el PR #55. Este documento no cambia las historias ni crea migraciones.
 
 ## Criterios usados
 
@@ -277,15 +277,19 @@ No se almacena el enlace, token ni código original. Confirmar si el outbox cubr
 - `users` 1:N `account_tokens`; `patients` 1:N `whatsapp_conversations`.
 - `account_tokens` 1:0..1 `notification_outbox`; `users` 1:N `audit_logs`.
 
-## Decisiones para aprobación
+## Decisiones aprobadas y límite técnico pendiente
 
-1. Aprobar o cambiar los cuatro nombres propuestos para horarios/excepciones y `audit_logs`.
-2. Confirmar si `city` y los campos de aceptación/versionado van en `patients`; aparecen en las vistas o formularios, pero las historias pueden no definirlos todos.
-3. Confirmar si los datos de WhatsApp viven en `patients` y si se reutiliza `notification_outbox` para ese canal.
-4. Confirmar si los cambios de cita se auditan en `audit_logs` como historial, sin crear una tabla adicional.
-5. Confirmar convención de UTC/`America/Bogota`, motor y versión mínima de MySQL.
-6. Confirmar si `doctors.specialty_id` puede cambiar y si se debe conservar la especialidad histórica en cada cita (esta propuesta la conserva).
-7. Aprobar límites/longitudes y vocabularios de estados; los valores de `ENUM` son propuestos para el modelo técnico.
+La autora aprobó el diseño propuesto al fusionar el PR #55. Para las decisiones de alcance de Sprint 0 también aprobó las siguientes reglas:
+
+- Se conservan los nombres propuestos para las cuatro tablas de horarios/excepciones y `audit_logs`.
+- Se conserva `city` como dato opcional del perfil y se registra la aceptación y versión de términos/privacidad.
+- Los datos de vinculación WhatsApp se ubican en `patients`; `notification_outbox` contempla canales email y WhatsApp.
+- `audit_logs` conserva actor y cambios de cita para trazabilidad, sin agregar una tabla número 16.
+- Se almacena en UTC y se muestra en `America/Bogota`.
+- Se conserva la especialidad de la cita como dato histórico.
+- Se mantienen los nombres técnicos, longitudes y estados propuestos en este esquema.
+
+Antes de crear migraciones debe definirse la versión mínima exacta de MySQL para asegurar compatibilidad de restricciones y tipos. La selección de versión no cambia el modelo aprobado.
 
 ## Relación con las vistas recibidas
 
@@ -298,4 +302,4 @@ Las imágenes no definen relaciones, estados, índices ni reglas de concurrencia
 
 ## Paso posterior
 
-Después de aprobar esta propuesta, se puede actualizar `DATABASE_DESIGN.md` con el esquema acordado y planificar migraciones mediante issues separados. Este PR solo documenta una propuesta; no crea tablas ni altera historias.
+El esquema aprobado se resume en `DATABASE_DESIGN.md`. La implementación de migraciones se planificará mediante issues separados. Este documento describe el modelo aprobado; no crea tablas ni altera historias.
