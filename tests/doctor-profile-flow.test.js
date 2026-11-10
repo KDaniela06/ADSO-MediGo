@@ -30,7 +30,7 @@ describe("doctor profile and schedule pages", () => {
     };
     server = createApp({ models }).listen(0);
     await new Promise((resolve) => server.once("listening", resolve));
-    baseUrl = \`http://127.0.0.1:\${server.address().port}\`;
+    baseUrl = `http://127.0.0.1:\${server.address().port}`;
   });
 
   afterAll(async () => {
@@ -38,11 +38,11 @@ describe("doctor profile and schedule pages", () => {
   });
 
   async function login() {
-    const page = await fetch(\`\${baseUrl}/iniciar-sesion\`);
+    const page = await fetch(`\${baseUrl}/iniciar-sesion`);
     const html = await page.text();
     const cookie = page.headers.get("set-cookie").split(";")[0];
     const token = html.match(/name="_csrf" value="([^"]+)"/)?.[1];
-    const response = await fetch(\`\${baseUrl}/iniciar-sesion\`, {
+    const response = await fetch(`\${baseUrl}/iniciar-sesion`, {
       method: "POST",
       headers: { cookie, "content-type": "application/x-www-form-urlencoded" },
       body: new URLSearchParams({ _csrf: token, email: user.email, password }).toString(),
@@ -53,16 +53,16 @@ describe("doctor profile and schedule pages", () => {
   }
 
   test("protects both pages and shows the doctor profile and read-only schedule state", async () => {
-    const anonymous = await fetch(\`\${baseUrl}/medico/perfil\`, { redirect: "manual" });
+    const anonymous = await fetch(`\${baseUrl}/medico/perfil`, { redirect: "manual" });
     expect(anonymous.status).toBe(303);
     const cookie = await login();
-    const profile = await fetch(\`\${baseUrl}/medico/perfil\`, { headers: { cookie } });
+    const profile = await fetch(`\${baseUrl}/medico/perfil`, { headers: { cookie } });
     const profileHtml = await profile.text();
     expect(profile.status).toBe(200);
     expect(profileHtml).toContain("Registro profesional");
     expect(profileHtml).toContain("MED-123");
     expect(profileHtml).toContain('name="profilePhotoUrl"');
-    const schedule = await fetch(\`\${baseUrl}/medico/agenda\`, { headers: { cookie } });
+    const schedule = await fetch(`\${baseUrl}/medico/agenda`, { headers: { cookie } });
     expect(schedule.status).toBe(200);
     expect(await schedule.text()).toContain("Tu agenda todavía no está configurada");
   });
@@ -70,7 +70,7 @@ describe("doctor profile and schedule pages", () => {
   test("does not allow a patient account into the doctor profile", async () => {
     const cookie = await login();
     user.role = "PATIENT";
-    const response = await fetch(\`\${baseUrl}/medico/perfil\`, { headers: { cookie } });
+    const response = await fetch(`\${baseUrl}/medico/perfil`, { headers: { cookie } });
     expect(response.status).toBe(403);
     user.role = "DOCTOR";
   });
