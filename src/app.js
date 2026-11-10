@@ -3,15 +3,17 @@ const path = require("node:path");
 const homeRoutes = require("./modules/home/routes");
 const { createAuthRouter } = require("./modules/auth/routes");
 const { initializeAuthModels } = require("./modules/auth/models");
+const { createEmailSender } = require("./modules/auth/services/email-sender");
 const { createDatabaseConnection } = require("./config/database");
 const patientRoutes = require("./modules/patient/routes");
 const doctorRoutes = require("./modules/doctor/routes");
 const adminRoutes = require("./modules/admin/routes");
 
-function createApp({ sequelize: providedSequelize } = {}) {
+function createApp({ sequelize: providedSequelize, emailSender: providedEmailSender } = {}) {
   const app = express();
   const sequelize = providedSequelize || createDatabaseConnection();
   const authModels = sequelize ? initializeAuthModels(sequelize) : null;
+  const emailSender = providedEmailSender || createEmailSender();
 
   app.set("view engine", "pug");
   app.set("views", [path.join(__dirname, "modules"), path.join(__dirname, "views")]);
@@ -19,7 +21,7 @@ function createApp({ sequelize: providedSequelize } = {}) {
   app.use(express.json());
   app.use(express.static(path.join(__dirname, "..", "public")));
   app.use(homeRoutes);
-  app.use(createAuthRouter({ sequelize, models: authModels }));
+  app.use(createAuthRouter({ sequelize, models: authModels, emailSender }));
   app.use(patientRoutes);
   app.use(doctorRoutes);
   app.use(adminRoutes);
