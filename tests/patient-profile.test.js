@@ -94,7 +94,7 @@ describe("patient profile", () => {
     }));
     expect(models.Patient.findOne).toHaveBeenCalledWith({
       where: { userId: 7 },
-      attributes: ["dateOfBirth"]
+      attributes: ["dateOfBirth", "city"]
     });
     expect(profile).toMatchObject({
       email: "ana@example.com",
