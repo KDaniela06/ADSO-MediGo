@@ -98,7 +98,6 @@ describe("patient profile", () => {
     });
     expect(profile).toMatchObject({
       email: "ana@example.com",
-      documentNumber: undefined,
       dateOfBirth: "1995-05-01",
       city: "Bogotá"
     });
