@@ -1,0 +1,17 @@
+extends ../../../views/shared/layout.pug
+
+block content
+  main(class="mx-auto flex min-h-screen max-w-xl items-center px-4 py-10")
+    section(class="w-full rounded-2xl bg-white p-8 text-center shadow-lg ring-1 ring-slate-200 sm:p-10")
+      p(class="text-sm font-semibold uppercase tracking-widest text-medigo-blue") MediGo
+      h1(class="mt-3 text-2xl font-bold text-medigo-navy")= title
+      p(class="mt-4 text-slate-700", role=status === "verified" ? "status" : "alert")= message
+      if deliveryFailed
+        p(class="mt-3 rounded-lg bg-amber-50 px-4 py-3 text-sm text-amber-900") No pudimos entregar el mensaje ahora. Puedes solicitar otro enlace cuando el servicio de correo esté disponible.
+      if showResend
+        form(class="mt-6 space-y-3 text-left", action="/verificar-correo/reenviar", method="post")
+          label(class="block text-sm font-medium text-slate-700", for="email") Correo electrónico
+          input(class="w-full rounded-lg border border-slate-300 px-3 py-2.5 outline-none focus:border-medigo-blue focus:ring-2 focus:ring-medigo-blue/20", type="email", id="email", name="email", autocomplete="email", required, value=email)
+          button(class="w-full rounded-lg bg-medigo-navy px-4 py-2.5 font-semibold text-white hover:bg-medigo-blue focus:outline-none focus:ring-2 focus:ring-medigo-blue focus:ring-offset-2", type="submit") Reenviar enlace
+      a(class="mt-6 inline-block text-sm font-semibold text-medigo-blue underline", href="/") Volver al inicio
+
