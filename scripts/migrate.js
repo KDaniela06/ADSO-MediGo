@@ -11,6 +11,10 @@ const migrations = [
   {
     name: "202611100001-add-account-token-rate-limit-index",
     migration: require("../src/database/migrations/202611100001-add-account-token-rate-limit-index")
+  },
+  {
+    name: "202611100002-add-patient-profile-email-change",
+    migration: require("../src/database/migrations/202611100002-add-patient-profile-email-change")
   }
 ];
 
