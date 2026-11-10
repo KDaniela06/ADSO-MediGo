@@ -1,7 +1,12 @@
 function clearSessionAndRedirect(request, response) {
   if (!request.session) return response.redirect(303, "/iniciar-sesion");
   return request.session.destroy(() => {
-    response.clearCookie("medigo.sid", { path: "/", httpOnly: true, sameSite: "lax" });
+    response.clearCookie("medigo.sid", {
+      path: "/",
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax"
+    });
     response.redirect(303, "/iniciar-sesion");
   });
 }
