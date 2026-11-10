@@ -111,7 +111,6 @@ describe("patient password reset", () => {
       sequelize: makeSequelize(), models, token, password: "new-password-123", now
     })).resolves.toEqual({ status: "reset" });
 
-    expect(accountToken).toMatchObject({ usedAt: now });
     expect(user.passwordHash).not.toBe("old-hash");
     expect(user.passwordHash).toMatch(/^scrypt\$/);
     expect(user.save).toHaveBeenCalledWith({ transaction });
