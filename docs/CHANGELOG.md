@@ -2,6 +2,13 @@
 
 Los cambios se registran en orden descendente. No se atribuyen funcionalidades de aplicación a cambios que solo añaden documentación.
 
+## 2026-11-10 — Recuperación de contraseña (US-PAT-04)
+
+- Se añadieron formularios para pedir un enlace y establecer una contraseña nueva.
+- El correo de recuperación usa un token de un solo uso con vencimiento de 30 minutos; solo se almacena su hash y el cambio invalida enlaces pendientes.
+- Las respuestas de solicitud son genéricas y se aplican los límites de cinco solicitudes por hora y una cada 60 segundos.
+- Se añadieron pruebas de servicio y rutas, y se documentaron los endpoints.
+
 ## 2026-11-10 — Cierre de planificación del Sprint 0
 
 - Se documentó como aprobado el diseño físico propuesto de 15 tablas a partir de historias, reglas de negocio y mockups revisados.
