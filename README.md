@@ -2,7 +2,7 @@
 
 MediGo es el proyecto académico de una plataforma web para la gestión de citas médicas. Su alcance previsto incluye pacientes, médicos y administración; reservas, consultas médicas, notificaciones por correo y un chatbot de WhatsApp sujeto a integración oficial.
 
-> **Estado del repositorio:** contiene la documentación de planificación y el esqueleto técnico inicial. Las historias describen el alcance previsto; cada funcionalidad se incorporará mediante su propio issue y PR.
+> **Estado del repositorio:** incluye registro y verificación de pacientes, inicio y cierre de sesión, recuperación de contraseña y perfil de paciente. El resto de las historias se implementará mediante su propio issue y PR.
 
 ## Documentación
 
@@ -37,7 +37,7 @@ El código está organizado por módulos dentro de `src/modules/` (`auth`, `pati
 
 Comandos disponibles: `npm start` construye el CSS y levanta el servidor; `npm test` ejecuta Jest; `npm run build:css` genera el CSS de producción.
 
-La página inicial puede abrirse sin MySQL. Para registrar e iniciar sesión, configura MySQL con las variables de `.env.example` y ejecuta `npm run db:migrate`. El acceso solo funciona para pacientes activos que hayan verificado su correo.
+La página inicial puede abrirse sin MySQL. Para registrar, iniciar sesión y gestionar el perfil, configura MySQL con las variables de `.env.example` y ejecuta `npm run db:migrate`. El acceso solo funciona para pacientes activos que hayan verificado su correo.
 
 Las sesiones en memoria están destinadas al desarrollo local. Antes de publicar la aplicación se debe configurar una tienda de sesiones persistente y un `SESSION_SECRET` propio.
 
