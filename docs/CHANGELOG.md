@@ -6,7 +6,7 @@ Los cambios se registran en orden descendente. No se atribuyen funcionalidades d
 
 - Se añadió envío de enlaces de verificación por SMTP configurable y activación de cuentas con token de un solo uso, vencimiento de 24 horas y almacenamiento únicamente del hash.
 - Se añadió el reenvío con espera de 60 segundos y límite de cinco solicitudes por hora, contando también los fallos de entrega.
-- Se añadieron pantallas de estado, migración del índice de límites, documentación y pruebas para los flujos de correo.
+- Se añadieron `notification_outbox`, hasta tres intentos automáticos de entrega, pantallas de estado, migración del índice de límites, documentación y pruebas para los flujos de correo.
 
 ## 2026-11-03 — Incorporación del inventario de historias
 
