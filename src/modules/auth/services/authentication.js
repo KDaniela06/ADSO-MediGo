@@ -3,6 +3,7 @@ const { promisify } = require("node:util");
 
 const scrypt = promisify(scryptCallback);
 const DUMMY_HASH = `scrypt$${Buffer.alloc(16).toString("base64url")}$${Buffer.alloc(64).toString("base64url")}`;
+const ALLOWED_ROLES = new Set(["PATIENT", "DOCTOR", "ADMIN"]);
 
 async function verifyPassword(password, passwordHash) {
   const [algorithm, saltText, keyText] = String(passwordHash || "").split("$");
@@ -18,7 +19,7 @@ async function verifyPassword(password, passwordHash) {
   return timingSafeEqual(derivedKey, expectedKey);
 }
 
-async function authenticatePatient({ models, email, password }) {
+async function authenticateUser({ models, email, password }) {
   if (!models?.User) return null;
 
   const normalizedEmail = String(email || "").trim().toLowerCase();
@@ -31,7 +32,7 @@ async function authenticatePatient({ models, email, password }) {
   if (
     !user
     || !passwordMatches
-    || user.role !== "PATIENT"
+    || !ALLOWED_ROLES.has(user.role)
     || user.status !== "ACTIVE"
     || !user.emailVerifiedAt
   ) {
@@ -46,4 +47,9 @@ async function authenticatePatient({ models, email, password }) {
   };
 }
 
-module.exports = { authenticatePatient, verifyPassword };
+async function authenticatePatient(credentials) {
+  const account = await authenticateUser(credentials);
+  return account?.role === "PATIENT" ? account : null;
+}
+
+module.exports = { authenticatePatient, authenticateUser, verifyPassword };
