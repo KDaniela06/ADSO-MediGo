@@ -2,10 +2,10 @@
 
 ## Estado actual
 
-Los issues #12 y #13 incluyen migraciones Sequelize para las tablas del registro y verificación de pacientes: `users`, `patients`, `account_tokens` y `notification_outbox`, más el índice compuesto para aplicar los límites de reenvío. El runner registra cada migración aplicada en `schema_migrations`. Las otras tablas del inventario todavía no tienen migraciones.
+Los issues #12 y #13 incluyen migraciones Sequelize para las tablas del registro y verificación de pacientes: `users`, `patients`, `account_tokens` y `notification_outbox`, más el índice compuesto para aplicar los límites de reenvío. La historia #27 agrega `specialties`, `doctors` y `appointments`, con claves foráneas e índices para consultas por médico/paciente, fecha y estado. El runner registra cada migración aplicada en `schema_migrations`.
 
 El diseño físico de registro está en [USER_REGISTRATION_SCHEMA.md](USER_REGISTRATION_SCHEMA.md).
-La historia #22 incorpora dos migraciones: `202611100002-add-patient-profile-email-change` añade `users.pending_email` y el propósito `EMAIL_CHANGE` a `account_tokens`; `202611100003-add-patient-city` añade la ciudad opcional a `patients`. El correo vigente no se reemplaza hasta que el paciente confirme el enlace.
+La historia #22 incorpora dos migraciones: `202611100002-add-patient-profile-email-change` añade `users.pending_email` y el propósito `EMAIL_CHANGE` a `account_tokens`; `202611100003-add-patient-city` añade la ciudad opcional a `patients`. El correo vigente no se reemplaza hasta que el paciente confirme el enlace. La migración `202611100004-create-doctor-appointments` crea las tablas base de especialidades, médicos y citas siguiendo el diseño físico aprobado.
 
 
 ## Ejecutar la migración
