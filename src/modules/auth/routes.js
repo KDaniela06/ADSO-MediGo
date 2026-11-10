@@ -30,7 +30,7 @@ function createAuthRouter({ sequelize = null, models = null, emailSender = null 
     response.set("Cache-Control", "no-store");
     const email = String(request.body?.email || "").trim().toLowerCase();
     const password = String(request.body?.password || "");
-    const validEmail = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email);
+    const validEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
     if (!validEmail || !password) {
       return response.status(401).render("auth/views/login", {
