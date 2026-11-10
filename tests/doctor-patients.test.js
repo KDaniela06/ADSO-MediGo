@@ -69,7 +69,7 @@ describe("doctor patients", () => {
     expect(models.Appointment.findAll).toHaveBeenCalledWith(expect.objectContaining({
       where: { doctorId: 8 },
       include: expect.arrayContaining([
-        expect.objectContaining({ where: { id: "51" }, required: true })
+        expect.objectContaining({ where: { id: 51 }, required: true })
       ])
     }));
     expect(result).toMatchObject({
