@@ -30,7 +30,7 @@ Node.js, Express, Pug, Tailwind CSS, MySQL, Sequelize, Jest, JavaScript y Git/Gi
 
 1. Instala Node.js 24.15.0 (también indicado en `.nvmrc`).
 2. Copia `.env.example` a `.env` y ajusta las variables si vas a conectar MySQL.
-3. Ejecuta `npm install`.
+3. Ejecuta `npm ci` para instalar las versiones guardadas en el lockfile.
 4. Ejecuta `npm run dev` y abre `http://localhost:3000`.
 
 El código está organizado por módulos dentro de `src/modules/` (`auth`, `patient`, `doctor` y `admin`), donde cada funcionalidad tendrá sus rutas, controladores, servicios y plantillas Pug. Los elementos visuales compartidos están en `src/views/shared/`; las referencias para replicar las pantallas están en [`design/mockups`](design/mockups/README.md). El esquema físico aún no está configurado y la aplicación puede iniciar sin conectarse a MySQL.
