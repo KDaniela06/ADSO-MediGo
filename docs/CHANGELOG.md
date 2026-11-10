@@ -1,3 +1,9 @@
+## 2026-11-10 — Agenda y perfil del médico (US-DOC-07)
+
+- Añadí la consulta de agenda semanal en modo solo lectura, con estados claros cuando todavía no hay horario configurado.
+- Permití actualizar el teléfono, la descripción profesional y la URL HTTPS de la fotografía; especialidad y registro quedan de solo lectura.
+- Añadí validaciones, pruebas de servicios y rutas, y documentación.
+
 ## 2026-11-10 — Pacientes asociados al médico (US-DOC-03)
 
 - Añadí una lista con búsqueda por nombre, identificación, teléfono o ciudad y un detalle de información básica.
