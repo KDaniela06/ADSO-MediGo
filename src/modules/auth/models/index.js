@@ -30,6 +30,7 @@ function initializeAuthModels(sequelize) {
       references: { model: "users", key: "id" }
     },
     dateOfBirth: { type: DataTypes.DATEONLY, allowNull: false, field: "date_of_birth" },
+    city: { type: DataTypes.STRING(100), allowNull: true },
     termsAcceptedAt: { type: DataTypes.DATE(3), allowNull: false, field: "terms_accepted_at" },
     termsVersion: { type: DataTypes.STRING(32), allowNull: false, field: "terms_version" },
     privacyAcceptedAt: { type: DataTypes.DATE(3), allowNull: false, field: "privacy_accepted_at" },
