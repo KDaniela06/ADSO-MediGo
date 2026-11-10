@@ -36,9 +36,20 @@ function createEmailSender(environment = process.env) {
         text: `Hola ${firstName || ""}. Verifica tu correo en este enlace: ${url}. El enlace vence en ${expiresInHours} horas. Si no creaste esta cuenta, ignora este mensaje.`,
         html: `<p>Hola ${safeName},</p><p>Confirma tu correo para activar tu cuenta de MediGo.</p><p><a href="${safeUrl}">Verificar correo</a></p><p>El enlace vence en ${expiresInHours} horas y solo se puede utilizar una vez.</p><p>Si no creaste esta cuenta, ignora este mensaje.</p>`
       });
+    },
+
+    async sendPasswordResetEmail({ to, firstName, url, expiresInMinutes }) {
+      const safeName = escapeHtml(firstName || "paciente");
+      const safeUrl = escapeHtml(url);
+      await transporter.sendMail({
+        from: environment.SMTP_FROM,
+        to,
+        subject: "Recupera tu contraseña de MediGo",
+        text: `Hola ${firstName || ""}. Puedes crear una nueva contraseña en este enlace: ${url}. El enlace vence en ${expiresInMinutes} minutos y solo se puede utilizar una vez. Si no solicitaste este cambio, ignora este mensaje.`,
+        html: `<p>Hola ${safeName},</p><p>Recibimos una solicitud para cambiar la contraseña de tu cuenta de MediGo.</p><p><a href="${safeUrl}">Crear una nueva contraseña</a></p><p>El enlace vence en ${expiresInMinutes} minutos y solo se puede utilizar una vez.</p><p>Si no solicitaste este cambio, ignora este mensaje.</p>`
+      });
     }
   };
 }
 
 module.exports = { createEmailSender, escapeHtml };
-
