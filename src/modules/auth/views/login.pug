@@ -1,0 +1,70 @@
+extends ../../../views/shared/layout.pug
+
+block content
+  main(class="min-h-screen bg-white lg:grid lg:grid-cols-[0.92fr_1.08fr]")
+    aside(class="relative hidden min-h-screen overflow-hidden bg-gradient-to-br from-sky-100 via-white to-cyan-50 px-10 py-12 lg:flex lg:flex-col lg:items-center lg:justify-center")
+      div(class="absolute -left-36 -top-32 h-96 w-96 rounded-full bg-medigo-cyan/30")
+      div(class="absolute -bottom-40 -left-20 h-96 w-[130%] rotate-[-8deg] rounded-[50%] bg-medigo-blue/10")
+      div(class="relative z-10 flex max-w-xl flex-col items-center text-center")
+        svg(xmlns="http://www.w3.org/2000/svg", viewBox="0 0 240 150", fill="none", class="h-48 w-72", role="img", aria-label="MediGo")
+          path(d="M32 78c4-22 24-36 44-31 8-26 44-35 63-14 20-9 44 3 47 24 20 0 31 15 28 33H41c-7 0-11-5-9-12Z", stroke="#0876c9", stroke-width="8", stroke-linecap="round", stroke-linejoin="round")
+          path(d="M95 43c-12-9-25 1-21 16 4 15 20 29 20 29s16-14 20-29c4-15-9-25-21-16Z", fill="#12b8e8")
+          path(d="M94 53v23m-11-12h22", stroke="white", stroke-width="6", stroke-linecap="round")
+          path(d="M139 47h30l8 8v24h-38V47Zm8-8v8m15-8v8m-16 18h4m8 0h4m-16 8h4m8 0h4", stroke="#0b3b69", stroke-width="4", stroke-linecap="round", stroke-linejoin="round")
+          circle(cx="177", cy="81", r="11", fill="#12b8e8")
+          path(d="m172 81 4 4 7-8", stroke="white", stroke-width="3", stroke-linecap="round", stroke-linejoin="round")
+          text(x="120", y="117", text-anchor="middle", fill="#0b3b69", font-size="34", font-weight="700", font-family="Arial, sans-serif") MediGo
+          text(x="120", y="139", text-anchor="middle", fill="#0b3b69", font-size="12", font-style="italic", font-family="Arial, sans-serif") Tu salud, en buenas manos
+        p(class="mt-5 max-w-md text-lg leading-7 text-medigo-navy") Tu bienestar, tus citas y tu información médica en un solo lugar.
+      div(class="absolute bottom-10 left-0 right-0 z-10 mx-auto grid max-w-2xl grid-cols-3 divide-x divide-medigo-blue/30 text-center text-sm text-medigo-navy")
+        div(class="px-4")
+          span(class="mx-auto mb-2 flex h-8 w-8 items-center justify-center rounded-full bg-white text-medigo-blue", aria-hidden="true") ✓
+          p Tu información está protegida
+        div(class="px-4")
+          span(class="mx-auto mb-2 flex h-8 w-8 items-center justify-center rounded-full bg-white text-medigo-blue", aria-hidden="true") ▦
+          p Agenda tus citas fácilmente
+        div(class="px-4")
+          span(class="mx-auto mb-2 flex h-8 w-8 items-center justify-center rounded-full bg-white text-medigo-blue", aria-hidden="true") ♥
+          p Cuida tu salud
+    section(class="flex min-h-screen items-center justify-center px-4 py-8 sm:px-8 lg:bg-gradient-to-br lg:from-sky-50 lg:to-white")
+      div(class="w-full max-w-2xl rounded-2xl bg-white px-5 py-8 shadow-xl ring-1 ring-slate-100 sm:px-10 sm:py-10 lg:px-14")
+        div(class="mb-7 text-center lg:hidden")
+          p(class="text-2xl font-extrabold text-medigo-navy") Medi#[span(class="text-medigo-cyan") Go]
+          p(class="mt-1 text-sm italic text-medigo-navy") Tu salud, en buenas manos
+        h1(class="text-center text-3xl font-bold tracking-tight text-medigo-navy sm:text-4xl") Iniciar sesión
+        p(class="mt-2 text-center text-lg text-medigo-navy sm:text-xl") Accede a tu cuenta en MediGo
+        if loginError
+          p(class="mt-5 rounded-lg bg-rose-50 px-4 py-3 text-sm text-rose-800", role="alert")= loginError
+        form(class="mt-8 space-y-5", action="/iniciar-sesion", method="post", novalidate)
+          input(type="hidden", name="_csrf", value=csrfToken)
+          div
+            label(class="sr-only", for="email") Correo electrónico
+            div(class="relative")
+              span(class="pointer-events-none absolute inset-y-0 left-4 flex items-center text-medigo-navy", aria-hidden="true")
+                svg(xmlns="http://www.w3.org/2000/svg", viewBox="0 0 24 24", fill="none", stroke="currentColor", stroke-width="1.8", class="h-6 w-6")
+                  path(d="M3 6.5A2.5 2.5 0 0 1 5.5 4h13A2.5 2.5 0 0 1 21 6.5v11a2.5 2.5 0 0 1-2.5 2.5h-13A2.5 2.5 0 0 1 3 17.5v-11Z")
+                  path(d="m4 6 8 6 8-6")
+              input(class="w-full rounded-xl border border-sky-200 bg-white py-4 pl-14 pr-4 text-base text-medigo-navy outline-none placeholder:text-slate-500 focus:border-medigo-blue focus:ring-2 focus:ring-medigo-blue/20", id="email", name="email", type="email", placeholder="Correo electrónico", autocomplete="email", required, value=email)
+          div
+            label(class="sr-only", for="password") Contraseña
+            div(class="relative")
+              span(class="pointer-events-none absolute inset-y-0 left-4 flex items-center text-medigo-navy", aria-hidden="true")
+                svg(xmlns="http://www.w3.org/2000/svg", viewBox="0 0 24 24", fill="none", stroke="currentColor", stroke-width="1.8", class="h-6 w-6")
+                  rect(x="4", y="10", width="16", height="11", rx="2")
+                  path(d="M8 10V7a4 4 0 1 1 8 0v3m-4 4v3")
+              input(class="w-full rounded-xl border border-sky-200 bg-white py-4 pl-14 pr-14 text-base text-medigo-navy outline-none placeholder:text-slate-500 focus:border-medigo-blue focus:ring-2 focus:ring-medigo-blue/20", id="password", name="password", type="password", placeholder="Contraseña", autocomplete="current-password", required, data-password-field)
+              button(class="absolute inset-y-0 right-3 flex items-center px-2 text-medigo-navy hover:text-medigo-blue", type="button", aria-label="Mostrar contraseña", aria-pressed="false", data-password-toggle)
+                svg(xmlns="http://www.w3.org/2000/svg", viewBox="0 0 24 24", fill="none", stroke="currentColor", stroke-width="1.8", class="h-6 w-6", aria-hidden="true")
+                  path(d="M2.5 12s3.3-6 9.5-6 9.5 6 9.5 6-3.3 6-9.5 6-9.5-6-9.5-6Z")
+                  circle(cx="12", cy="12", r="2.8")
+          div(class="flex flex-wrap items-center justify-between gap-3 text-sm")
+            label(class="inline-flex items-center gap-2 text-medigo-navy")
+              input(class="h-4 w-4 rounded border-slate-300 accent-medigo-blue", type="checkbox", name="rememberMe", value="on")
+              span Recordarme
+            a(class="font-semibold text-medigo-blue hover:underline", href="/recuperar-contrasena") ¿Olvidaste tu contraseña?
+          button(class="flex w-full items-center justify-center gap-3 rounded-xl bg-gradient-to-r from-medigo-blue to-sky-600 px-5 py-4 text-lg font-semibold text-white shadow-sm transition hover:brightness-105 focus:outline-none focus:ring-2 focus:ring-medigo-blue focus:ring-offset-2", type="submit")
+            span Iniciar sesión
+            span(class="text-2xl", aria-hidden="true") →
+        p(class="mt-8 text-center text-base text-slate-700") ¿No tienes una cuenta? #[a(class="font-semibold text-medigo-blue hover:underline", href="/registro") Regístrate aquí]
+        p(class="mt-7 border-t border-slate-100 pt-5 text-center text-xs text-slate-500") Tus datos se protegen con una sesión segura.
+  script(src="/js/password-toggle.js", defer)
