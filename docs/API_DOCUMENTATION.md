@@ -44,7 +44,18 @@ Los formularios POST están protegidos con token CSRF. La cookie de sesión es H
 
 El token aleatorio se guarda solo como hash SHA-256, vence en 30 minutos y se invalida tras el cambio. Un cambio exitoso también invalida otros enlaces de recuperación pendientes de la cuenta. Los formularios mantienen protección CSRF y no se almacenan en caché.
 
-## Dominios previstos
+## Dominios previstos## Perfil del paciente — issue #22
+
+| Método y ruta | Acceso | Comportamiento |
+|---|---|---|
+| `GET /perfil` | Paciente autenticado | Muestra los datos de identificación, fecha de nacimiento y contacto del paciente de la sesión. |
+| `POST /perfil` | Paciente autenticado | Valida y guarda nombres y teléfono. La identificación no se recibe como dato editable. |
+| `GET /confirmar-cambio-correo/:token` | Público, token requerido | Muestra una confirmación explícita; abrir el enlace no consume el token. |
+| `POST /confirmar-cambio-correo/:token` | Público, token requerido y CSRF | Cambia el correo solo con un token vigente y de un solo uso. |
+
+Al solicitar un correo nuevo, se conserva el correo vigente y se guarda la dirección nueva como pendiente. El paciente recibe allí un enlace que vence en 24 horas. El token se guarda como hash; al confirmarlo se actualiza el correo y se invalidan otros enlaces pendientes. Las rutas privadas validan sesión y rol en el servidor.
+
+
 
 | Dominio | Operaciones previstas | Acceso general |
 |---|---|---|
