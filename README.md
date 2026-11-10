@@ -2,7 +2,7 @@
 
 MediGo es el proyecto académico de una plataforma web para la gestión de citas médicas. Su alcance previsto incluye pacientes, médicos y administración; reservas, consultas médicas, notificaciones por correo y un chatbot de WhatsApp sujeto a integración oficial.
 
-> **Estado del repositorio:** incluye registro y verificación de pacientes, inicio y cierre de sesión, recuperación y cambio de contraseña, y perfil de paciente. El resto de las historias se implementará mediante su propio issue y PR.
+> **Estado del repositorio:** incluye registro y verificación de pacientes, inicio y cierre de sesión, recuperación y cambio de contraseña, y perfil de paciente y cuenta de administrador. El resto de las historias se implementará mediante su propio issue y PR.
 
 ## Documentación
 
