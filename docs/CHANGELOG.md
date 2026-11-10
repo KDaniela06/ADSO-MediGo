@@ -2,6 +2,12 @@
 
 Los cambios se registran en orden descendente. No se atribuyen funcionalidades de aplicación a cambios que solo añaden documentación.
 
+## 2026-11-10 — Verificación de correo (US-PAT-02)
+
+- Se añadió envío de enlaces de verificación por SMTP configurable y activación de cuentas con token de un solo uso, vencimiento de 24 horas y almacenamiento únicamente del hash.
+- Se añadió el reenvío con espera de 60 segundos y límite de cinco solicitudes por hora, contando también los fallos de entrega.
+- Se añadieron `notification_outbox`, hasta tres intentos automáticos de entrega, pantallas de estado, migración del índice de límites, documentación y pruebas para los flujos de correo.
+
 ## 2026-11-03 — Incorporación del inventario de historias
 
 - Se incorporó al índice el documento `MediTurno_35_Historias_de_Usuario.md` disponible en `docs/`.
@@ -24,4 +30,5 @@ Los cambios se registran en orden descendente. No se atribuyen funcionalidades d
 - Se añadió documentación del alcance maestro, requisitos, reglas, entidades, rutas previstas, diseño visual, pruebas y plan de trabajo.
 - Se marcaron expresamente como pendientes los criterios originales de historias, el diseño físico detallado y los artefactos visuales no presentes.
 - No se implementó código de aplicación ni se ejecutaron pruebas automatizadas.
+
 

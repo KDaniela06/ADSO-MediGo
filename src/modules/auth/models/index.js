@@ -49,12 +49,32 @@ function initializeAuthModels(sequelize) {
     usedAt: { type: DataTypes.DATE(3), allowNull: true, field: "used_at" }
   }, { tableName: "account_tokens", underscored: true });
 
+  const NotificationOutbox = sequelize.define("NotificationOutbox", {
+    id: { type: DataTypes.BIGINT.UNSIGNED, primaryKey: true, autoIncrement: true },
+    accountTokenId: {
+      type: DataTypes.BIGINT.UNSIGNED,
+      allowNull: false,
+      unique: true,
+      field: "account_token_id",
+      references: { model: "account_tokens", key: "id" }
+    },
+    recipient: { type: DataTypes.STRING(254), allowNull: false },
+    notificationType: { type: DataTypes.STRING(64), allowNull: false, field: "notification_type" },
+    channel: { type: DataTypes.ENUM("EMAIL", "WHATSAPP"), allowNull: false },
+    status: { type: DataTypes.ENUM("PENDING", "SENT", "FAILED"), allowNull: false },
+    attempts: { type: DataTypes.TINYINT.UNSIGNED, allowNull: false, defaultValue: 0 },
+    sentAt: { type: DataTypes.DATE(3), allowNull: true, field: "sent_at" },
+    lastError: { type: DataTypes.STRING(100), allowNull: true, field: "last_error" }
+  }, { tableName: "notification_outbox", underscored: true });
+
   User.hasOne(Patient, { foreignKey: "userId", as: "patient" });
   Patient.belongsTo(User, { foreignKey: "userId", as: "user" });
   User.hasMany(AccountToken, { foreignKey: "userId", as: "accountTokens" });
   AccountToken.belongsTo(User, { foreignKey: "userId", as: "user" });
+  AccountToken.hasOne(NotificationOutbox, { foreignKey: "accountTokenId", as: "notification" });
+  NotificationOutbox.belongsTo(AccountToken, { foreignKey: "accountTokenId", as: "accountToken" });
 
-  return { User, Patient, AccountToken };
+  return { User, Patient, AccountToken, NotificationOutbox };
 }
 
 module.exports = { initializeAuthModels };

@@ -39,7 +39,7 @@ Comandos disponibles: `npm start` construye el CSS y levanta el servidor; `npm t
 
 ## Registro de pacientes
 
-El esquema propuesto para el registro está documentado en [USER_REGISTRATION_SCHEMA](docs/USER_REGISTRATION_SCHEMA.md). Con MySQL configurado en `.env`, ejecuta `npm run db:migrate` una vez para crear las tablas `users`, `patients` y `account_tokens`. La verificación por correo se incorpora en el issue #13.
+El esquema propuesto para el registro está documentado en [USER_REGISTRATION_SCHEMA](docs/USER_REGISTRATION_SCHEMA.md). Con MySQL configurado en `.env`, ejecuta `npm run db:migrate` para crear las tablas de registro y el índice de límites de verificación. Para entregar correo, configura `APP_BASE_URL` y los valores SMTP de `.env.example`. El paciente permanece sin acceso hasta verificar su correo.
 
 ## Flujo de contribución
 

@@ -54,11 +54,17 @@ La aceptación de las condiciones y de la política se registra con fecha y vers
 | `used_at` | `DATETIME(3)` | Nulo mientras no se use |
 | `created_at` | `DATETIME(3)` | Obligatorio |
 
-El token original se genera con un generador criptográfico, se entrega solo al usuario por el mecanismo de correo que se implementará en US-PAT-02 y no se guarda en la base de datos. La validez de 24 horas se controla con `expires_at`.
+El token original se genera con un generador criptográfico, se entrega solo al usuario por el transporte SMTP configurado y no se guarda en la base de datos. La validez de 24 horas se controla con `expires_at`.
+
+El índice compuesto `(user_id, purpose, created_at)` permite contar solicitudes de reenvío por propósito durante la última hora. El registro de token se escribe antes de enviar el correo; así un fallo de entrega tampoco reinicia el límite.
 
 ## Registro transaccional
 
 La creación debe insertar `users` y `patients` dentro de una misma transacción. Se asigna rol `PATIENT`, estado `PENDING_VERIFICATION` y `email_verified_at = NULL`; por tanto no puede iniciar sesión ni reservar hasta verificar el correo. Un error en cualquiera de las inserciones revierte ambas. Las restricciones únicas son la defensa final ante dos registros simultáneos con el mismo correo o documento.
+
+## `notification_outbox` para verificación
+
+La migración del issue #13 crea una fila de notificación en la misma transacción que el token. `account_token_id` es único y referencia el token asociado; el registro conserva destinatario, tipo, canal, estado, intentos, fecha de envío y un código de error genérico. No almacena el enlace ni el token original. El transporte SMTP intenta entregar hasta tres veces y actualiza el estado del outbox.
 
 ## Decisiones para revisión
 
