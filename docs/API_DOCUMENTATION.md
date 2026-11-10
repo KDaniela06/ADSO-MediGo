@@ -44,7 +44,16 @@ Los formularios POST están protegidos con token CSRF. La cookie de sesión es H
 
 El token aleatorio se guarda solo como hash SHA-256, vence en 30 minutos y se invalida tras el cambio. Un cambio exitoso también invalida otros enlaces de recuperación pendientes de la cuenta. Los formularios mantienen protección CSRF y no se almacenan en caché.
 
-## Dominios previstos## Perfil del paciente — issue #22
+## Cambio de contraseña del paciente — issue #23
+
+| Método y ruta | Acceso | Comportamiento |
+|---|---|---|
+| `GET /cambiar-contrasena` | Paciente autenticado | Muestra el formulario protegido para cambiar la contraseña. |
+| `POST /cambiar-contrasena` | Paciente autenticado | Valida contraseña actual, contraseña nueva de al menos ocho caracteres y confirmación. Solo guarda el cambio si la contraseña actual es correcta. Los errores no muestran datos sensibles. |
+
+El cambio guarda una nueva clave scrypt con sal aleatoria e invalida enlaces pendientes de recuperación de esa cuenta. La ruta exige sesión y rol de paciente; el formulario POST usa protección CSRF y no se almacena en caché.
+
+## Perfil del paciente — issue #22
 
 | Método y ruta | Acceso | Comportamiento |
 |---|---|---|
