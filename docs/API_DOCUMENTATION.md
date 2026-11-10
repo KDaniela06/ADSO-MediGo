@@ -74,6 +74,20 @@ El cambio guarda una nueva clave scrypt con sal aleatoria e invalida enlaces pen
 Al solicitar un correo nuevo, se conserva el correo vigente y se guarda la dirección nueva como pendiente. El paciente recibe allí un enlace que vence en 24 horas. El token se guarda como hash; al confirmarlo se actualiza el correo y se invalidan otros enlaces pendientes. Las rutas privadas validan sesión y rol en el servidor.
 
 
+## Cuenta del administrador — issue #46
+
+| Método y ruta | Acceso | Comportamiento |
+|---|---|---|
+| `GET /administrador/mi-cuenta` | Administrador autenticado | Muestra los datos de su propia cuenta; identificación y rol son de solo lectura. |
+| `POST /administrador/mi-cuenta` | Administrador autenticado | Valida nombres, teléfono y correo. Un correo nuevo queda pendiente hasta confirmar un enlace de un solo uso. |
+| `GET /administrador/cambiar-contrasena` | Administrador autenticado | Muestra el formulario de cambio de contraseña. |
+| `POST /administrador/cambiar-contrasena` | Administrador autenticado | Verifica la contraseña actual, la nueva (mínimo ocho caracteres) y su confirmación. |
+| `GET /administrador/confirmar-cambio-correo/:token` | Público, token requerido | Muestra la confirmación explícita; abrir el enlace no consume el token. |
+| `POST /administrador/confirmar-cambio-correo/:token` | Público, token requerido y CSRF | Cambia el correo solo con un token vigente de un solo uso asociado a una cuenta ADMIN activa. |
+
+El enlace vence en 24 horas y el token se almacena solo como hash SHA-256. Las rutas de cuenta y contraseña exigen sesión y rol ADMIN. El formulario no permite cambiar identificación o rol ni crear otros administradores.
+
+## Dominios previstos
 
 | Dominio | Operaciones previstas | Acceso general |
 |---|---|---|
