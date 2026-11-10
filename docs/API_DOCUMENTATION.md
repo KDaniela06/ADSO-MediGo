@@ -87,6 +87,16 @@ Las fechas se filtran y presentan en `America/Bogota`. El acceso a iniciar atenc
 
 La vista muestra información mínima de contacto y cantidad/fecha de citas asociadas. No presenta observaciones ni historia clínica. Los nombres se buscan sin distinguir mayúsculas ni tildes; los resultados se escapan en las vistas Pug.
 
+## Agenda y perfil del médico — issue #32
+
+| Método y ruta | Acceso | Comportamiento |
+|---|---|---|
+| `GET /medico/agenda` | Médico autenticado | Consulta los bloques del horario semanal vigente asociado al médico. No permite crear ni cambiar horarios o excepciones. |
+| `GET /medico/perfil` | Médico autenticado | Muestra correo, especialidad y registro profesional como solo lectura, además del teléfono, descripción y foto. |
+| `POST /medico/perfil` | Médico autenticado | Valida y actualiza teléfono, descripción profesional y URL HTTPS de la fotografía. No recibe cambios de nombre, correo, especialidad ni registro profesional. |
+
+La consulta de agenda muestra un estado vacío o de configuración pendiente cuando aún no existe un horario semanal disponible para el médico. Las tablas de horarios previstas en el diseño se incorporarán en el sprint de configuración de disponibilidad. Los datos privados no se almacenan en caché.
+
 ## Cambio de contraseña del médico — issue #33
 
 | Método y ruta | Acceso | Comportamiento |

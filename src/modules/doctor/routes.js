@@ -6,6 +6,9 @@ const { getDoctorDashboard } = require("./services/dashboard");
 const { getDoctorAppointment, getDoctorAppointments, APPOINTMENT_STATUSES } = require("./services/appointments");
 const { validateAppointmentFilters } = require("./validators/appointments");
 const { getDoctorPatient, getDoctorPatients } = require("./services/patients");
+const { getDoctorProfile, updateDoctorProfile } = require("./services/profile");
+const { getDoctorSchedule } = require("./services/schedule");
+const { validateDoctorProfile } = require("./validators/profile");
 
 function createDoctorRouter({ sequelize = null, models = null } = {}) {
   const router = Router();
@@ -21,6 +24,81 @@ function createDoctorRouter({ sequelize = null, models = null } = {}) {
       return response.status(statusCode).render("doctor/views/dashboard", {
         title: "Panel médico",
         dashboard
+      });
+    }
+  );
+
+  router.get(
+    "/medico/perfil",
+    requireAuthenticatedUser({ models }),
+    requireRole("DOCTOR"),
+    async (request, response) => {
+      response.set("Cache-Control", "no-store");
+      try {
+        const profile = await getDoctorProfile({ models, userId: request.currentUser.id });
+        if (!profile) return response.status(404).render("doctor/views/profile", {
+          title: "Mi perfil", profile: {}, values: {}, errors: {}, message: "No encontramos tu perfil médico."
+        });
+        return response.render("doctor/views/profile", {
+          title: "Mi perfil", profile, values: profile, errors: {}, message: null
+        });
+      } catch {
+        return response.status(503).send("No fue posible cargar el perfil en este momento.");
+      }
+    }
+  );
+
+  router.post(
+    "/medico/perfil",
+    requireAuthenticatedUser({ models }),
+    requireRole("DOCTOR"),
+    async (request, response) => {
+      response.set("Cache-Control", "no-store");
+      const { values, errors, isValid } = validateDoctorProfile(request.body || {});
+      let profile;
+      try {
+        profile = await getDoctorProfile({ models, userId: request.currentUser.id });
+      } catch {
+        return response.status(503).send("No fue posible cargar el perfil en este momento.");
+      }
+      if (!profile) return response.status(404).render("doctor/views/profile", {
+        title: "Mi perfil", profile: {}, values, errors: {}, message: "No encontramos tu perfil médico."
+      });
+      if (!isValid) return response.status(422).render("doctor/views/profile", {
+        title: "Mi perfil", profile, values, errors, message: "Revisa los campos señalados."
+      });
+      if (!sequelize) return response.status(503).render("doctor/views/profile", {
+        title: "Mi perfil", profile, values, errors: {},
+        message: "No fue posible guardar los cambios en este momento."
+      });
+      try {
+        const result = await updateDoctorProfile({ sequelize, models, userId: request.currentUser.id, input: values });
+        if (result.status === "not_found") return response.status(404).render("doctor/views/profile", {
+          title: "Mi perfil", profile: {}, values, errors: {}, message: "No encontramos tu perfil médico."
+        });
+        const updatedProfile = await getDoctorProfile({ models, userId: request.currentUser.id });
+        return response.status(200).render("doctor/views/profile", {
+          title: "Mi perfil", profile: updatedProfile, values: updatedProfile, errors: {},
+          message: "Tus datos se actualizaron correctamente."
+        });
+      } catch {
+        return response.status(503).render("doctor/views/profile", {
+          title: "Mi perfil", profile, values, errors: {},
+          message: "No fue posible guardar los cambios en este momento."
+        });
+      }
+    }
+  );
+
+  router.get(
+    "/medico/agenda",
+    requireAuthenticatedUser({ models }),
+    requireRole("DOCTOR"),
+    async (request, response) => {
+      response.set("Cache-Control", "no-store");
+      const schedule = await getDoctorSchedule({ models, userId: request.currentUser.id });
+      return response.status(schedule.status === "error" ? 503 : 200).render("doctor/views/schedule", {
+        title: "Mi agenda", schedule
       });
     }
   );

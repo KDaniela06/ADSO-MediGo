@@ -1,0 +1,72 @@
+extends ../../../views/shared/layout.pug
+
+block content
+  .min-h-screen.bg-slate-50.text-slate-800(class="md:flex")
+    aside(class="bg-medigo-navy text-white md:min-h-screen md:w-64 md:shrink-0")
+      .flex.items-center.gap-3.px-5.py-4(class="md:flex-col md:items-start md:px-6 md:py-8")
+        a(href="/medico", aria-label="MediGo, inicio", class="text-2xl font-extrabold tracking-tight") Medi#[span(class="text-medigo-cyan") Go]
+        nav(aria-label="Navegación principal", class="ml-auto flex gap-2 overflow-x-auto text-sm md:ml-0 md:mt-10 md:w-full md:flex-col md:gap-1")
+          a(href="/medico", class="whitespace-nowrap rounded-lg px-3 py-2 hover:bg-white/10") Inicio
+          a(href="/medico/citas", class="whitespace-nowrap rounded-lg px-3 py-2 hover:bg-white/10") Mis citas
+          a(href="/medico/pacientes", class="whitespace-nowrap rounded-lg px-3 py-2 hover:bg-white/10") Mis pacientes
+          a(href="/medico/agenda", class="whitespace-nowrap rounded-lg px-3 py-2 hover:bg-white/10") Mi agenda
+          a(href="/medico/perfil", aria-current="page", class="whitespace-nowrap rounded-lg bg-medigo-blue px-3 py-2 font-semibold") Mi perfil
+        form(action="/cerrar-sesion", method="post", class="hidden md:mt-auto md:block md:w-full")
+          input(type="hidden", name="_csrf", value=csrfToken)
+          button(type="submit", class="mt-8 w-full rounded-lg px-3 py-2 text-left text-sm text-sky-100 hover:bg-white/10") Cerrar sesión
+
+    main(class="mx-auto w-full max-w-5xl px-4 py-6 sm:px-6 md:py-10")
+      header(class="mb-6")
+        a(href="/medico", class="text-sm font-semibold text-medigo-blue hover:underline") ← Volver al panel
+        h1(class="mt-2 text-2xl font-bold text-medigo-navy sm:text-3xl") Mi perfil
+        p(class="mt-1 text-sm text-slate-600") Consulta tus datos profesionales y actualiza la información permitida.
+      if message
+        p(role=errors && Object.keys(errors).length ? "alert" : "status", class="mb-5 rounded-xl border border-sky-200 bg-sky-50 p-4 text-sm text-sky-900")= message
+
+      if profile && profile.user
+        section(class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7")
+          .flex.items-center.gap-4.border-b.border-slate-100.pb-6
+            if profile.profilePhotoUrl
+              img(src=profile.profilePhotoUrl, alt="Fotografía de perfil", class="h-20 w-20 rounded-full object-cover")
+            else
+              span(aria-hidden="true", class="flex h-20 w-20 items-center justify-center rounded-full bg-sky-100 text-2xl font-bold text-medigo-blue") #{(profile.user.firstName || "M").slice(0, 1).toUpperCase()}
+            div
+              h2(class="text-xl font-bold text-medigo-navy") Dr. #{profile.user.firstName} #{profile.user.lastName}
+              p(class="mt-1 text-sm text-slate-600") #{profile.specialty ? profile.specialty.name : "Especialidad no disponible"}
+          dl(class="mt-6 grid gap-4 sm:grid-cols-2")
+            div
+              dt(class="text-xs font-semibold uppercase tracking-wide text-slate-500") Correo electrónico
+              dd(class="mt-1 text-sm text-slate-800") #{profile.user.email}
+            div
+              dt(class="text-xs font-semibold uppercase tracking-wide text-slate-500") Especialidad
+              dd(class="mt-1 text-sm text-slate-800") #{profile.specialty ? profile.specialty.name : "No disponible"}
+            div
+              dt(class="text-xs font-semibold uppercase tracking-wide text-slate-500") Registro profesional
+              dd(class="mt-1 text-sm text-slate-800") #{profile.professionalRegistration || "No disponible"}
+          form(action="/medico/perfil", method="post", class="mt-7 border-t border-slate-100 pt-6")
+            input(type="hidden", name="_csrf", value=csrfToken)
+            h3(class="text-lg font-bold text-medigo-navy") Datos que puedes actualizar
+            div(class="mt-4 grid gap-5 sm:grid-cols-2")
+              div
+                label(for="phone", class="block text-sm font-semibold text-slate-700") Teléfono
+                input#phone(name="phone", type="tel", required, maxlength="30", autocomplete="tel", value=values.phone || profile.user.phone || "", class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2")
+                if errors.phone
+                  p(role="alert", class="mt-1 text-sm text-rose-700")= errors.phone
+              div
+                label(for="profilePhotoUrl", class="block text-sm font-semibold text-slate-700") Fotografía (URL HTTPS)
+                input#profilePhotoUrl(name="profilePhotoUrl", type="url", maxlength="2048", value=values.profilePhotoUrl || profile.profilePhotoUrl || "", placeholder="https://...", class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2")
+                if errors.profilePhotoUrl
+                  p(role="alert", class="mt-1 text-sm text-rose-700")= errors.profilePhotoUrl
+              div(class="sm:col-span-2")
+                label(for="professionalDescription", class="block text-sm font-semibold text-slate-700") Descripción profesional
+                textarea#professionalDescription(name="professionalDescription", rows="5", maxlength="2000", class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2")= values.professionalDescription || profile.professionalDescription || ""
+                if errors.professionalDescription
+                  p(role="alert", class="mt-1 text-sm text-rose-700")= errors.professionalDescription
+            button(type="submit", class="mt-5 rounded-lg bg-medigo-blue px-5 py-3 text-sm font-semibold text-white hover:bg-medigo-navy") Guardar cambios
+            p(class="mt-3 text-xs text-slate-500") Tu nombre, correo, especialidad y registro profesional se muestran como datos de solo lectura.
+      else if !message
+        p(role="status", class="rounded-xl bg-white p-5 text-sm text-slate-700 shadow-sm") No encontramos tu perfil médico.
+
+      form(action="/cerrar-sesion", method="post", class="mt-6 md:hidden")
+        input(type="hidden", name="_csrf", value=csrfToken)
+        button(type="submit", class="w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-700") Cerrar sesión
