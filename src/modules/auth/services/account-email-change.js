@@ -13,7 +13,7 @@ function emailChangeUrl(token, baseUrl) {
   return new URL(`/administrador/confirmar-cambio-correo/${encodeURIComponent(token)}`, baseUrl).toString();
 }
 
-async function requestAccountEmailChange({ sequelize, models, userId, role, email, emailSender, baseUrl, now = new Date() }) {
+async function requestAccountEmailChange({ sequelize, models, userId, role, email, updates = {}, emailSender, baseUrl, now = new Date() }) {
   const { User, AccountToken, NotificationOutbox } = models;
   const normalizedEmail = String(email || "").trim().toLowerCase();
   const request = await sequelize.transaction(async (transaction) => {
@@ -21,7 +21,7 @@ async function requestAccountEmailChange({ sequelize, models, userId, role, emai
     if (!user || user.role !== role || user.status !== "ACTIVE") return { status: "unavailable" };
 
     if (normalizedEmail === String(user.email || "").trim().toLowerCase()) {
-      user.pendingEmail = null;
+      Object.assign(user, updates);
       await user.save({ transaction });
       return { status: "saved" };
     }
@@ -33,6 +33,7 @@ async function requestAccountEmailChange({ sequelize, models, userId, role, emai
     });
     if (existing && Number(existing.id) !== Number(user.id)) return { status: "email_in_use" };
 
+    Object.assign(user, updates);
     await AccountToken.update({ usedAt: now }, {
       where: { userId: user.id, purpose: EMAIL_CHANGE_PURPOSE, usedAt: null },
       transaction
