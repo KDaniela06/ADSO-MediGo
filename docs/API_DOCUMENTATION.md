@@ -33,6 +33,17 @@ Los tokens son aleatorios, vencen en 24 horas y solo su hash SHA-256 se persiste
 
 Los formularios POST están protegidos con token CSRF. La cookie de sesión es HttpOnly y SameSite=Lax; en producción exige HTTPS, un secreto propio y una tienda persistente configurada. El almacenamiento en memoria se limita al desarrollo local.
 
+## Recuperación de contraseña — issue #15
+
+| Método y ruta | Acceso | Comportamiento |
+|---|---|---|
+| `GET /recuperar-contrasena` | Público | Muestra el formulario de correo. |
+| `POST /recuperar-contrasena` | Público | Responde con el mismo mensaje aunque la cuenta no exista, no esté activa, haya un límite o falle el correo. Aplica espera de 60 segundos y máximo cinco solicitudes por hora. |
+| `GET /restablecer-contrasena/:token` | Público, token requerido | Muestra el formulario de nueva contraseña sin consumir el token. |
+| `POST /restablecer-contrasena/:token` | Público, token requerido | Comprueba contraseña y confirmación, y actualiza la clave solo con un token válido, no usado y vigente. |
+
+El token aleatorio se guarda solo como hash SHA-256, vence en 30 minutos y se invalida tras el cambio. Un cambio exitoso también invalida otros enlaces de recuperación pendientes de la cuenta. Los formularios mantienen protección CSRF y no se almacenan en caché.
+
 ## Dominios previstos
 
 | Dominio | Operaciones previstas | Acceso general |
