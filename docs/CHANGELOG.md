@@ -2,6 +2,12 @@
 
 Los cambios se registran en orden descendente. No se atribuyen funcionalidades de aplicación a cambios que solo añaden documentación.
 
+## 2026-11-10 — Cambio de contraseña del paciente (US-PAT-12)
+
+- Se añadió el formulario accesible desde el perfil para solicitar la contraseña actual, una nueva de mínimo ocho caracteres y su confirmación.
+- La contraseña actual se verifica antes de guardar; se usa un nuevo hash scrypt y se invalidan enlaces de recuperación pendientes.
+- Se protegieron las rutas con sesión, rol de paciente y CSRF, y se añadieron pruebas del servicio y del flujo web.
+
 ## 2026-11-10 — Perfil del paciente (US-PAT-11)
 
 - Se añadió la pantalla, siguiendo el mockup, para consultar identificación y datos de contacto, incluida ciudad opcional; la identificación queda de solo lectura.
