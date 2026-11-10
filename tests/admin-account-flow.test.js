@@ -105,6 +105,7 @@ describe("administrator account pages", () => {
   });
 
   test("updates personal details and confirms a new email before replacing the current one", async () => {
+    user.role = "PATIENT";
     const cookie = await login();
     user.role = "ADMIN";
     const page = await getPage("/administrador/mi-cuenta", cookie);
