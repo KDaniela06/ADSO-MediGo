@@ -11,7 +11,16 @@ La aplicación usa rutas Express con formularios Pug. Las rutas se documentan co
 | `GET /registro` | Público | Renderiza el formulario de registro de paciente. |
 | `POST /registro` | Público | Valida en servidor y crea `users` + `patients` en una transacción. La cuenta queda `PENDING_VERIFICATION`. Devuelve `422` para campos inválidos, `409` para correo o documento duplicado, `201` al crear y `503` si la persistencia no está disponible. |
 
-La contraseña se guarda como hash scrypt con sal aleatoria. Las tablas base se crean con `npm run db:migrate`. La emisión y entrega del token de verificación corresponde al issue #13; el registro no inicia sesión.
+La contraseña se guarda como hash scrypt con sal aleatoria. Las tablas base se crean con `npm run db:migrate`. El registro no inicia sesión.
+
+## Verificación de correo — issue #13
+
+| Método y ruta | Acceso | Comportamiento |
+|---|---|---|
+| `GET /verificar-correo/:token` | Público, token requerido | Verifica y activa la cuenta si el token es válido, no usado y no vencido. Presenta estados para éxito, vencimiento, uso previo o token inválido. |
+| `POST /verificar-correo/reenviar` | Público | Solicita un nuevo enlace sin revelar si el correo pertenece a una cuenta pendiente. Aplica espera de 60 segundos y máximo cinco solicitudes por hora. |
+
+Los tokens son aleatorios, vencen en 24 horas y solo su hash SHA-256 se persiste. SMTP se configura con las variables `SMTP_*`; los reenvíos fallidos también consumen el límite.
 
 ## Dominios previstos
 
@@ -35,3 +44,4 @@ La contraseña se guarda como hash scrypt con sal aleatoria. Las tablas base se 
 - Límites de solicitud y tokens de un solo uso.
 - El webhook de WhatsApp debe validar la firma del proveedor oficial.
 - No devolver información clínica en el historial del paciente ni detalles no autorizados.
+
