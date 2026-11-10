@@ -49,7 +49,7 @@ El token aleatorio se guarda solo como hash SHA-256, vence en 30 minutos y se in
 | Método y ruta | Acceso | Comportamiento |
 |---|---|---|
 | `GET /perfil` | Paciente autenticado | Muestra los datos de identificación, fecha de nacimiento y contacto del paciente de la sesión. |
-| `POST /perfil` | Paciente autenticado | Valida y guarda nombres y teléfono. La identificación no se recibe como dato editable. |
+| `POST /perfil` | Paciente autenticado | Valida y guarda nombres, teléfono y ciudad opcional. La identificación no se recibe como dato editable. |
 | `GET /confirmar-cambio-correo/:token` | Público, token requerido | Muestra una confirmación explícita; abrir el enlace no consume el token. |
 | `POST /confirmar-cambio-correo/:token` | Público, token requerido y CSRF | Cambia el correo solo con un token vigente y de un solo uso. |
 
