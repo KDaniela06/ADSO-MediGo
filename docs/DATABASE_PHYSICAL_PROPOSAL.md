@@ -93,7 +93,7 @@ El mockup de perfil muestra registro profesional, descripción y fotografía; no
 | `profile_photo_url` | `VARCHAR(2048)` | Opcional; guardar referencia, no binario |
 | `created_at`, `updated_at` | `DATETIME(3)` | Obligatorios |
 
-El estado activo/inactivo se toma de `users.status` para evitar dos fuentes de verdad. Confirmar si se necesita un estado profesional independiente.
+El estado activo/inactivo se toma de `users.status` para evitar dos fuentes de verdad; no se define un estado profesional independiente.
 
 ### 4. `specialties`
 
@@ -214,7 +214,7 @@ Una cita tiene como máximo una consulta. La observación original queda inmutab
 | `used_at` | `DATETIME(3)` | Opcional |
 | `created_at` | `DATETIME(3)` | Obligatorio |
 
-Índice propuesto: (`user_id`, `purpose`, `created_at`) para límites de reenvío. Confirmar que invitaciones médicas comparten la tabla y propósitos.
+Índice propuesto: (`user_id`, `purpose`, `created_at`) para límites de reenvío. Las invitaciones médicas comparten la tabla con propósito independiente y vencimiento propio.
 
 ### 13. `whatsapp_conversations`
 
@@ -248,7 +248,7 @@ Se guarda el estado de conversación, no una copia permanente del contenido de m
 | `sent_at` | `DATETIME(3)` | Opcional |
 | `created_at`, `updated_at` | `DATETIME(3)` | Obligatorios |
 
-No se almacena el enlace, token ni código original. Confirmar si el outbox cubrirá WhatsApp o solo correo.
+No se almacena el enlace, token ni código original. El outbox admite los canales email y WhatsApp.
 
 ### 15. `audit_logs`
 
