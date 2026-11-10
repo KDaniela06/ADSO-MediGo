@@ -7,8 +7,8 @@
 - Se conserva el inventario de 15 tablas del diseño lógico existente.
 - Las vistas sirven para identificar datos visibles; las historias y reglas describen procesos, relaciones y restricciones.
 - Identificadores, nombres de tablas y columnas se proponen en inglés para mantener consistencia con el código.
-- Tipos MySQL son una propuesta para revisión. Se asume InnoDB y `utf8mb4`; confirmar la versión exacta antes de depender de restricciones `CHECK`.
-- Se propone almacenar instantes en UTC con `DATETIME(3)` y convertir a `America/Bogota` en la interfaz. Esta decisión debe aprobarse junto con la revisión de las historias.
+- Tipos MySQL, InnoDB y `utf8mb4` se aprobaron como propuesta. La versión exacta debe confirmarse antes de depender de restricciones `CHECK`.
+- Se propone almacenar instantes en UTC con `DATETIME(3)` y convertir a `America/Bogota` en la interfaz. Esta convención fue aprobada por la autora durante el cierre del Sprint 0.
 - Las contraseñas, tokens y códigos de verificación nunca se almacenan en texto plano.
 - No se incluyen diagnósticos, prescripciones ni historia clínica completa.
 
@@ -77,7 +77,7 @@ La vista de registro muestra fecha de nacimiento y aceptación de términos/priv
 | `whatsapp_verification_attempts` | `TINYINT UNSIGNED` | Propuesta: contador limitado por regla |
 | `created_at`, `updated_at` | `DATETIME(3)` | Obligatorios |
 
-La relación paciente-usuario es uno a uno. El teléfono de contacto general vive en `users.phone`; el número de WhatsApp puede ser distinto.
+La relación paciente-usuario es uno a uno. El teléfono de contacto general vive en `users.phone`; el número de WhatsApp puede ser distinto. Las operaciones del bot requieren un número vinculado y verificado; el documento por sí solo no autentica al paciente.
 
 ### 3. `doctors`
 
@@ -171,7 +171,7 @@ Cada cita conserva los datos necesarios para mostrar su historial aunque cambien
 | `specialty_id` | `BIGINT UNSIGNED` | FK a `specialties.id`; valor al reservar |
 | `starts_at`, `ends_at` | `DATETIME(3)` | Instantes UTC; duración propuesta de 30 min |
 | `status` | `ENUM('CONFIRMED','IN_PROGRESS','ATTENDED','CANCELLED','NO_SHOW')` | Estado actual |
-| `created_by_user_id` | `BIGINT UNSIGNED` | FK opcional a `users.id`; nulo para reserva del paciente si no se desea duplicar actor |
+| `created_by_user_id` | `BIGINT UNSIGNED` | FK opcional a `users.id`; el actor y los cambios se conservan en `audit_logs` |
 | `cancelled_at` | `DATETIME(3)` | Opcional |
 | `cancellation_reason` | `VARCHAR(255)` | Opcional |
 | `created_at`, `updated_at` | `DATETIME(3)` | Obligatorios |
@@ -298,7 +298,7 @@ Antes de crear migraciones debe definirse la versión mínima exacta de MySQL pa
 - `doctor/profile.jpg`: registro profesional, descripción, fotografía y especialidad; identidad y teléfono provienen de `users`.
 - Paneles de paciente, médico y administrador: muestran citas, conteos y accesos; no justifican almacenar datos clínicos adicionales.
 
-Las imágenes no definen relaciones, estados, índices ni reglas de concurrencia. Esos elementos se proponen desde las historias y reglas de negocio y quedan sujetos a aprobación.
+Las imágenes no definen relaciones, estados, índices ni reglas de concurrencia. Esos elementos se definieron en el modelo aprobado a partir de las historias y reglas de negocio.
 
 ## Paso posterior
 
