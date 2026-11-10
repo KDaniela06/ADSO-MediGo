@@ -57,8 +57,8 @@ MediGo manejará datos personales y datos asociados a atención médica. Aplicar
 - Nombre oficial del producto: **MediGo**.
 - Desarrollo organizado por issues pequeños, con una rama por issue.
 - Commits pequeños y frecuentes, en inglés; la descripción funcional de cada cambio se documenta en español.
-- Cada issue termina con un PR hacia `develop`; no se inicia el siguiente issue hasta que el PR actual esté abierto para revisión.
-- Los PR deben ejecutar CI básico con GitHub Actions y Jest. Incorporar Supertest solo después de confirmar su aprobación como dependencia adicional.
+- Cada issue termina con un PR hacia `develop`; no se inicia el siguiente issue hasta que la autora revise y fusione el PR actual.
+- Los PR ejecutan CI básico con GitHub Actions y Jest. Supertest queda fuera del alcance aprobado.
 - No cambiar las historias de usuario sin consultar primero a la autora.
 
 ## Estado
