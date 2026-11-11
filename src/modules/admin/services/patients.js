@@ -84,7 +84,7 @@ async function getAdminPatients({ models, search = "", status = "", page = 1 }) 
 
 async function getAdminPatient({ models, patientId }) {
   if (!models?.Patient?.findByPk || !models?.User) return { status: "unavailable" };
-  if (!/^\\d+$/.test(String(patientId || ""))) return { status: "not_found" };
+  if (!/^[0-9]+$/.test(String(patientId || ""))) return { status: "not_found" };
   try {
     const record = await models.Patient.findByPk(patientId, {
       attributes: ["id", "userId", "city", "dateOfBirth"],
@@ -98,7 +98,7 @@ async function getAdminPatient({ models, patientId }) {
 
 async function updateAdminPatient({ sequelize, models, patientId, input }) {
   if (!sequelize || !models?.Patient || !models?.User) return { status: "unavailable" };
-  if (!/^\\d+$/.test(String(patientId || ""))) return { status: "not_found" };
+  if (!/^[0-9]+$/.test(String(patientId || ""))) return { status: "not_found" };
   return sequelize.transaction(async (transaction) => {
     const patient = await models.Patient.findByPk(patientId, { transaction, lock: transaction.LOCK.UPDATE });
     if (!patient) return { status: "not_found" };
@@ -116,7 +116,7 @@ async function updateAdminPatient({ sequelize, models, patientId, input }) {
 
 async function changeAdminPatientStatus({ sequelize, models, patientId, actorUserId, newStatus, confirmed, now = new Date() }) {
   if (!sequelize || !models?.User || !models?.AuditLog) return { status: "unavailable" };
-  if (!/^\\d+$/.test(String(patientId || ""))) return { status: "not_found" };
+  if (!/^[0-9]+$/.test(String(patientId || ""))) return { status: "not_found" };
   if (!["ACTIVE", "INACTIVE"].includes(newStatus)) return { status: "invalid_status" };
   if (confirmed !== "YES") return { status: "confirmation_required" };
 
