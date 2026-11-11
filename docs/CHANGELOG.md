@@ -1,3 +1,10 @@
+## 2026-11-11 — Registro de médicos por invitación (US-ADM-03)
+
+- Añadí el formulario administrativo para registrar médicos con especialidad activa.
+- Envié una invitación de un solo uso con vencimiento de 24 horas; el médico define su contraseña desde ese enlace.
+- Registré la fecha de configuración y mantuve la cuenta pendiente hasta completar el proceso.
+- Añadí pruebas de validación, unicidad, enlaces y activación, además de documentación y migración.
+
 ## 2026-11-11 — Gestión de pacientes por administrador (US-ADM-02)
 
 - Añadí búsqueda, filtro por estado y paginación para pacientes.
