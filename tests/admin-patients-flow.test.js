@@ -19,7 +19,7 @@ describe("administrator patient pages", () => {
     patient = {
       id: 3, userId: 7, city: "Cali", dateOfBirth: "1995-04-02",
       user: { id: 7, firstName: "Ana", lastName: "Paz", documentType: "CC",
-        documentNumber: "123", email: "ana@example.com", phone: "3001112233", status: "ACTIVE" },
+        documentNumber: "123", email: "ana@example.com", phone: "3001112233", role: "PATIENT", status: "ACTIVE" },
       save: jest.fn()
     };
     auditCreate = jest.fn().mockResolvedValue({ id: 1 });
@@ -90,7 +90,7 @@ describe("administrator patient pages", () => {
       redirect: "manual"
     });
     expect(response.status).toBe(303);
-    expect(user.status).toBe("INACTIVE");
+    expect(patient.user.status).toBe("INACTIVE");
     expect(auditCreate).toHaveBeenCalled();
   });
 });
