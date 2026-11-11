@@ -1,0 +1,47 @@
+extends ../../../views/shared/layout.pug
+
+block content
+  .min-h-screen.bg-slate-100.px-4.py-8.text-slate-800
+    main(class="mx-auto max-w-3xl")
+      a(class="text-sm font-semibold text-medigo-blue hover:underline", href="/administrador/pacientes") ← Volver a pacientes
+      h1(class="mt-4 text-2xl font-bold text-medigo-navy") Datos administrativos del paciente
+      if message
+        p(role="alert", class="mt-4 rounded-xl bg-amber-50 p-4 text-sm text-amber-900")= message
+      if patient
+        p(class="mt-2 text-sm text-slate-600") Identificación y fecha de nacimiento son de solo lectura. No se muestran datos clínicos.
+        dl(class="mt-5 grid gap-3 rounded-2xl border border-slate-200 bg-white p-5 sm:grid-cols-2")
+          div
+            dt(class="text-xs uppercase text-slate-500") Documento
+            dd(class="mt-1 font-semibold") #{patient.documentType} #{patient.documentNumber}
+          div
+            dt(class="text-xs uppercase text-slate-500") Correo
+            dd(class="mt-1 font-semibold")= patient.email
+          div
+            dt(class="text-xs uppercase text-slate-500") Fecha de nacimiento
+            dd(class="mt-1 font-semibold")= patient.dateOfBirth
+          div
+            dt(class="text-xs uppercase text-slate-500") Estado
+            dd(class="mt-1 font-semibold")= patient.status
+        form(class="mt-5 space-y-4 rounded-2xl border border-slate-200 bg-white p-5", action="/administrador/pacientes/" + patient.id, method="post")
+          input(type="hidden", name="_csrf", value=csrfToken)
+          div
+            label(for="firstName", class="mb-1 block text-sm font-semibold") Nombres
+            input#firstName(class="w-full rounded-lg border border-slate-300 px-3 py-2", name="firstName", maxlength="100", required, value=values.firstName)
+            if errors.firstName
+              p(class="mt-1 text-sm text-rose-700")= errors.firstName
+          div
+            label(for="lastName", class="mb-1 block text-sm font-semibold") Apellidos
+            input#lastName(class="w-full rounded-lg border border-slate-300 px-3 py-2", name="lastName", maxlength="100", required, value=values.lastName)
+            if errors.lastName
+              p(class="mt-1 text-sm text-rose-700")= errors.lastName
+          div
+            label(for="phone", class="mb-1 block text-sm font-semibold") Teléfono
+            input#phone(class="w-full rounded-lg border border-slate-300 px-3 py-2", name="phone", maxlength="30", required, value=values.phone)
+            if errors.phone
+              p(class="mt-1 text-sm text-rose-700")= errors.phone
+          div
+            label(for="city", class="mb-1 block text-sm font-semibold") Ciudad
+            input#city(class="w-full rounded-lg border border-slate-300 px-3 py-2", name="city", maxlength="100", value=values.city)
+            if errors.city
+              p(class="mt-1 text-sm text-rose-700")= errors.city
+          button(class="rounded-lg bg-medigo-blue px-5 py-3 font-semibold text-white", type="submit") Guardar cambios

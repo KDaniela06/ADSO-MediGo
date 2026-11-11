@@ -139,6 +139,18 @@ El enlace vence en 24 horas y el token se almacena solo como hash SHA-256. Las r
 
 Los conteos se consultan como agregados, y la vista semanal solo carga fechas y cantidades. No se consultan ni se presentan notas clínicas. El día de reporte se calcula en `America/Bogota`; la página indica estados vacíos, sin configuración y error, y no se almacena en caché. Al iniciar sesión, la cuenta ADMIN llega a este panel.
 
+## Gestión de pacientes — issue #35
+
+| Método y ruta | Acceso | Comportamiento |
+|---|---|---|
+| `GET /administrador/pacientes` | Administrador autenticado | Lista pacientes con búsqueda, filtro por estado y paginación. |
+| `GET /administrador/pacientes/:patientId` | Administrador autenticado | Muestra identificación y fecha de nacimiento como solo lectura; permite editar nombres, teléfono y ciudad. |
+| `POST /administrador/pacientes/:patientId` | Administrador autenticado | Valida y guarda solo nombres, teléfono y ciudad. Correo, identificación, rol y fecha de nacimiento no se pueden editar aquí. |
+| `GET /administrador/pacientes/:patientId/estado?nuevo=ACTIVE` o `?nuevo=INACTIVE` | Administrador autenticado | Presenta confirmación explícita para activar o desactivar una cuenta. |
+| `POST /administrador/pacientes/:patientId/estado` | Administrador autenticado | Cambia el estado tras confirmación y registra actor, paciente, estado anterior/nuevo y fecha en `audit_logs`, dentro de la misma transacción. |
+
+La consulta solo incluye datos administrativos de paciente y excluye notas clínicas y observaciones. Las acciones requieren sesión, rol ADMIN y protección CSRF. Los cambios de estado solo aplican a cuentas activas o inactivas.
+
 ## Dominios previstos
 
 | Dominio | Operaciones previstas | Acceso general |

@@ -69,6 +69,18 @@ function initializeAuthModels(sequelize) {
     lastError: { type: DataTypes.STRING(100), allowNull: true, field: "last_error" }
   }, { tableName: "notification_outbox", underscored: true });
 
+  const AuditLog = sequelize.define("AuditLog", {
+    id: { type: DataTypes.BIGINT.UNSIGNED, primaryKey: true, autoIncrement: true },
+    actorUserId: { type: DataTypes.BIGINT.UNSIGNED, allowNull: true, field: "actor_user_id" },
+    action: { type: DataTypes.STRING(80), allowNull: false },
+    entityType: { type: DataTypes.STRING(60), allowNull: false, field: "entity_type" },
+    entityId: { type: DataTypes.BIGINT.UNSIGNED, allowNull: false, field: "entity_id" },
+    beforeData: { type: DataTypes.JSON, allowNull: true, field: "before_data" },
+    afterData: { type: DataTypes.JSON, allowNull: true, field: "after_data" },
+    createdAt: { type: DataTypes.DATE(3), allowNull: false, field: "created_at" },
+    requestId: { type: DataTypes.STRING(64), allowNull: true, field: "request_id" }
+  }, { tableName: "audit_logs", underscored: true, updatedAt: false });
+
   const Specialty = sequelize.define("Specialty", {
     id: { type: DataTypes.BIGINT.UNSIGNED, primaryKey: true, autoIncrement: true },
     name: { type: DataTypes.STRING(100), allowNull: false, unique: true },
@@ -124,7 +136,7 @@ function initializeAuthModels(sequelize) {
   AccountToken.hasOne(NotificationOutbox, { foreignKey: "accountTokenId", as: "notification" });
   NotificationOutbox.belongsTo(AccountToken, { foreignKey: "accountTokenId", as: "accountToken" });
 
-  return { User, Patient, Doctor, Specialty, Appointment, AccountToken, NotificationOutbox };
+  return { User, Patient, Doctor, Specialty, Appointment, AccountToken, NotificationOutbox, AuditLog };
 }
 
 module.exports = { initializeAuthModels };

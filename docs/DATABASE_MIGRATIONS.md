@@ -14,7 +14,7 @@ La historia #22 incorpora dos migraciones: `202611100002-add-patient-profile-ema
 2. Para enviar mensajes, configura también `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASSWORD`, `SMTP_FROM` y `APP_BASE_URL`.
 3. Ejecuta `npm run db:migrate`.
 
-El runner omite migraciones ya registradas. La migración exporta `down(queryInterface)` para rollback manual; el runner no aplica rollbacks. No se generan datos personales de pacientes en seeders y no se incluyen credenciales iniciales.
+La migración `202611100005-create-audit-logs` crea la bitácora genérica aprobada; en la gestión de pacientes registra actor, entidad, estado anterior/nuevo y fecha, sin guardar datos clínicos.\n\nEl runner omite migraciones ya registradas. La migración exporta `down(queryInterface)` para rollback manual; el runner no aplica rollbacks. No se generan datos personales de pacientes en seeders y no se incluyen credenciales iniciales.
 
 ## Convenciones
 
