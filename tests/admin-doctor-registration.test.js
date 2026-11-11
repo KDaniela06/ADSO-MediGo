@@ -1,4 +1,3 @@
-const { createHash } = require("node:crypto");
 const { validateDoctorRegistration } = require("../src/modules/admin/validators/doctor");
 const { createDoctorInvitation } = require("../src/modules/admin/services/doctors");
 const { configureDoctorAccount, getDoctorInvitationStatus, hashToken } = require("../src/modules/auth/services/doctor-invitation");
@@ -71,7 +70,9 @@ describe("doctor registration", () => {
     const savedToken = AccountToken.create.mock.calls[0][0];
     expect(savedToken).toMatchObject({ userId: 12, purpose: "DOCTOR_INVITATION", usedAt: null });
     expect(savedToken.tokenHash).toMatch(/^[a-f0-9]{64}$/);
-    expect(savedToken.tokenHash).not.toBe(sendDoctorInvitationEmail.mock.calls[0][0].url.split("/").pop());
+    const invitationUrl = new URL(sendDoctorInvitationEmail.mock.calls[0][0].url);
+    const invitationToken = decodeURIComponent(invitationUrl.pathname.split("/").pop());
+    expect(savedToken.tokenHash).toBe(hashToken(invitationToken));
     expect(sendDoctorInvitationEmail).toHaveBeenCalledWith(expect.objectContaining({
       to: "laura@example.com", expiresInHours: 24, url: expect.stringContaining("/invitacion-medico/")
     }));
@@ -97,7 +98,7 @@ describe("doctor invitation setup", () => {
     const token = "secure-random-token";
     const accountToken = { userId: 12, expiresAt: new Date(now.getTime() + 1000), usedAt: null, save: jest.fn() };
     const user = {
-      id: 12, role: "DOCTOR", status: "PENDING_VERIFICATION", passwordHash: null,
+      id: 12, firstName: "Laura", role: "DOCTOR", status: "PENDING_VERIFICATION", passwordHash: null,
       save: jest.fn()
     };
     const models = {
@@ -107,7 +108,7 @@ describe("doctor invitation setup", () => {
     const transaction = { LOCK: { UPDATE: "UPDATE" } };
     const sequelize = { transaction: (callback) => callback(transaction) };
 
-    expect(await getDoctorInvitationStatus({ models, token, now })).toEqual({ status: "ready", firstName: undefined });
+    expect(await getDoctorInvitationStatus({ models, token, now })).toEqual({ status: "ready", firstName: "Laura" });
     const result = await configureDoctorAccount({ sequelize, models, token, password: "password-seguro", now });
 
     expect(result).toEqual({ status: "configured" });
