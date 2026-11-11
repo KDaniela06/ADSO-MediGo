@@ -116,7 +116,7 @@ describe("doctor invitation setup", () => {
     expect(accountToken.save).toHaveBeenCalledWith({ transaction });
     expect(user).toMatchObject({
       role: "DOCTOR", status: "ACTIVE", emailVerifiedAt: now, passwordConfiguredAt: now,
-      passwordHash: expect.stringMatching(/^scrypt\\$/)
+      passwordHash: expect.stringMatching(/^scrypt\$/)
     });
     expect(user.passwordHash).not.toContain("password-seguro");
     expect(user.save).toHaveBeenCalledWith({ transaction });
