@@ -1,0 +1,70 @@
+extends ../../../views/shared/layout.pug
+
+block content
+  .min-h-screen.bg-slate-100.text-slate-800(class="lg:flex")
+    aside(class="bg-medigo-navy text-white lg:flex lg:w-64 lg:flex-col lg:shrink-0")
+      a(class="px-6 py-5 text-2xl font-extrabold", href="/administrador") Medi#[span(class="text-medigo-cyan") Go]
+      nav(class="space-y-1 px-3 pb-4", aria-label="Navegación de administrador")
+        a(class="block rounded-xl px-4 py-3 text-sm text-sky-100 hover:bg-white/10", href="/administrador") Inicio
+        a(class="block rounded-xl bg-medigo-cyan px-4 py-3 text-sm font-semibold", href="/administrador/pacientes", aria-current="page") Pacientes
+        a(class="block rounded-xl px-4 py-3 text-sm text-sky-100 hover:bg-white/10", href="/administrador/mi-cuenta") Mi cuenta
+    main(class="mx-auto w-full max-w-7xl px-4 py-7 sm:px-8")
+      header(class="mb-6")
+        p(class="text-sm font-semibold uppercase tracking-wide text-medigo-blue") MediGo
+        h1(class="mt-1 text-2xl font-bold text-medigo-navy sm:text-3xl") Gestionar pacientes
+        p(class="mt-1 text-sm text-slate-600") Consulta y actualiza datos administrativos de las cuentas.
+      if message === "updated"
+        p(role="status", class="mb-4 rounded-xl bg-emerald-50 p-4 text-sm text-emerald-900") Los datos del paciente se actualizaron.
+      if message === "status-updated"
+        p(role="status", class="mb-4 rounded-xl bg-emerald-50 p-4 text-sm text-emerald-900") El estado de la cuenta se actualizó y quedó registrado.
+      if patientsResult.status === "error"
+        p(role="alert", class="rounded-xl bg-amber-50 p-4 text-sm text-amber-900") No pudimos cargar los pacientes. Inténtalo de nuevo más tarde.
+      else if patientsResult.status === "unavailable"
+        p(role="status", class="rounded-xl bg-sky-50 p-4 text-sm text-sky-900") La consulta de pacientes no está disponible en este momento.
+      else
+        form(class="mb-5 grid gap-3 rounded-2xl border border-slate-200 bg-white p-4 sm:grid-cols-[1fr_12rem_auto]", action="/administrador/pacientes", method="get")
+          label(class="sr-only", for="search") Buscar pacientes
+          input#search(class="rounded-lg border border-slate-300 px-3 py-2", type="search", name="q", value=patientsResult.search, placeholder="Nombre, documento, correo o teléfono")
+          label(class="sr-only", for="status") Filtrar por estado
+          select#status(class="rounded-lg border border-slate-300 px-3 py-2", name="estado")
+            option(value="") Todos los estados
+            option(value="ACTIVE", selected=patientsResult.selectedStatus === "ACTIVE") Activa
+            option(value="INACTIVE", selected=patientsResult.selectedStatus === "INACTIVE") Inactiva
+            option(value="PENDING_VERIFICATION", selected=patientsResult.selectedStatus === "PENDING_VERIFICATION") Pendiente de verificación
+          button(class="rounded-lg bg-medigo-blue px-4 py-2 font-semibold text-white", type="submit") Buscar
+        p(class="mb-3 text-sm text-slate-600") #{patientsResult.total} paciente(s) · Página #{patientsResult.page} de #{patientsResult.pageCount}
+        if patientsResult.patients.length
+          .overflow-x-auto.rounded-2xl.border.border-slate-200.bg-white
+            table(class="w-full min-w-[780px] text-left text-sm")
+              thead(class="bg-slate-50 text-slate-600")
+                tr
+                  th(class="px-4 py-3") Paciente
+                  th(class="px-4 py-3") Documento
+                  th(class="px-4 py-3") Contacto
+                  th(class="px-4 py-3") Ciudad
+                  th(class="px-4 py-3") Estado
+                  th(class="px-4 py-3") Acciones
+              tbody
+                each patient in patientsResult.patients
+                  tr(class="border-t border-slate-100")
+                    td(class="px-4 py-3 font-semibold") #{patient.firstName} #{patient.lastName}
+                    td(class="px-4 py-3") #{patient.documentType} #{patient.documentNumber}
+                    td(class="px-4 py-3") #{patient.email}<br>#{patient.phone}
+                    td(class="px-4 py-3")= patient.city || "—"
+                    td(class="px-4 py-3")= patient.status === "ACTIVE" ? "Activa" : patient.status === "INACTIVE" ? "Inactiva" : "Pendiente"
+                    td(class="px-4 py-3")
+                      a(class="font-semibold text-medigo-blue hover:underline", href="/administrador/pacientes/" + patient.id) Ver y editar
+                      if patient.status === "ACTIVE"
+                        a(class="ml-3 font-semibold text-rose-700 hover:underline", href="/administrador/pacientes/" + patient.id + "/estado?nuevo=INACTIVE") Desactivar
+                      else if patient.status === "INACTIVE"
+                        a(class="ml-3 font-semibold text-emerald-700 hover:underline", href="/administrador/pacientes/" + patient.id + "/estado?nuevo=ACTIVE") Activar
+        else
+          p(class="rounded-xl bg-slate-50 p-4 text-sm text-slate-600") No encontramos pacientes con esos filtros.
+        if patientsResult.page > 1 || patientsResult.page < patientsResult.pageCount
+          nav(class="mt-5 flex items-center justify-between", aria-label="Paginación")
+            if patientsResult.page > 1
+              a(class="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold", href="/administrador/pacientes?q=" + encodeURIComponent(patientsResult.search) + "&estado=" + patientsResult.selectedStatus + "&pagina=" + (patientsResult.page - 1)) Anterior
+            else
+              span
+            if patientsResult.page < patientsResult.pageCount
+              a(class="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold", href="/administrador/pacientes?q=" + encodeURIComponent(patientsResult.search) + "&estado=" + patientsResult.selectedStatus + "&pagina=" + (patientsResult.page + 1)) Siguiente

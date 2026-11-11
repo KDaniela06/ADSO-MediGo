@@ -1,3 +1,10 @@
+## 2026-11-11 — Gestión de pacientes por administrador (US-ADM-02)
+
+- Añadí búsqueda, filtro por estado y paginación para pacientes.
+- Permití editar nombres, teléfono y ciudad; identificación, correo, rol y fecha de nacimiento permanecen protegidos.
+- Añadí confirmación para activar o desactivar cuentas y guardé cada cambio en `audit_logs` dentro de la transacción.
+- Excluí las observaciones clínicas de las consultas y agregué pruebas y documentación.
+
 ## 2026-11-10 — Panel principal del administrador (US-ADM-01)
 
 - Añadí indicadores agregados de pacientes, médicos activos, citas de hoy y citas atendidas.
