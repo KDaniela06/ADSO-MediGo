@@ -8,6 +8,8 @@ const { validateAdminAccount } = require("./validators/account");
 const { getAdminDashboard } = require("./services/dashboard");
 const { changeAdminPatientStatus, getAdminPatient, getAdminPatients, updateAdminPatient } = require("./services/patients");
 const { validateAdminPatient } = require("./validators/patient");
+const { createDoctorInvitation, getActiveSpecialties } = require("./services/doctors");
+const { validateDoctorRegistration } = require("./validators/doctor");
 
 function createAdminRouter({ sequelize = null, models = null, emailSender = null } = {}) {
   const router = Router();
@@ -239,6 +241,56 @@ function createAdminRouter({ sequelize = null, models = null, emailSender = null
       return response.status(result.status === "unavailable" ? 503 : 404).send("No fue posible cambiar el estado de la cuenta.");
     } catch {
       return response.status(503).send("No fue posible cambiar el estado de la cuenta.");
+    }
+  });
+
+  router.get("/administrador/medicos/nuevo", ...requireAdmin, async (request, response) => {
+    response.set("Cache-Control", "no-store");
+    const result = await getActiveSpecialties({ models });
+    return response.status(result.status === "ready" ? 200 : 503).render("admin/views/doctor-registration", {
+      title: "Registrar médico", specialties: result.specialties, values: {}, errors: {},
+      message: result.status === "ready" ? null : "No pudimos cargar las especialidades activas."
+    });
+  });
+
+  router.post("/administrador/medicos/nuevo", ...requireAdmin, async (request, response) => {
+    response.set("Cache-Control", "no-store");
+    const { values, errors, isValid } = validateDoctorRegistration(request.body || {});
+    const specialtyResult = await getActiveSpecialties({ models });
+    const renderForm = (statusCode, formErrors = errors, message = null) => response.status(statusCode).render("admin/views/doctor-registration", {
+      title: "Registrar médico", specialties: specialtyResult.specialties, values, errors: formErrors, message
+    });
+    if (!isValid) return renderForm(422);
+    if (!sequelize || !models) return renderForm(503, {}, "El registro de médicos no está disponible en este momento.");
+    try {
+      const result = await createDoctorInvitation({
+        sequelize, models, input: values, actorUserId: request.currentUser.id, emailSender,
+        baseUrl: process.env.APP_BASE_URL || "http://localhost:3000"
+      });
+      const duplicateMessages = {
+        email_in_use: { email: "Ya existe una cuenta con este correo." },
+        document_in_use: { documentNumber: "Ya existe una cuenta con este documento." },
+        registration_in_use: { professionalRegistration: "Este registro profesional ya está asociado a un médico." },
+        specialty_unavailable: { specialtyId: "Selecciona una especialidad activa." }
+      };
+      if (duplicateMessages[result.status]) return renderForm(409, duplicateMessages[result.status], "No se pudo crear la cuenta con esos datos.");
+      if (result.status === "unavailable") return renderForm(503, {}, "El registro de médicos no está disponible en este momento.");
+      return response.status(201).render("admin/views/doctor-registration-result", {
+        title: "Invitación enviada", deliveryFailed: result.deliveryFailed,
+        message: result.deliveryFailed
+          ? "Creamos la cuenta, pero no pudimos enviar la invitación. Revisa el correo y solicita un nuevo envío cuando el servicio esté disponible."
+          : "Creamos la cuenta y enviamos al médico un enlace para configurar su contraseña. El enlace vence en 24 horas."
+      });
+    } catch (error) {
+      if (error.name === "SequelizeUniqueConstraintError") {
+        const fields = Object.keys(error.fields || {}).join(" ");
+        const field = fields.includes("professional_registration") ? "professionalRegistration" : (fields.includes("document") ? "documentNumber" : "email");
+        const message = field === "professionalRegistration"
+          ? "Este registro profesional ya está asociado a un médico."
+          : field === "documentNumber" ? "Ya existe una cuenta con este documento." : "Ya existe una cuenta con este correo.";
+        return renderForm(409, { [field]: message }, "No se pudo crear la cuenta con esos datos.");
+      }
+      return renderForm(503, {}, "No fue posible crear la cuenta. Inténtalo de nuevo más tarde.");
     }
   });
 
