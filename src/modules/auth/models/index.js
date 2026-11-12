@@ -104,6 +104,28 @@ function initializeAuthModels(sequelize) {
     profilePhotoUrl: { type: DataTypes.STRING(2048), allowNull: true, field: "profile_photo_url" }
   }, { tableName: "doctors", underscored: true });
 
+  const DoctorWeeklySchedule = sequelize.define("DoctorWeeklySchedule", {
+    id: { type: DataTypes.BIGINT.UNSIGNED, primaryKey: true, autoIncrement: true },
+    doctorId: {
+      type: DataTypes.BIGINT.UNSIGNED, allowNull: false,
+      field: "doctor_id", references: { model: "doctors", key: "id" }
+    },
+    effectiveFrom: { type: DataTypes.DATEONLY, allowNull: false, field: "effective_from" },
+    effectiveTo: { type: DataTypes.DATEONLY, allowNull: true, field: "effective_to" },
+    status: { type: DataTypes.ENUM("ACTIVE", "INACTIVE"), allowNull: false, defaultValue: "ACTIVE" }
+  }, { tableName: "doctor_weekly_schedules", underscored: true });
+
+  const DoctorWeeklyScheduleBlock = sequelize.define("DoctorWeeklyScheduleBlock", {
+    id: { type: DataTypes.BIGINT.UNSIGNED, primaryKey: true, autoIncrement: true },
+    scheduleId: {
+      type: DataTypes.BIGINT.UNSIGNED, allowNull: false,
+      field: "schedule_id", references: { model: "doctor_weekly_schedules", key: "id" }
+    },
+    weekday: { type: DataTypes.TINYINT.UNSIGNED, allowNull: false },
+    startsAt: { type: DataTypes.TIME, allowNull: false, field: "starts_at" },
+    endsAt: { type: DataTypes.TIME, allowNull: false, field: "ends_at" }
+  }, { tableName: "doctor_weekly_schedule_blocks", underscored: true });
+
   const Appointment = sequelize.define("Appointment", {
     id: { type: DataTypes.BIGINT.UNSIGNED, primaryKey: true, autoIncrement: true },
     patientId: { type: DataTypes.BIGINT.UNSIGNED, allowNull: false, field: "patient_id" },
@@ -126,6 +148,10 @@ function initializeAuthModels(sequelize) {
   Doctor.belongsTo(User, { foreignKey: "userId", as: "user" });
   Specialty.hasMany(Doctor, { foreignKey: "specialtyId", as: "doctors" });
   Doctor.belongsTo(Specialty, { foreignKey: "specialtyId", as: "specialty" });
+  Doctor.hasMany(DoctorWeeklySchedule, { foreignKey: "doctorId", as: "weeklySchedules" });
+  DoctorWeeklySchedule.belongsTo(Doctor, { foreignKey: "doctorId", as: "doctor" });
+  DoctorWeeklySchedule.hasMany(DoctorWeeklyScheduleBlock, { foreignKey: "scheduleId", as: "blocks" });
+  DoctorWeeklyScheduleBlock.belongsTo(DoctorWeeklySchedule, { foreignKey: "scheduleId", as: "schedule" });
   Patient.hasMany(Appointment, { foreignKey: "patientId", as: "appointments" });
   Doctor.hasMany(Appointment, { foreignKey: "doctorId", as: "appointments" });
   Specialty.hasMany(Appointment, { foreignKey: "specialtyId", as: "appointments" });
@@ -137,7 +163,7 @@ function initializeAuthModels(sequelize) {
   AccountToken.hasOne(NotificationOutbox, { foreignKey: "accountTokenId", as: "notification" });
   NotificationOutbox.belongsTo(AccountToken, { foreignKey: "accountTokenId", as: "accountToken" });
 
-  return { User, Patient, Doctor, Specialty, Appointment, AccountToken, NotificationOutbox, AuditLog };
+  return { User, Patient, Doctor, Specialty, Appointment, DoctorWeeklySchedule, DoctorWeeklyScheduleBlock, AccountToken, NotificationOutbox, AuditLog };
 }
 
 module.exports = { initializeAuthModels };
