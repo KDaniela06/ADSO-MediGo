@@ -336,6 +336,7 @@ function createAdminRouter({ sequelize = null, models = null, emailSender = null
       getDoctorSpecialties({ models })
     ]);
     if (doctorResult.status !== "ready") return response.status(doctorResult.status === "error" ? 503 : 404).send("No encontramos el médico solicitado.");
+    if (specialtyResult.status !== "ready") return response.status(503).send("No pudimos cargar las especialidades para actualizar el médico.");
     const doctor = doctorResult.doctor;
     const renderForm = (statusCode, formErrors = errors, message = null) => response.status(statusCode).render("admin/views/doctor-edit", {
       title: "Actualizar médico", doctor, values, errors: formErrors,

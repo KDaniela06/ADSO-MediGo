@@ -14,10 +14,10 @@ function normalizeSearch(value) {
 function invitationState(token, now = new Date()) {
   if (!token) return { code: "NOT_SENT", label: "Sin invitación", expiresAt: null, sentStatus: null };
   const notification = plain(token.notification) || {};
+  if (token.usedAt) return { code: "USED", label: "Utilizada", expiresAt: token.expiresAt, sentStatus: notification.status || null };
   if (notification.status === "FAILED") return {
     code: "DELIVERY_FAILED", label: "No enviada", expiresAt: token.expiresAt, sentStatus: notification.status
   };
-  if (token.usedAt) return { code: "USED", label: "Utilizada", expiresAt: token.expiresAt, sentStatus: notification.status || null };
   if (new Date(token.expiresAt).getTime() <= now.getTime()) return {
     code: "EXPIRED", label: "Vencida", expiresAt: token.expiresAt, sentStatus: notification.status || null
   };
