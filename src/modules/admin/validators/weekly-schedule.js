@@ -29,7 +29,7 @@ function validateWeeklySchedule(input = {}) {
       errors.blocks = "Selecciona un día válido para cada bloque.";
       continue;
     }
-    if (!/^([01]\\d|2[0-3]):[0-5]\\d$/.test(startsAt) || !/^([01]\\d|2[0-3]):[0-5]\\d$/.test(endsAt)) {
+    if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(startsAt) || !/^([01]\d|2[0-3]):[0-5]\d$/.test(endsAt)) {
       errors.blocks = "Ingresa horas válidas para cada bloque.";
       continue;
     }
