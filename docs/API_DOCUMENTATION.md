@@ -146,10 +146,10 @@ Los conteos se consultan como agregados, y la vista semanal solo carga fechas y 
 | `GET /administrador/pacientes` | Administrador autenticado | Lista pacientes con búsqueda, filtro por estado y paginación. |
 | `GET /administrador/pacientes/:patientId` | Administrador autenticado | Muestra identificación y fecha de nacimiento como solo lectura; permite editar nombres, teléfono y ciudad. |
 | `POST /administrador/pacientes/:patientId` | Administrador autenticado | Valida y guarda solo nombres, teléfono y ciudad. Correo, identificación, rol y fecha de nacimiento no se pueden editar aquí. |
-| `GET /administrador/pacientes/:patientId/estado?nuevo=ACTIVE` o `?nuevo=INACTIVE` | Administrador autenticado | Presenta confirmación explícita para activar o desactivar una cuenta. |
-| `POST /administrador/pacientes/:patientId/estado` | Administrador autenticado | Cambia el estado tras confirmación y registra actor, paciente, estado anterior/nuevo y fecha en `audit_logs`, dentro de la misma transacción. |
+| `GET /administrador/pacientes/:patientId/estado?nuevo=ACTIVE` o `?nuevo=INACTIVE` | Administrador autenticado | Presenta confirmación y, al desactivar, el número de citas futuras confirmadas que se cancelarían. |
+| `POST /administrador/pacientes/:patientId/estado` | Administrador autenticado | Cambia el estado tras confirmación. Al desactivar, cancela citas futuras confirmadas y registra el cambio y las cancelaciones en `audit_logs` dentro de la transacción. Envía avisos por correo a las personas involucradas. |
 
-La consulta solo incluye datos administrativos de paciente y excluye notas clínicas y observaciones. Las acciones requieren sesión, rol ADMIN y protección CSRF. Los cambios de estado solo aplican a cuentas activas o inactivas.
+La consulta solo incluye datos administrativos de paciente y excluye notas clínicas y observaciones. Las acciones requieren sesión, rol ADMIN y protección CSRF. La desactivación solo cancela citas confirmadas cuyo inicio es futuro; conserva las citas pasadas, en curso y atendidas. Los avisos se envían a la cuenta y a los participantes de las citas canceladas.
 
 ## Gestión de médicos — issue #37
 
@@ -159,6 +159,8 @@ La consulta solo incluye datos administrativos de paciente y excluye notas clín
 | `GET /administrador/medicos/:doctorId` | Administrador autenticado | Muestra datos administrativos, estado de cuenta, verificación de correo, contraseña configurada y estado/vencimiento de invitación. |
 | `GET /administrador/medicos/:doctorId/editar` | Administrador autenticado | Permite editar nombres, teléfono, registro profesional y especialidad. El correo, documento y estado no se editan aquí. |
 | `POST /administrador/medicos/:doctorId/editar` | Administrador autenticado | Valida y guarda los campos permitidos; cambiar especialidad requiere confirmación y queda auditado. |
+| `GET /administrador/medicos/:doctorId/estado?nuevo=ACTIVE` o `?nuevo=INACTIVE` | Administrador autenticado | Presenta confirmación y, al desactivar, el número de citas futuras confirmadas que se cancelarían. |
+| `POST /administrador/medicos/:doctorId/estado` | Administrador autenticado | Cambia el estado tras confirmación. Al desactivar, cancela citas futuras confirmadas y registra el cambio y las cancelaciones en `audit_logs` dentro de la transacción. Envía avisos por correo a las personas involucradas. |
 
 El correo conserva el flujo de confirmación existente. El panel solo consulta datos administrativos, no observaciones clínicas.
 
