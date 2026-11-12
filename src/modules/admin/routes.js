@@ -13,6 +13,11 @@ const { createDoctorInvitation, getActiveSpecialties } = require("./services/doc
 const { validateDoctorRegistration } = require("./validators/doctor");
 const { getAdminDoctor, getAdminDoctors, getDoctorSpecialties, updateAdminDoctor } = require("./services/manage-doctors");
 const { validateAdminDoctor } = require("./validators/manage-doctor");
+const {
+  changeAdminSpecialtyStatus, createAdminSpecialty, getAdminSpecialties,
+  getAdminSpecialty, updateAdminSpecialty
+} = require("./services/specialties");
+const { validateSpecialty } = require("./validators/specialty");
 
 function createAdminRouter({ sequelize = null, models = null, emailSender = null } = {}) {
   const router = Router();
@@ -401,6 +406,97 @@ function createAdminRouter({ sequelize = null, models = null, emailSender = null
     } catch (error) {
       if (error.name === "SequelizeUniqueConstraintError") return renderForm(409, { professionalRegistration: "Este registro profesional ya está asociado a otro médico." }, "No pudimos guardar los cambios.");
       return renderForm(503, {}, "No fue posible guardar los cambios en este momento.");
+    }
+  });
+
+
+  router.get("/administrador/especialidades", ...requireAdmin, async (request, response) => {
+    response.set("Cache-Control", "no-store");
+    const result = await getAdminSpecialties({
+      models, search: request.query.q, status: request.query.estado, page: request.query.pagina
+    });
+    return response.status(result.status === "error" ? 503 : 200).render("admin/views/specialties", {
+      title: "Gestionar especialidades", result, message: request.query.mensaje || null
+    });
+  });
+
+  router.get("/administrador/especialidades/nueva", ...requireAdmin, (request, response) => {
+    response.set("Cache-Control", "no-store");
+    return response.render("admin/views/specialty-form", {
+      title: "Agregar especialidad", specialty: null, values: {}, errors: {}, message: null
+    });
+  });
+
+  router.post("/administrador/especialidades/nueva", ...requireAdmin, async (request, response) => {
+    response.set("Cache-Control", "no-store");
+    const { values, errors, isValid } = validateSpecialty(request.body || {});
+    const renderForm = (statusCode, formErrors = errors, message = null) => response.status(statusCode).render("admin/views/specialty-form", {
+      title: "Agregar especialidad", specialty: null, values, errors: formErrors, message
+    });
+    if (!isValid) return renderForm(422);
+    if (!sequelize || !models) return renderForm(503, {}, "No pudimos crear la especialidad en este momento.");
+    try {
+      const result = await createAdminSpecialty({
+        sequelize, models, actorUserId: request.currentUser.id, input: values
+      });
+      if (result.status === "name_in_use") return renderForm(409, { name: "Ya existe una especialidad con este nombre." }, "Revisa el nombre ingresado.");
+      if (result.status === "unavailable") return renderForm(503, {}, "La gestión de especialidades no está disponible.");
+      return response.redirect(303, "/administrador/especialidades?mensaje=created");
+    } catch (error) {
+      if (error.name === "SequelizeUniqueConstraintError") return renderForm(409, { name: "Ya existe una especialidad con este nombre." }, "Revisa el nombre ingresado.");
+      return renderForm(503, {}, "No fue posible crear la especialidad. Inténtalo de nuevo.");
+    }
+  });
+
+  router.get("/administrador/especialidades/:specialtyId/editar", ...requireAdmin, async (request, response) => {
+    response.set("Cache-Control", "no-store");
+    const result = await getAdminSpecialty({ models, specialtyId: request.params.specialtyId });
+    if (result.status !== "ready") return response.status(result.status === "error" ? 503 : 404).send("No encontramos la especialidad solicitada.");
+    return response.render("admin/views/specialty-form", {
+      title: "Editar especialidad", specialty: result.specialty, values: result.specialty, errors: {}, message: null
+    });
+  });
+
+  router.post("/administrador/especialidades/:specialtyId/editar", ...requireAdmin, async (request, response) => {
+    response.set("Cache-Control", "no-store");
+    const { values, errors, isValid } = validateSpecialty(request.body || {});
+    const specialtyResult = await getAdminSpecialty({ models, specialtyId: request.params.specialtyId });
+    if (specialtyResult.status !== "ready") return response.status(specialtyResult.status === "error" ? 503 : 404).send("No encontramos la especialidad solicitada.");
+    const specialty = specialtyResult.specialty;
+    const renderForm = (statusCode, formErrors = errors, message = null) => response.status(statusCode).render("admin/views/specialty-form", {
+      title: "Editar especialidad", specialty, values, errors: formErrors, message
+    });
+    if (!isValid) return renderForm(422);
+    if (!sequelize || !models) return renderForm(503, {}, "No pudimos actualizar la especialidad en este momento.");
+    try {
+      const result = await updateAdminSpecialty({
+        sequelize, models, specialtyId: request.params.specialtyId,
+        actorUserId: request.currentUser.id, input: values
+      });
+      if (result.status === "name_in_use") return renderForm(409, { name: "Ya existe una especialidad con este nombre." }, "Revisa el nombre ingresado.");
+      if (result.status === "unavailable") return renderForm(503, {}, "La gestión de especialidades no está disponible.");
+      if (result.status === "not_found") return response.status(404).send("No encontramos la especialidad solicitada.");
+      return response.redirect(303, "/administrador/especialidades?mensaje=updated");
+    } catch (error) {
+      if (error.name === "SequelizeUniqueConstraintError") return renderForm(409, { name: "Ya existe una especialidad con este nombre." }, "Revisa el nombre ingresado.");
+      return renderForm(503, {}, "No fue posible actualizar la especialidad. Inténtalo de nuevo.");
+    }
+  });
+
+  router.post("/administrador/especialidades/:specialtyId/estado", ...requireAdmin, async (request, response) => {
+    response.set("Cache-Control", "no-store");
+    if (!sequelize || !models) return response.status(503).send("La gestión de especialidades no está disponible.");
+    try {
+      const result = await changeAdminSpecialtyStatus({
+        sequelize, models, specialtyId: request.params.specialtyId,
+        actorUserId: request.currentUser.id, status: String(request.body?.status || "")
+      });
+      if (result.status === "not_found") return response.status(404).send("No encontramos la especialidad solicitada.");
+      if (result.status === "invalid_status") return response.status(400).send("El estado solicitado no es válido.");
+      if (result.status === "unavailable") return response.status(503).send("La gestión de especialidades no está disponible.");
+      return response.redirect(303, "/administrador/especialidades?mensaje=status-updated");
+    } catch {
+      return response.status(503).send("No fue posible actualizar el estado de la especialidad.");
     }
   });
 
