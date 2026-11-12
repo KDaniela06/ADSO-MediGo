@@ -1,3 +1,10 @@
+## 2026-11-12 — Gestión de médicos por administración (US-ADM-04)
+
+- Añadí búsqueda, filtros por estado y especialidad, y paginación para el directorio.
+- Incorporé el detalle de la cuenta y su invitación, además de edición de datos administrativos y especialidad.
+- Pedí confirmación para cambiar especialidad y guardé las actualizaciones en la auditoría.
+- Añadí pruebas y documentación para el flujo administrativo.
+
 ## 2026-11-11 — Registro de médicos por invitación (US-ADM-03)
 
 - Añadí el formulario administrativo para registrar médicos con especialidad activa.

@@ -10,6 +10,8 @@ const { changeAdminPatientStatus, getAdminPatient, getAdminPatients, updateAdmin
 const { validateAdminPatient } = require("./validators/patient");
 const { createDoctorInvitation, getActiveSpecialties } = require("./services/doctors");
 const { validateDoctorRegistration } = require("./validators/doctor");
+const { getAdminDoctor, getAdminDoctors, getDoctorSpecialties, updateAdminDoctor } = require("./services/manage-doctors");
+const { validateAdminDoctor } = require("./validators/manage-doctor");
 
 function createAdminRouter({ sequelize = null, models = null, emailSender = null } = {}) {
   const router = Router();
@@ -244,6 +246,18 @@ function createAdminRouter({ sequelize = null, models = null, emailSender = null
     }
   });
 
+  router.get("/administrador/medicos", ...requireAdmin, async (request, response) => {
+    response.set("Cache-Control", "no-store");
+    const [result, specialties] = await Promise.all([
+      getAdminDoctors({ models, search: request.query.q, status: request.query.estado, specialtyId: request.query.especialidad, page: request.query.pagina }),
+      getDoctorSpecialties({ models })
+    ]);
+    return response.status([result.status, specialties.status].some((status) => ["error", "unavailable"].includes(status)) ? 503 : 200).render("admin/views/doctors", {
+      title: "Gestionar médicos", result, specialties: specialties.specialties,
+      message: request.query.mensaje || null
+    });
+  });
+
   router.get("/administrador/medicos/nuevo", ...requireAdmin, async (request, response) => {
     response.set("Cache-Control", "no-store");
     const result = await getActiveSpecialties({ models });
@@ -291,6 +305,64 @@ function createAdminRouter({ sequelize = null, models = null, emailSender = null
         return renderForm(409, { [field]: message }, "No se pudo crear la cuenta con esos datos.");
       }
       return renderForm(503, {}, "No fue posible crear la cuenta. Inténtalo de nuevo más tarde.");
+    }
+  });
+
+  router.get("/administrador/medicos/:doctorId/editar", ...requireAdmin, async (request, response) => {
+    response.set("Cache-Control", "no-store");
+    const [result, specialties] = await Promise.all([
+      getAdminDoctor({ models, doctorId: request.params.doctorId }),
+      getDoctorSpecialties({ models })
+    ]);
+    if (result.status !== "ready") return response.status(result.status === "error" ? 503 : 404).send("No encontramos el médico solicitado.");
+    return response.status(specialties.status === "ready" ? 200 : 503).render("admin/views/doctor-edit", {
+      title: "Actualizar médico", doctor: result.doctor, values: result.doctor, errors: {},
+      specialties: specialties.specialties, message: specialties.status === "ready" ? null : "No pudimos cargar las especialidades."
+    });
+  });
+
+  router.get("/administrador/medicos/:doctorId", ...requireAdmin, async (request, response) => {
+    response.set("Cache-Control", "no-store");
+    const result = await getAdminDoctor({ models, doctorId: request.params.doctorId });
+    if (result.status !== "ready") return response.status(result.status === "error" ? 503 : 404).send("No encontramos el médico solicitado.");
+    return response.render("admin/views/doctor-detail", { title: "Detalle del médico", doctor: result.doctor, message: request.query.mensaje || null });
+  });
+
+  router.post("/administrador/medicos/:doctorId/editar", ...requireAdmin, async (request, response) => {
+    response.set("Cache-Control", "no-store");
+    const { values, errors, isValid } = validateAdminDoctor(request.body || {});
+    const [doctorResult, specialtyResult] = await Promise.all([
+      getAdminDoctor({ models, doctorId: request.params.doctorId }),
+      getDoctorSpecialties({ models })
+    ]);
+    if (doctorResult.status !== "ready") return response.status(doctorResult.status === "error" ? 503 : 404).send("No encontramos el médico solicitado.");
+    if (specialtyResult.status !== "ready") return response.status(503).send("No pudimos cargar las especialidades para actualizar el médico.");
+    const doctor = doctorResult.doctor;
+    const renderForm = (statusCode, formErrors = errors, message = null) => response.status(statusCode).render("admin/views/doctor-edit", {
+      title: "Actualizar médico", doctor, values, errors: formErrors,
+      specialties: specialtyResult.specialties, message
+    });
+    if (!isValid) return renderForm(422);
+    if (!sequelize || !models) return renderForm(503, {}, "La actualización de médicos no está disponible en este momento.");
+    if (request.body?.confirmed !== "YES" && String(values.specialtyId) !== String(doctor.specialtyId)) {
+      return response.status(200).render("admin/views/doctor-specialty-confirmation", {
+        title: "Confirmar especialidad", doctor, values, specialtyName: specialtyResult.specialties.find((item) => String(item.id) === String(values.specialtyId))?.name || ""
+      });
+    }
+    try {
+      const result = await updateAdminDoctor({
+        sequelize, models, doctorId: request.params.doctorId, actorUserId: request.currentUser.id,
+        input: values, confirmed: request.body?.confirmed === "YES"
+      });
+      if (result.status === "saved" || result.status === "unchanged") return response.redirect(303, "/administrador/medicos/" + request.params.doctorId + "?mensaje=updated");
+      if (result.status === "registration_in_use") return renderForm(409, { professionalRegistration: "Este registro profesional ya está asociado a otro médico." }, "No pudimos guardar los cambios.");
+      if (result.status === "specialty_unavailable") return renderForm(409, { specialtyId: "Selecciona una especialidad activa." }, "La especialidad dejó de estar disponible.");
+      if (result.status === "confirmation_required") return renderForm(422, {}, "Confirma el cambio de especialidad para continuar.");
+      if (result.status === "unavailable") return renderForm(503, {}, "La actualización de médicos no está disponible en este momento.");
+      return renderForm(404, {}, "No encontramos el médico solicitado.");
+    } catch (error) {
+      if (error.name === "SequelizeUniqueConstraintError") return renderForm(409, { professionalRegistration: "Este registro profesional ya está asociado a otro médico." }, "No pudimos guardar los cambios.");
+      return renderForm(503, {}, "No fue posible guardar los cambios en este momento.");
     }
   });
 
