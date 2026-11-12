@@ -61,11 +61,10 @@ function notificationRecipients(user, role, appointments, accountStatus) {
 }
 
 async function getAccountStatusPreview({ models, role, accountId, now = new Date() }) {
+  if (!ACCOUNT_ROLES.has(role)) return { status: "not_found" };
   const Model = modelForRole(models, role);
-  if (!ACCOUNT_ROLES.has(role) || !Model?.findByPk || !models?.User || !models?.Appointment?.count) {
-    return { status: "unavailable" };
-  }
-  if (!/^\\d+$/.test(String(accountId || ""))) return { status: "not_found" };
+  if (!Model?.findByPk || !models?.User || !models?.Appointment?.count) return { status: "unavailable" };
+  if (!/^\d+$/.test(String(accountId || ""))) return { status: "not_found" };
   try {
     const record = await Model.findByPk(accountId, {
       attributes: ["id", "userId"],
@@ -104,9 +103,10 @@ async function getAccountStatusPreview({ models, role, accountId, now = new Date
 async function changeAdminAccountStatus({
   sequelize, models, role, accountId, actorUserId, newStatus, confirmed, emailSender, now = new Date()
 }) {
+  if (!ACCOUNT_ROLES.has(role)) return { status: "not_found" };
   const Model = modelForRole(models, role);
   if (!sequelize || !Model || !models?.User || !models?.Appointment || !models?.AuditLog) return { status: "unavailable" };
-  if (!ACCOUNT_ROLES.has(role) || !/^\\d+$/.test(String(accountId || ""))) return { status: "not_found" };
+  if (!/^\d+$/.test(String(accountId || ""))) return { status: "not_found" };
   if (!ACCOUNT_STATUSES.has(newStatus)) return { status: "invalid_status" };
   if (confirmed !== "YES") return { status: "confirmation_required" };
 
