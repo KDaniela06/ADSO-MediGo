@@ -1,0 +1,24 @@
+extends ../../../views/shared/layout.pug
+
+block content
+  main(class="mx-auto min-h-screen max-w-xl bg-slate-100 px-4 py-8 text-slate-800")
+    section(class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm")
+      a(class="text-sm font-semibold text-medigo-blue hover:underline", href=account.role === "DOCTOR" ? "/administrador/medicos" : "/administrador/pacientes") ← Volver
+      h1(class="mt-4 text-2xl font-bold text-medigo-navy") Confirmar cambio de estado
+      p(class="mt-3 text-slate-700") Vas a #{newStatus === "INACTIVE" ? "desactivar" : "activar"} la cuenta de #{account.firstName} #{account.lastName}.
+      if newStatus === "INACTIVE"
+        if upcomingConfirmedAppointments
+          p(class="mt-4 rounded-xl bg-amber-50 p-4 text-sm text-amber-950") Esta cuenta tiene #{upcomingConfirmedAppointments} cita(s) futura(s) confirmada(s). Al desactivarla se cancelarán y se avisará por correo a las personas involucradas.
+        else
+          p(class="mt-4 rounded-xl bg-sky-50 p-4 text-sm text-sky-900") No hay citas futuras confirmadas para cancelar.
+        p(class="mt-3 text-sm text-slate-600") Las citas pasadas, en curso y atendidas no se modificarán.
+      else
+        p(class="mt-4 text-sm text-slate-600") Al activar la cuenta, la persona podrá volver a iniciar sesión.
+      p(class="mt-3 text-sm text-slate-600") El cambio y las cancelaciones quedarán registrados en la auditoría.
+      form(class="mt-5 space-y-4", action=action, method="post")
+        input(type="hidden", name="_csrf", value=csrfToken)
+        input(type="hidden", name="newStatus", value=newStatus)
+        label(class="flex items-start gap-3 rounded-xl bg-slate-50 p-4 text-sm")
+          input(type="checkbox", name="confirmed", value="YES", required)
+          span Confirmo que quiero #{newStatus === "INACTIVE" ? "desactivar" : "activar"} esta cuenta.
+        button(class="rounded-lg bg-medigo-blue px-5 py-3 font-semibold text-white", type="submit") Confirmar cambio
