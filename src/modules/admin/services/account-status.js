@@ -34,9 +34,9 @@ function appointmentIncludes(models) {
   ];
 }
 
-function notificationRecipients(user, role, appointments) {
+function notificationRecipients(user, role, appointments, accountStatus) {
   const recipients = new Map();
-  const add = (record, messageCount) => {
+  const add = (record, messageCount, isTarget = false) => {
     const account = plain(record);
     if (!account?.email) return;
     const key = String(account.id);
@@ -44,12 +44,12 @@ function notificationRecipients(user, role, appointments) {
     recipients.set(key, {
       email: account.email,
       firstName: account.firstName || "",
-      status: account.id === user.id ? "INACTIVE" : null,
+      status: isTarget ? accountStatus : null,
       cancelledAppointments: (existing?.cancelledAppointments || 0) + messageCount
     });
   };
 
-  add(user, 0);
+  add(user, 0, true);
   for (const appointmentRecord of appointments) {
     const appointment = plain(appointmentRecord);
     const patientUser = plain(plain(appointment.patient)?.user);
@@ -162,8 +162,8 @@ async function changeAdminAccountStatus({
     }, { transaction });
 
     const recipients = newStatus === "INACTIVE"
-      ? notificationRecipients(user, role, appointments)
-      : notificationRecipients(user, role, []);
+      ? notificationRecipients(user, role, appointments, newStatus)
+      : notificationRecipients(user, role, [], newStatus);
     return { status: "changed", previousStatus, newStatus, cancelledAppointments: appointments.length, recipients };
   });
 
@@ -178,7 +178,9 @@ async function changeAdminAccountStatus({
           to: recipient.email,
           firstName: recipient.firstName,
           role,
-          status: newStatus,
+          status: recipient.status,
+          changedAccountStatus: newStatus,
+          impactedRole: role,
           cancelledAppointments: recipient.cancelledAppointments
         });
       } catch {
