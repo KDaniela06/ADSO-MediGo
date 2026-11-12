@@ -32,7 +32,7 @@ function setup({ role = "PATIENT", status = "ACTIVE", appointments = [] } = {}) 
 
 describe("administrator account status", () => {
   test("previews confirmed future appointments before deactivation", async () => {
-    const { models } = setup();
+    const { models } = setup({ appointments: [{}] });
     const result = await getAccountStatusPreview({
       models, role: "PATIENT", accountId: "3", now: new Date("2026-11-12T12:00:00Z")
     });
