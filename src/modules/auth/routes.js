@@ -4,6 +4,8 @@ const { registerPatient } = require("./services/patient-registration");
 const { authenticateUser } = require("./services/authentication");
 const { requestEmailVerification, verifyEmailToken } = require("./services/email-verification");
 const { requestPasswordReset, resetPatientPassword } = require("./services/password-reset");
+const { configureDoctorAccount, getDoctorInvitationStatus } = require("./services/doctor-invitation");
+const { validateDoctorAccountSetup } = require("./validators/doctor-account-setup");
 
 const VERIFICATION_MESSAGES = {
   verified: "Tu correo fue verificado. Tu cuenta ya está activa.",
@@ -338,6 +340,69 @@ function createAuthRouter({ sequelize = null, models = null, emailSender = null 
       showResend: true,
       message: "Si el correo corresponde a una cuenta pendiente, recibirás un enlace si se puede enviar. Espera al menos 60 segundos entre solicitudes; se permiten hasta cinco solicitudes por hora."
     });
+  });
+
+  router.get("/invitacion-medico/:token", async (request, response) => {
+    response.set({ "Cache-Control": "no-store", "Referrer-Policy": "no-referrer" });
+    if (!models) return response.status(503).render("auth/views/doctor-invitation-setup", {
+      title: "Configurar cuenta médica", token: request.params.token, firstName: "",
+      errors: {}, message: "La configuración de la cuenta no está disponible en este momento."
+    });
+    try {
+      const result = await getDoctorInvitationStatus({ models, token: request.params.token });
+      const messages = {
+        expired: "Este enlace venció. Solicita al administrador una nueva invitación.",
+        used: "Este enlace ya fue utilizado. Inicia sesión o solicita ayuda al administrador.",
+        invalid: "El enlace no es válido. Solicita una nueva invitación al administrador.",
+        unavailable: "La configuración de la cuenta no está disponible en este momento."
+      };
+      return response.status(result.status === "unavailable" ? 503 : 200).render("auth/views/doctor-invitation-setup", {
+        title: "Configurar cuenta médica",
+        token: request.params.token,
+        firstName: result.firstName || "",
+        errors: {},
+        message: result.status === "ready" ? null : (messages[result.status] || messages.invalid)
+      });
+    } catch {
+      return response.status(503).render("auth/views/doctor-invitation-setup", {
+        title: "Configurar cuenta médica", token: request.params.token, firstName: "",
+        errors: {}, message: "No pudimos validar la invitación en este momento."
+      });
+    }
+  });
+
+  router.post("/invitacion-medico/:token", async (request, response) => {
+    response.set({ "Cache-Control": "no-store", "Referrer-Policy": "no-referrer" });
+    const token = String(request.params.token || "");
+    const validation = validateDoctorAccountSetup(request.body || {});
+    if (!validation.isValid) return response.status(422).render("auth/views/doctor-invitation-setup", {
+      title: "Configurar cuenta médica", token, firstName: "", errors: validation.errors, message: "Revisa los campos señalados."
+    });
+    if (!sequelize || !models) return response.status(503).render("auth/views/doctor-invitation-setup", {
+      title: "Configurar cuenta médica", token, firstName: "", errors: {},
+      message: "La configuración de la cuenta no está disponible en este momento."
+    });
+    try {
+      const result = await configureDoctorAccount({ sequelize, models, token, password: validation.values.password });
+      if (result.status === "configured") return response.status(200).render("auth/views/doctor-invitation-result", {
+        title: "Cuenta configurada", status: "configured",
+        message: "Tu cuenta médica quedó configurada. Ya puedes iniciar sesión."
+      });
+      const messages = {
+        expired: "Este enlace venció. Solicita al administrador una nueva invitación.",
+        used: "Este enlace ya fue utilizado. Inicia sesión o solicita ayuda al administrador.",
+        unavailable: "La configuración de la cuenta no está disponible en este momento."
+      };
+      return response.status(result.status === "unavailable" ? 503 : 400).render("auth/views/doctor-invitation-setup", {
+        title: "Configurar cuenta médica", token, firstName: "", errors: {},
+        message: messages[result.status] || "El enlace no es válido. Solicita una nueva invitación al administrador."
+      });
+    } catch {
+      return response.status(503).render("auth/views/doctor-invitation-setup", {
+        title: "Configurar cuenta médica", token, firstName: "", errors: {},
+        message: "No pudimos configurar la cuenta en este momento."
+      });
+    }
   });
 
   return router;

@@ -50,7 +50,8 @@ La propuesta ya usada por el registro de pacientes se mantiene como referencia.
 | `email` | `VARCHAR(254)` | Obligatorio; minúsculas y único |
 | `pending_email` | `VARCHAR(254)` | Opcional; único entre cambios pendientes; solo se vuelve vigente al confirmar el enlace |
 | `phone` | `VARCHAR(30)` | Obligatorio |
-| `password_hash` | `VARCHAR(255)` | Obligatorio |
+| `password_hash` | `VARCHAR(255)` | Obligatorio para cuentas configuradas; nulo hasta que el médico completa su invitación |
+| `password_configured_at` | `DATETIME(3)` | Opcional; se registra al completar la configuración de contraseña de médico |
 | `role` | `ENUM('PATIENT','DOCTOR','ADMIN')` | Obligatorio |
 | `status` | `ENUM('PENDING_VERIFICATION','ACTIVE','INACTIVE')` | Obligatorio |
 | `email_verified_at` | `DATETIME(3)` | Opcional |

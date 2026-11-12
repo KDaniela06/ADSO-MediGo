@@ -151,7 +151,16 @@ Los conteos se consultan como agregados, y la vista semanal solo carga fechas y 
 
 La consulta solo incluye datos administrativos de paciente y excluye notas clínicas y observaciones. Las acciones requieren sesión, rol ADMIN y protección CSRF. Los cambios de estado solo aplican a cuentas activas o inactivas.
 
-## Dominios previstos
+## Registro de médicos — issue #36
+
+| Método y ruta | Acceso | Comportamiento |
+|---|---|---|
+| `GET /administrador/medicos/nuevo` | Administrador autenticado | Muestra el formulario con especialidades activas. |
+| `POST /administrador/medicos/nuevo` | Administrador autenticado | Valida y crea el usuario médico y su perfil profesional; el correo, documento y registro profesional deben ser únicos. |
+| `GET /invitacion-medico/:token` | Público, token requerido | Muestra el formulario solo si la invitación está vigente y no se ha usado. |
+| `POST /invitacion-medico/:token` | Público, token requerido y CSRF | Guarda la contraseña configurada, activa la cuenta y consume la invitación dentro de una transacción. |
+
+La invitación se almacena como hash SHA-256, es de un solo uso y vence en 24 horas. La contraseña no se define desde administración y `password_hash` permanece nulo hasta que el médico completa la configuración. La fecha queda en `password_configured_at`. El envío usa SMTP y el outbox existente; los errores no exponen tokens ni datos de transporte.
 
 | Dominio | Operaciones previstas | Acceso general |
 |---|---|---|

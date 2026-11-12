@@ -10,7 +10,8 @@ function initializeAuthModels(sequelize) {
     email: { type: DataTypes.STRING(254), allowNull: false, unique: true },
     pendingEmail: { type: DataTypes.STRING(254), allowNull: true, unique: true, field: "pending_email" },
     phone: { type: DataTypes.STRING(30), allowNull: false },
-    passwordHash: { type: DataTypes.STRING(255), allowNull: false, field: "password_hash" },
+    passwordHash: { type: DataTypes.STRING(255), allowNull: true, field: "password_hash" },
+    passwordConfiguredAt: { type: DataTypes.DATE(3), allowNull: true, field: "password_configured_at" },
     role: { type: DataTypes.ENUM("PATIENT", "DOCTOR", "ADMIN"), allowNull: false },
     status: { type: DataTypes.ENUM("PENDING_VERIFICATION", "ACTIVE", "INACTIVE"), allowNull: false },
     emailVerifiedAt: { type: DataTypes.DATE(3), allowNull: true, field: "email_verified_at" }
@@ -45,7 +46,7 @@ function initializeAuthModels(sequelize) {
       field: "user_id",
       references: { model: "users", key: "id" }
     },
-    purpose: { type: DataTypes.ENUM("EMAIL_VERIFICATION", "PASSWORD_RESET", "EMAIL_CHANGE"), allowNull: false },
+    purpose: { type: DataTypes.ENUM("EMAIL_VERIFICATION", "PASSWORD_RESET", "EMAIL_CHANGE", "DOCTOR_INVITATION"), allowNull: false },
     tokenHash: { type: DataTypes.CHAR(64), allowNull: false, unique: true, field: "token_hash" },
     expiresAt: { type: DataTypes.DATE(3), allowNull: false, field: "expires_at" },
     usedAt: { type: DataTypes.DATE(3), allowNull: true, field: "used_at" }

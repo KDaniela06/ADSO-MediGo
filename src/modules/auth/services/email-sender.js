@@ -50,6 +50,18 @@ function createEmailSender(environment = process.env) {
       });
     },
 
+    async sendDoctorInvitationEmail({ to, firstName, url, expiresInHours }) {
+      const safeName = escapeHtml(firstName || "médico");
+      const safeUrl = escapeHtml(url);
+      await transporter.sendMail({
+        from: environment.SMTP_FROM,
+        to,
+        subject: "Configura tu cuenta médica en MediGo",
+        text: `Hola ${firstName || ""}. El administrador de MediGo te invitó a configurar tu cuenta médica: ${url}. El enlace vence en ${expiresInHours} horas y solo se puede utilizar una vez. Si no esperabas esta invitación, ignora este mensaje.`,
+        html: `<p>Hola ${safeName},</p><p>El administrador de MediGo creó una cuenta médica para ti.</p><p><a href="${safeUrl}">Configurar mi cuenta</a></p><p>El enlace vence en ${expiresInHours} horas y solo se puede utilizar una vez.</p><p>Si no esperabas esta invitación, ignora este mensaje.</p>`
+      });
+    },
+
     async sendPasswordResetEmail({ to, firstName, url, expiresInMinutes }) {
       const safeName = escapeHtml(firstName || "paciente");
       const safeUrl = escapeHtml(url);
