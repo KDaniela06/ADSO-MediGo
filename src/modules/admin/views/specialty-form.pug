@@ -1,0 +1,28 @@
+extends ../../../views/shared/layout.pug
+
+block content
+  main(class="mx-auto min-h-screen max-w-3xl bg-slate-100 px-4 py-8 text-slate-800")
+    a(class="text-sm font-semibold text-medigo-blue hover:underline", href="/administrador/especialidades") ← Volver a especialidades
+    section(class="mt-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-8")
+      p(class="text-sm font-semibold uppercase tracking-wide text-medigo-blue") MediGo · Administración
+      h1(class="mt-1 text-2xl font-bold text-medigo-navy")= specialty ? "Editar especialidad" : "Agregar especialidad"
+      p(class="mt-2 text-sm text-slate-600") El nombre debe ser único. La descripción es opcional.
+      if message
+        p(class="mt-4 rounded-xl bg-amber-50 p-4 text-sm text-amber-900", role="alert")= message
+      form(class="mt-6 space-y-5", action=specialty ? "/administrador/especialidades/" + specialty.id + "/editar" : "/administrador/especialidades/nueva", method="post")
+        input(type="hidden", name="_csrf", value=csrfToken)
+        div
+          label(class="mb-1 block text-sm font-semibold", for="name") Nombre
+          input#name(class="w-full rounded-lg border border-slate-300 px-3 py-2", name="name", value=values.name || "", maxlength="100", required, autofocus)
+          if errors.name
+            p(class="mt-1 text-sm text-rose-700", role="alert")= errors.name
+        div
+          label(class="mb-1 block text-sm font-semibold", for="description") Descripción (opcional)
+          textarea#description(class="w-full rounded-lg border border-slate-300 px-3 py-2", name="description", rows="4", maxlength="500")= values.description || ""
+          if errors.description
+            p(class="mt-1 text-sm text-rose-700", role="alert")= errors.description
+        if specialty
+          p(class="rounded-xl bg-sky-50 p-4 text-sm text-sky-900") Cambiar la especialidad no altera las citas existentes ni el historial.
+        div(class="flex flex-wrap gap-3")
+          button(class="rounded-lg bg-medigo-blue px-5 py-3 font-semibold text-white", type="submit") Guardar
+          a(class="rounded-lg border border-slate-300 px-5 py-3 font-semibold text-slate-700", href="/administrador/especialidades") Cancelar
