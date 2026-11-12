@@ -1,0 +1,19 @@
+extends ../../../views/shared/layout.pug
+
+block content
+  main(class="mx-auto flex min-h-screen max-w-2xl items-center px-4 py-10")
+    section(class="w-full rounded-2xl bg-white p-8 shadow-lg ring-1 ring-slate-200")
+      p(class="text-sm font-semibold uppercase tracking-wide text-medigo-blue") MediGo · Administración
+      h1(class="mt-2 text-2xl font-bold text-medigo-navy") Confirmar cambio de especialidad
+      p(class="mt-4 text-slate-700") Vas a cambiar la especialidad de #{doctor.firstName} #{doctor.lastName} de #{doctor.specialtyName} a #{specialtyName}.
+      p(class="mt-2 text-sm text-slate-600") Las citas existentes conservan la especialidad con la que fueron creadas. Este cambio se guardará en la auditoría.
+      form(class="mt-6 space-y-3", action="/administrador/medicos/" + doctor.id + "/editar", method="post")
+        input(type="hidden", name="_csrf", value=csrfToken)
+        input(type="hidden", name="firstName", value=values.firstName)
+        input(type="hidden", name="lastName", value=values.lastName)
+        input(type="hidden", name="phone", value=values.phone)
+        input(type="hidden", name="professionalRegistration", value=values.professionalRegistration)
+        input(type="hidden", name="specialtyId", value=values.specialtyId)
+        input(type="hidden", name="confirmed", value="YES")
+        button(class="w-full rounded-lg bg-medigo-blue px-4 py-3 font-semibold text-white", type="submit") Confirmar y guardar
+      a(class="mt-4 block text-center text-sm font-semibold text-medigo-blue underline", href="/administrador/medicos/" + doctor.id + "/editar") Volver y revisar los datos
