@@ -183,7 +183,8 @@ function createAdminRouter({ sequelize = null, models = null, emailSender = null
       models, search: request.query.q, status: request.query.estado, page: request.query.pagina
     });
     return response.status(patientsResult.status === "error" ? 503 : 200).render("admin/views/patients", {
-      title: "Gestionar pacientes", patientsResult, message: request.query.mensaje || null
+      title: "Gestionar pacientes", patientsResult, message: request.query.mensaje || null,
+      notificacionesFallidas: Number(request.query["notificaciones-fallidas"]) || 0
     });
   });
 
@@ -290,7 +291,8 @@ function createAdminRouter({ sequelize = null, models = null, emailSender = null
     ]);
     return response.status([result.status, specialties.status].some((status) => ["error", "unavailable"].includes(status)) ? 503 : 200).render("admin/views/doctors", {
       title: "Gestionar médicos", result, specialties: specialties.specialties,
-      message: request.query.mensaje || null
+      message: request.query.mensaje || null,
+      notificacionesFallidas: Number(request.query["notificaciones-fallidas"]) || 0
     });
   });
 
