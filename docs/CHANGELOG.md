@@ -1,3 +1,10 @@
+## 2026-11-12 — Activación y desactivación de cuentas (US-ADM-12)
+
+- Añadí confirmación con el número de citas futuras confirmadas que se cancelarían.
+- Al desactivar pacientes o médicos, cancelé en la misma transacción sus citas futuras confirmadas y registré cada cambio.
+- Conservé citas pasadas, en curso y atendidas, y envié avisos por correo a las personas involucradas.
+- Añadí pruebas y actualicé la documentación del flujo administrativo.
+
 ## 2026-11-12 — Gestión de médicos por administración (US-ADM-04)
 
 - Añadí búsqueda, filtros por estado y especialidad, y paginación para el directorio.
