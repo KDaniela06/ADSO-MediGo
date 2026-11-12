@@ -6,7 +6,8 @@ const { validatePasswordChange } = require("../auth/validators/change-password")
 const { getAdminAccount, updateAdminAccount } = require("./services/account");
 const { validateAdminAccount } = require("./validators/account");
 const { getAdminDashboard } = require("./services/dashboard");
-const { changeAdminPatientStatus, getAdminPatient, getAdminPatients, updateAdminPatient } = require("./services/patients");
+const { getAdminPatient, getAdminPatients, updateAdminPatient } = require("./services/patients");
+const { changeAdminAccountStatus, getAccountStatusPreview } = require("./services/account-status");
 const { validateAdminPatient } = require("./validators/patient");
 const { createDoctorInvitation, getActiveSpecialties } = require("./services/doctors");
 const { validateDoctorRegistration } = require("./validators/doctor");
@@ -188,12 +189,13 @@ function createAdminRouter({ sequelize = null, models = null, emailSender = null
 
   router.get("/administrador/pacientes/:patientId/estado", ...requireAdmin, async (request, response) => {
     response.set("Cache-Control", "no-store");
-    const result = await getAdminPatient({ models, patientId: request.params.patientId });
-    if (result.status !== "ready") return response.status(result.status === "error" ? 503 : 404).send("No encontramos el paciente solicitado.");
     const newStatus = String(request.query.nuevo || "");
     if (!["ACTIVE", "INACTIVE"].includes(newStatus)) return response.status(400).send("El estado solicitado no es válido.");
-    return response.render("admin/views/patient-status-confirmation", {
-      title: "Confirmar cambio de estado", patient: result.patient, newStatus, message: null
+    const result = await getAccountStatusPreview({ models, role: "PATIENT", accountId: request.params.patientId });
+    if (result.status !== "ready") return response.status(result.status === "error" ? 503 : 404).send("No encontramos la cuenta solicitada.");
+    return response.render("admin/views/account-status-confirmation", {
+      title: "Confirmar cambio de estado", ...result, newStatus,
+      action: "/administrador/pacientes/" + result.account.id + "/estado"
     });
   });
 
@@ -231,12 +233,46 @@ function createAdminRouter({ sequelize = null, models = null, emailSender = null
   router.post("/administrador/pacientes/:patientId/estado", ...requireAdmin, async (request, response) => {
     response.set("Cache-Control", "no-store");
     try {
-      const result = await changeAdminPatientStatus({
-        sequelize, models, patientId: request.params.patientId, actorUserId: request.currentUser.id,
-        newStatus: request.body?.newStatus, confirmed: request.body?.confirmed
+      const result = await changeAdminAccountStatus({
+        sequelize, models, role: "PATIENT", accountId: request.params.patientId,
+        actorUserId: request.currentUser.id, newStatus: request.body?.newStatus,
+        confirmed: request.body?.confirmed, emailSender
       });
       if (result.status === "changed" || result.status === "unchanged") {
-        return response.redirect(303, "/administrador/pacientes?mensaje=status-updated");
+        const delivery = result.notificationFailures ? "&notificaciones-fallidas=" + result.notificationFailures : "";
+        return response.redirect(303, "/administrador/pacientes?mensaje=status-updated" + delivery);
+      }
+      if (result.status === "confirmation_required") return response.status(422).send("Confirma el cambio de estado para continuar.");
+      if (result.status === "invalid_status") return response.status(400).send("El estado solicitado no es válido.");
+      return response.status(result.status === "unavailable" ? 503 : 404).send("No fue posible cambiar el estado de la cuenta.");
+    } catch {
+      return response.status(503).send("No fue posible cambiar el estado de la cuenta.");
+    }
+  });
+
+  router.get("/administrador/medicos/:doctorId/estado", ...requireAdmin, async (request, response) => {
+    response.set("Cache-Control", "no-store");
+    const newStatus = String(request.query.nuevo || "");
+    if (!["ACTIVE", "INACTIVE"].includes(newStatus)) return response.status(400).send("El estado solicitado no es válido.");
+    const result = await getAccountStatusPreview({ models, role: "DOCTOR", accountId: request.params.doctorId });
+    if (result.status !== "ready") return response.status(result.status === "error" ? 503 : 404).send("No encontramos la cuenta solicitada.");
+    return response.render("admin/views/account-status-confirmation", {
+      title: "Confirmar cambio de estado", ...result, newStatus,
+      action: "/administrador/medicos/" + result.account.id + "/estado"
+    });
+  });
+
+  router.post("/administrador/medicos/:doctorId/estado", ...requireAdmin, async (request, response) => {
+    response.set("Cache-Control", "no-store");
+    try {
+      const result = await changeAdminAccountStatus({
+        sequelize, models, role: "DOCTOR", accountId: request.params.doctorId,
+        actorUserId: request.currentUser.id, newStatus: request.body?.newStatus,
+        confirmed: request.body?.confirmed, emailSender
+      });
+      if (result.status === "changed" || result.status === "unchanged") {
+        const delivery = result.notificationFailures ? "&notificaciones-fallidas=" + result.notificationFailures : "";
+        return response.redirect(303, "/administrador/medicos?mensaje=status-updated" + delivery);
       }
       if (result.status === "confirmation_required") return response.status(422).send("Confirma el cambio de estado para continuar.");
       if (result.status === "invalid_status") return response.status(400).send("El estado solicitado no es válido.");
