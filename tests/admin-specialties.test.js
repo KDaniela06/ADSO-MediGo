@@ -65,6 +65,10 @@ describe("administrator specialty management", () => {
     expect(result.status).toBe("name_in_use");
     expect(create).not.toHaveBeenCalled();
     expect((await getAdminSpecialty({ models: { Specialty: { findByPk: jest.fn() } }, specialtyId: "x" })).status).toBe("not_found");
+    expect((await getAdminSpecialty({
+      models: { Specialty: { findByPk: jest.fn().mockResolvedValue({ id: 4, name: "Medicina" }) } },
+      specialtyId: "4"
+    })).status).toBe("ready");
   });
 
   test("updates specialty details and audits only the change", async () => {
