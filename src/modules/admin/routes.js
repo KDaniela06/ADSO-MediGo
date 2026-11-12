@@ -18,6 +18,9 @@ const {
   getAdminSpecialty, updateAdminSpecialty
 } = require("./services/specialties");
 const { validateSpecialty } = require("./validators/specialty");
+const { getAdminSchedulePage, previewDoctorScheduleChanges, saveDoctorWeeklySchedule } = require("./services/weekly-schedules");
+const { WEEKDAY_NAMES, validateWeeklySchedule } = require("./validators/weekly-schedule");
+const WEEKDAYS = ["", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
 
 function createAdminRouter({ sequelize = null, models = null, emailSender = null } = {}) {
   const router = Router();
@@ -497,6 +500,76 @@ function createAdminRouter({ sequelize = null, models = null, emailSender = null
       return response.redirect(303, "/administrador/especialidades?mensaje=status-updated");
     } catch {
       return response.status(503).send("No fue posible actualizar el estado de la especialidad.");
+    }
+  });
+
+
+  router.get("/administrador/horarios", ...requireAdmin, async (request, response) => {
+    response.set("Cache-Control", "no-store");
+    const page = await getAdminSchedulePage({ models, doctorId: request.query.doctorId });
+    const statusCode = ["error", "unavailable"].includes(page.status) ? 503 : 200;
+    return response.status(statusCode).render("admin/views/weekly-schedules", {
+      title: "Configurar horarios médicos", page,
+      values: { blocks: page.blocks.length ? page.blocks : [{ weekday: "", startsAt: "", endsAt: "" }] },
+      errors: {}, weekdayNames: WEEKDAYS,
+      message: request.query.mensaje || null,
+      cancelled: Number(request.query.canceladas) || 0,
+      failedNotifications: Number(request.query["notificaciones-fallidas"]) || 0
+    });
+  });
+
+  router.post("/administrador/horarios/:doctorId/vista-previa", ...requireAdmin, async (request, response) => {
+    response.set("Cache-Control", "no-store");
+    const page = await getAdminSchedulePage({ models, doctorId: request.params.doctorId });
+    if (!page.selectedDoctor) return response.status(page.status === "error" ? 503 : 404).send("No encontramos el médico solicitado.");
+    const { values, errors, isValid } = validateWeeklySchedule(request.body || {});
+    if (!isValid) return response.status(422).render("admin/views/weekly-schedules", {
+      title: "Configurar horarios médicos", page, values, errors, weekdayNames: WEEKDAYS,
+      message: null, cancelled: 0, failedNotifications: 0
+    });
+    const preview = await previewDoctorScheduleChanges({
+      models, doctorId: request.params.doctorId, blocks: values.blocks
+    });
+    if (preview.status !== "ready") return response.status(preview.status === "error" ? 503 : 404).send("No pudimos revisar las citas del médico.");
+    return response.render("admin/views/weekly-schedule-confirmation", {
+      title: "Confirmar cambio de horario", doctor: page.selectedDoctor,
+      blocks: values.blocks, appointments: preview.appointments,
+      previewChanged: false, weekdayNames: WEEKDAYS
+    });
+  });
+
+  router.post("/administrador/horarios/:doctorId/guardar", ...requireAdmin, async (request, response) => {
+    response.set("Cache-Control", "no-store");
+    const page = await getAdminSchedulePage({ models, doctorId: request.params.doctorId });
+    if (!page.selectedDoctor) return response.status(page.status === "error" ? 503 : 404).send("No encontramos el médico solicitado.");
+    const { values, errors, isValid } = validateWeeklySchedule(request.body || {});
+    if (!isValid) return response.status(422).render("admin/views/weekly-schedules", {
+      title: "Configurar horarios médicos", page, values, errors, weekdayNames: WEEKDAYS,
+      message: null, cancelled: 0, failedNotifications: 0
+    });
+    if (!sequelize || !models) return response.status(503).send("La gestión de horarios no está disponible.");
+    try {
+      const result = await saveDoctorWeeklySchedule({
+        sequelize, models, doctorId: request.params.doctorId,
+        actorUserId: request.currentUser.id, blocks: values.blocks,
+        confirmed: request.body?.confirmed,
+        confirmedAppointmentIds: request.body?.confirmedAppointmentIds,
+        emailSender
+      });
+      if (result.status === "not_found") return response.status(404).send("No encontramos el médico solicitado.");
+      if (result.status === "unavailable") return response.status(503).send("La gestión de horarios no está disponible.");
+      if (result.status === "confirmation_required" || result.status === "preview_changed") {
+        return response.status(200).render("admin/views/weekly-schedule-confirmation", {
+          title: "Confirmar cambio de horario", doctor: page.selectedDoctor,
+          blocks: values.blocks, appointments: result.appointments,
+          previewChanged: result.status === "preview_changed", weekdayNames: WEEKDAYS
+        });
+      }
+      return response.redirect(303, "/administrador/horarios?doctorId=" + encodeURIComponent(request.params.doctorId)
+        + "&mensaje=saved&canceladas=" + Number(result.cancelled || 0)
+        + "&notificaciones-fallidas=" + Number(result.failedNotifications || 0));
+    } catch {
+      return response.status(503).send("No fue posible guardar el horario en este momento.");
     }
   });
 
