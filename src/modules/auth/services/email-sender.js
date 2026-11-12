@@ -73,22 +73,30 @@ function createEmailSender(environment = process.env) {
         html: `<p>Hola ${safeName},</p><p>Recibimos una solicitud para cambiar la contraseña de tu cuenta de MediGo.</p><p><a href="${safeUrl}">Crear una nueva contraseña</a></p><p>El enlace vence en ${expiresInMinutes} minutos y solo se puede utilizar una vez.</p><p>Si no solicitaste este cambio, ignora este mensaje.</p>`
       });
     }
-    async sendAccountStatusNotification({ to, firstName, status, changedAccountStatus, impactedRole, cancelledAppointments }) {
+    async sendAccountStatusNotification({ to, firstName, status, impactedRole, cancelledAppointments }) {
       const safeName = escapeHtml(firstName || "");
       const roleName = impactedRole === "DOCTOR" ? "médico" : "paciente";
       const safeRoleName = escapeHtml(roleName);
       const appointmentCount = Number(cancelledAppointments) || 0;
       const isTarget = Boolean(status);
-      const statusText = status === "ACTIVE" ? "activada" : "desactivada";
+      const cancellationText = appointmentCount === 1
+        ? "Se canceló 1 cita futura confirmada."
+        : appointmentCount > 1
+          ? `Se cancelaron ${appointmentCount} citas futuras confirmadas.`
+          : "No se cancelaron citas.";
       const subject = isTarget
         ? "Actualización de tu cuenta de MediGo"
         : "Cambio en una cita de MediGo";
       const text = isTarget
-        ? `Hola ${firstName || ""}. Un administrador ${status === "ACTIVE" ? "activó" : "desactivó"} tu cuenta de MediGo. Se cancelaron ${appointmentCount} citas futuras confirmadas asociadas a esta cuenta. Si tienes preguntas, comunícate con MediGo.`
-        : `Hola ${firstName || ""}. Un administrador desactivó la cuenta de un ${roleName} en MediGo. Se cancelaron ${appointmentCount} citas futuras confirmadas en las que participabas. Comunícate con MediGo si necesitas ayuda.`;
+        ? status === "ACTIVE"
+          ? `Hola ${firstName || ""}. Un administrador activó tu cuenta de MediGo. Ya puedes iniciar sesión.`
+          : `Hola ${firstName || ""}. Un administrador desactivó tu cuenta de MediGo. ${cancellationText} Si tienes preguntas, comunícate con MediGo.`
+        : `Hola ${firstName || ""}. Un administrador desactivó la cuenta de un ${roleName} en MediGo. ${cancellationText} Comunícate con MediGo si necesitas ayuda.`;
       const html = isTarget
-        ? `<p>Hola ${safeName},</p><p>Un administrador ${status === "ACTIVE" ? "activó" : "desactivó"} tu cuenta de MediGo.</p><p>Se cancelaron ${appointmentCount} citas futuras confirmadas asociadas a esta cuenta.</p><p>Si tienes preguntas, comunícate con MediGo.</p>`
-        : `<p>Hola ${safeName},</p><p>Un administrador desactivó la cuenta de un ${safeRoleName} en MediGo.</p><p>Se cancelaron ${appointmentCount} citas futuras confirmadas en las que participabas.</p><p>Comunícate con MediGo si necesitas ayuda.</p>`;
+        ? status === "ACTIVE"
+          ? `<p>Hola ${safeName},</p><p>Un administrador activó tu cuenta de MediGo. Ya puedes iniciar sesión.</p>`
+          : `<p>Hola ${safeName},</p><p>Un administrador desactivó tu cuenta de MediGo.</p><p>${escapeHtml(cancellationText)}</p><p>Si tienes preguntas, comunícate con MediGo.</p>`
+        : `<p>Hola ${safeName},</p><p>Un administrador desactivó la cuenta de un ${safeRoleName} en MediGo.</p><p>${escapeHtml(cancellationText)}</p><p>Comunícate con MediGo si necesitas ayuda.</p>`;
       await transporter.sendMail({
         from: environment.SMTP_FROM,
         to,
