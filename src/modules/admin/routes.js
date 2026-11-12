@@ -193,7 +193,7 @@ function createAdminRouter({ sequelize = null, models = null, emailSender = null
     const newStatus = String(request.query.nuevo || "");
     if (!["ACTIVE", "INACTIVE"].includes(newStatus)) return response.status(400).send("El estado solicitado no es válido.");
     const result = await getAccountStatusPreview({ models, role: "PATIENT", accountId: request.params.patientId });
-    if (result.status !== "ready") return response.status(result.status === "error" ? 503 : 404).send("No encontramos la cuenta solicitada.");
+    if (result.status !== "ready") return response.status(result.status === "not_found" ? 404 : 503).send("No encontramos la cuenta solicitada.");
     return response.render("admin/views/account-status-confirmation", {
       title: "Confirmar cambio de estado", ...result, newStatus,
       action: "/administrador/pacientes/" + result.account.id + "/estado"

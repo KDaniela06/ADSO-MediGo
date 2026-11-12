@@ -6,7 +6,7 @@ function setup({ role = "PATIENT", status = "ACTIVE", appointments = [] } = {}) 
     id: 10, firstName: "Laura", lastName: "Gómez", email: "laura@example.com",
     role, status, save: jest.fn().mockResolvedValue(undefined)
   };
-  const profile = { id: 3, userId: user.id };
+  const profile = { id: 3, userId: user.id, user };
   const patientUser = { id: 20, firstName: "Pedro", lastName: "Paz", email: "pedro@example.com" };
   const doctorUser = { id: 30, firstName: "Ana", lastName: "Díaz", email: "ana@example.com" };
   const records = appointments.map((appointment, index) => ({
@@ -32,7 +32,7 @@ function setup({ role = "PATIENT", status = "ACTIVE", appointments = [] } = {}) 
 
 describe("administrator account status", () => {
   test("previews confirmed future appointments before deactivation", async () => {
-    const { models } = setup();
+    const { models } = setup({ appointments: [{}] });
     const result = await getAccountStatusPreview({
       models, role: "PATIENT", accountId: "3", now: new Date("2026-11-12T12:00:00Z")
     });

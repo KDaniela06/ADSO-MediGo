@@ -72,7 +72,7 @@ function createEmailSender(environment = process.env) {
         text: `Hola ${firstName || ""}. Puedes crear una nueva contraseña en este enlace: ${url}. El enlace vence en ${expiresInMinutes} minutos y solo se puede utilizar una vez. Si no solicitaste este cambio, ignora este mensaje.`,
         html: `<p>Hola ${safeName},</p><p>Recibimos una solicitud para cambiar la contraseña de tu cuenta de MediGo.</p><p><a href="${safeUrl}">Crear una nueva contraseña</a></p><p>El enlace vence en ${expiresInMinutes} minutos y solo se puede utilizar una vez.</p><p>Si no solicitaste este cambio, ignora este mensaje.</p>`
       });
-    }
+    },
     async sendAccountStatusNotification({ to, firstName, status, impactedRole, cancelledAppointments }) {
       const safeName = escapeHtml(firstName || "");
       const roleName = impactedRole === "DOCTOR" ? "médico" : "paciente";

@@ -32,6 +32,7 @@ describe("administrator patient pages", () => {
         findAndCountAll: jest.fn().mockResolvedValue({ count: 1, rows: [patient] }),
         findByPk: jest.fn().mockResolvedValue(patient)
       },
+      Appointment: { count: jest.fn().mockResolvedValue(0), findAll: jest.fn().mockResolvedValue([]) },
       AuditLog: { create: auditCreate }
     };
     const sequelize = { transaction: (callback) => callback({ LOCK: { UPDATE: "UPDATE" } }) };
