@@ -51,7 +51,7 @@ async function getAdminSpecialties({ models, search = "", status = "", page = 1 
 
 async function getAdminSpecialty({ models, specialtyId }) {
   if (!models?.Specialty?.findByPk) return { status: "unavailable" };
-  if (!/^\\d+$/.test(String(specialtyId || ""))) return { status: "not_found" };
+  if (!/^\d+$/.test(String(specialtyId || ""))) return { status: "not_found" };
   try {
     const specialty = await models.Specialty.findByPk(specialtyId, {
       attributes: ["id", "name", "description", "status", "createdAt", "updatedAt"]
@@ -85,7 +85,7 @@ async function createAdminSpecialty({ sequelize, models, actorUserId, input, now
 
 async function updateAdminSpecialty({ sequelize, models, specialtyId, actorUserId, input, now = new Date() }) {
   if (!sequelize || !models?.Specialty || !models?.AuditLog) return { status: "unavailable" };
-  if (!/^\\d+$/.test(String(specialtyId || ""))) return { status: "not_found" };
+  if (!/^\d+$/.test(String(specialtyId || ""))) return { status: "not_found" };
   const name = String(input.name || "").trim();
   const description = String(input.description || "").trim() || null;
   return sequelize.transaction(async (transaction) => {
@@ -114,7 +114,7 @@ async function updateAdminSpecialty({ sequelize, models, specialtyId, actorUserI
 
 async function changeAdminSpecialtyStatus({ sequelize, models, specialtyId, actorUserId, status, now = new Date() }) {
   if (!sequelize || !models?.Specialty || !models?.AuditLog) return { status: "unavailable" };
-  if (!/^\\d+$/.test(String(specialtyId || ""))) return { status: "not_found" };
+  if (!/^\d+$/.test(String(specialtyId || ""))) return { status: "not_found" };
   if (!ALLOWED_STATUSES.has(status)) return { status: "invalid_status" };
   return sequelize.transaction(async (transaction) => {
     const specialty = await models.Specialty.findByPk(specialtyId, {
