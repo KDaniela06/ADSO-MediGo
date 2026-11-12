@@ -17,6 +17,8 @@ block content
         p(role="status", class="mb-4 rounded-xl bg-emerald-50 p-4 text-sm text-emerald-900") Los datos del paciente se actualizaron.
       if message === "status-updated"
         p(role="status", class="mb-4 rounded-xl bg-emerald-50 p-4 text-sm text-emerald-900") El estado de la cuenta se actualizó y quedó registrado.
+      if notificacionesFallidas
+        p(role="alert", class="mb-4 rounded-xl bg-amber-50 p-4 text-sm text-amber-900") No se pudieron enviar #{notificacionesFallidas} aviso(s) por correo.
       if patientsResult.status === "error"
         p(role="alert", class="rounded-xl bg-amber-50 p-4 text-sm text-amber-900") No pudimos cargar los pacientes. Inténtalo de nuevo más tarde.
       else if patientsResult.status === "unavailable"
