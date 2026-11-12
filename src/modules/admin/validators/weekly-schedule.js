@@ -14,6 +14,7 @@ function validateWeeklySchedule(input = {}) {
   const ends = valuesAsArray(input.endsAt);
   const count = Math.max(weekdays.length, starts.length, ends.length);
   const blocks = [];
+  const submittedBlocks = [];
   const errors = {};
 
   for (let index = 0; index < count; index += 1) {
@@ -21,6 +22,7 @@ function validateWeeklySchedule(input = {}) {
     const startsAt = String(starts[index] || "").trim();
     const endsAt = String(ends[index] || "").trim();
     if (!weekday && !startsAt && !endsAt) continue;
+    submittedBlocks.push({ weekday, startsAt, endsAt });
     if (!weekday || !startsAt || !endsAt) {
       errors.blocks = "Completa el día, la hora de inicio y la hora de fin de cada bloque.";
       continue;
@@ -60,7 +62,7 @@ function validateWeeklySchedule(input = {}) {
   }
 
   return {
-    values: { blocks: ordered },
+    values: { blocks: Object.keys(errors).length ? submittedBlocks : ordered },
     errors,
     isValid: Object.keys(errors).length === 0
   };
