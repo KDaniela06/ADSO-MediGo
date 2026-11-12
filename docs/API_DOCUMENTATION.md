@@ -151,7 +151,16 @@ Los conteos se consultan como agregados, y la vista semanal solo carga fechas y 
 
 La consulta solo incluye datos administrativos de paciente y excluye notas clínicas y observaciones. Las acciones requieren sesión, rol ADMIN y protección CSRF. Los cambios de estado solo aplican a cuentas activas o inactivas.
 
-## Registro de médicos — issue #36
+## Gestión de médicos — issue #37
+
+| Método y ruta | Acceso | Comportamiento |
+|---|---|---|
+| `GET /administrador/medicos` | Administrador autenticado | Lista médicos con búsqueda, filtro por estado de cuenta y especialidad, y paginación. |
+| `GET /administrador/medicos/:doctorId` | Administrador autenticado | Muestra datos administrativos, estado de cuenta, verificación de correo, contraseña configurada y estado/vencimiento de invitación. |
+| `GET /administrador/medicos/:doctorId/editar` | Administrador autenticado | Permite editar nombres, teléfono, registro profesional y especialidad. El correo, documento y estado no se editan aquí. |
+| `POST /administrador/medicos/:doctorId/editar` | Administrador autenticado | Valida y guarda los campos permitidos; cambiar especialidad requiere confirmación y queda auditado. |
+
+El correo conserva el flujo de confirmación existente. El panel solo consulta datos administrativos, no observaciones clínicas.
 
 | Método y ruta | Acceso | Comportamiento |
 |---|---|---|
