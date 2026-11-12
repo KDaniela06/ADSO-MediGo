@@ -43,4 +43,9 @@ block content
         div
           p(class="text-xs uppercase text-slate-500") Contraseña configurada
           p(class="mt-1 font-semibold")= doctor.passwordConfiguredAt ? "Sí" : "No"
-      a(class="mt-6 inline-flex rounded-lg bg-medigo-blue px-4 py-2 text-sm font-semibold text-white", href="/administrador/medicos/" + doctor.id + "/editar") Actualizar datos
+      div(class="mt-6 flex flex-wrap gap-3")
+        a(class="inline-flex rounded-lg bg-medigo-blue px-4 py-2 text-sm font-semibold text-white", href="/administrador/medicos/" + doctor.id + "/editar") Actualizar datos
+        if doctor.accountStatus === "ACTIVE"
+          a(class="inline-flex rounded-lg border border-rose-300 px-4 py-2 text-sm font-semibold text-rose-700", href="/administrador/medicos/" + doctor.id + "/estado?nuevo=INACTIVE") Desactivar cuenta
+        else if doctor.accountStatus === "INACTIVE"
+          a(class="inline-flex rounded-lg border border-emerald-300 px-4 py-2 text-sm font-semibold text-emerald-700", href="/administrador/medicos/" + doctor.id + "/estado?nuevo=ACTIVE") Activar cuenta
