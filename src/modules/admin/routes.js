@@ -19,7 +19,7 @@ const {
 } = require("./services/specialties");
 const { validateSpecialty } = require("./validators/specialty");
 const { getAdminSchedulePage, previewDoctorScheduleChanges, saveDoctorWeeklySchedule } = require("./services/weekly-schedules");
-const { WEEKDAY_NAMES, validateWeeklySchedule } = require("./validators/weekly-schedule");
+const { validateWeeklySchedule } = require("./validators/weekly-schedule");
 const WEEKDAYS = ["", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
 
 function createAdminRouter({ sequelize = null, models = null, emailSender = null } = {}) {
