@@ -35,9 +35,6 @@ module.exports = {
       type: "unique",
       name: "doctor_weekly_schedule_block_unique_start"
     });
-    await queryInterface.addIndex("doctor_weekly_schedule_blocks", ["schedule_id", "weekday", "starts_at"], {
-      name: "doctor_weekly_schedule_blocks_weekday_idx"
-    });
   },
 
   async down(queryInterface) {
