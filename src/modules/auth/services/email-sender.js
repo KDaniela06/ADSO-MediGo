@@ -105,6 +105,18 @@ function createEmailSender(environment = process.env) {
         html
       });
     },
+    async sendAppointmentCancellationNotification({ to, firstName, appointmentDate, appointmentTime }) {
+      const safeName = escapeHtml(firstName || "paciente");
+      const safeDate = escapeHtml(appointmentDate || "");
+      const safeTime = escapeHtml(appointmentTime || "");
+      await transporter.sendMail({
+        from: environment.SMTP_FROM,
+        to,
+        subject: "Actualización de una cita en MediGo",
+        text: `Hola ${firstName || ""}. Actualizamos la disponibilidad del médico y tu cita de ${appointmentDate || ""} a las ${appointmentTime || ""} fue cancelada. Ingresa a MediGo para elegir otro horario.`,
+        html: `<p>Hola ${safeName},</p><p>Actualizamos la disponibilidad del médico y tu cita del ${safeDate} a las ${safeTime} fue cancelada.</p><p>Ingresa a MediGo para elegir otro horario.</p>`
+      });
+    }
   };
 }
 
