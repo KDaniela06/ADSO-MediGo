@@ -1,3 +1,5 @@
+const path = require("node:path");
+const pug = require("pug");
 const { validateWeeklySchedule } = require("../src/modules/admin/validators/weekly-schedule");
 const {
   previewDoctorScheduleChanges, saveDoctorWeeklySchedule, scheduleBlockCoversAppointment
@@ -18,6 +20,12 @@ function appointment(id, startsAt, endsAt) {
 }
 
 describe("administrator weekly schedules", () => {
+  test("compiles the administrator schedule screens", () => {
+    for (const view of ["weekly-schedules.pug", "weekly-schedule-confirmation.pug"]) {
+      expect(() => pug.compileFile(path.join(__dirname, "../src/modules/admin/views", view))).not.toThrow();
+    }
+  });
+
   test("validates half-hour blocks and rejects overlaps and midnight crossing", () => {
     const valid = validateWeeklySchedule({
       weekday: ["1", "1"], startsAt: ["09:00", "10:00"], endsAt: ["09:30", "11:00"]
