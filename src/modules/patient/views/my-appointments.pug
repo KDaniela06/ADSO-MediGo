@@ -3,10 +3,8 @@ extends ../../../views/shared/layout.pug
 block content
   main(class="min-h-screen bg-slate-50 px-4 py-8 text-slate-800")
     section(class="mx-auto max-w-5xl")
-      a(class="text-sm font-semibold text-medigo-blue hover:underline", href="/paciente") ← Volver a mi espacio
-      header(class="mt-4")
-        p(class="text-sm font-semibold uppercase tracking-wide text-medigo-blue") MediGo · Área de paciente
-        h1(class="mt-1 text-2xl font-bold text-medigo-navy sm:text-3xl") Mis citas
+      header
+        h1(class="mt-1 text-2xl font-bold text-medigo-navy sm:text-3xl")= title
         p(class="mt-1 text-sm text-slate-600") Consulta las fechas, el médico y el estado de tus citas.
       nav(aria-label="Filtrar citas", class="mt-5 flex flex-wrap gap-2")
         a(

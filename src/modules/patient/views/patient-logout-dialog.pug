@@ -1,0 +1,13 @@
+dialog#patient-logout-dialog.patient-logout-dialog(aria-labelledby="patient-logout-title", aria-describedby="patient-logout-description")
+  .patient-logout-card
+    span.patient-logout-icon(aria-hidden="true")
+      svg(xmlns="http://www.w3.org/2000/svg", viewBox="0 0 24 24", fill="none", stroke="currentColor", stroke-width="1.8", stroke-linecap="round", stroke-linejoin="round", class="h-6 w-6")
+        path(d="M10 17l5-5-5-5m5 5H3")
+        path(d="M12 3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6")
+    h2#patient-logout-title(class="mt-4 text-xl font-bold text-medigo-navy") ¿Quieres cerrar sesión?
+    p#patient-logout-description(class="mt-2 text-sm leading-6 text-slate-600") Tendrás que volver a ingresar tus datos para entrar a MediGo.
+    div(class="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end")
+      button.patient-dialog-cancel(type="button", data-close-logout) Seguir en MediGo
+      form(action="/cerrar-sesion", method="post")
+        input(type="hidden", name="_csrf", value=csrfToken)
+        button.patient-dialog-confirm(type="submit") Sí, cerrar sesión

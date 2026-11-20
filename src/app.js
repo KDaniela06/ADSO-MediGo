@@ -10,6 +10,29 @@ const { createPatientRouter } = require("./modules/patient/routes");
 const { createDoctorRouter } = require("./modules/doctor/routes");
 const { createAdminRouter } = require("./modules/admin/routes");
 
+const patientNavigationItems = [
+  { id: "home", label: "Inicio", href: "/paciente", icon: "home" },
+  { id: "booking", label: "Reservar cita", href: "/citas/reservar", icon: "calendar" },
+  { id: "appointments", label: "Mis citas", href: "/mis-citas", icon: "appointments" },
+  { id: "history", label: "Historial", href: "/historial", icon: "history" },
+  { id: "profile", label: "Mi perfil", href: "/perfil", icon: "profile" },
+  { id: "whatsapp", label: "WhatsApp", href: "/whatsapp/vincular", icon: "whatsapp" }
+];
+
+function getPatientActivePage(request) {
+  const currentPath = request.path;
+
+  if (currentPath === "/paciente") return "home";
+  if (currentPath.startsWith("/citas/reservar")) return "booking";
+  if (currentPath === "/historial") return "history";
+  if (currentPath === "/mis-citas" && request.query.filtro === "anteriores") return "history";
+  if (currentPath === "/mis-citas" || currentPath.startsWith("/citas/")) return "appointments";
+  if (currentPath === "/perfil" || currentPath === "/cambiar-contrasena") return "profile";
+  if (currentPath.startsWith("/whatsapp/")) return "whatsapp";
+
+  return "";
+}
+
 function createApp({
   sequelize: providedSequelize,
   models: providedModels,
@@ -30,6 +53,8 @@ function createApp({
   app.use(csrfSynchronisedProtection);
   app.use((request, response, next) => {
     response.locals.csrfToken = generateToken(request);
+    response.locals.activePatientPage = getPatientActivePage(request);
+    response.locals.patientNavigationItems = patientNavigationItems;
     next();
   });
 

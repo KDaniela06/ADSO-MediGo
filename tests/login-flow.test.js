@@ -80,13 +80,26 @@ describe("patient login flow", () => {
     expect(response.status).toBe(303);
     expect(response.headers.get("location")).toBe("/paciente");
 
-    const sessionCookie = response.headers.get("set-cookie").split(";")[0];
+    const sessionSetCookie = response.headers.get("set-cookie");
+    expect(sessionSetCookie).toContain("Expires=");
+    const expiry = new Date(sessionSetCookie.match(/Expires=([^;]+)/)[1]);
+    expect(expiry.getTime()).toBeGreaterThan(Date.now() + 29 * 24 * 60 * 60 * 1000);
+
+    const sessionCookie = sessionSetCookie.split(";")[0];
     const dashboard = await fetch(`${baseUrl}/paciente`, {
       headers: { cookie: sessionCookie }
     });
     expect(dashboard.status).toBe(200);
     expect(await dashboard.text()).toContain("Hola, Ana");
     expect(models.User.findByPk).toHaveBeenCalledWith(19, expect.any(Object));
+  });
+
+  test("keeps the session cookie temporary when remember me is not selected", async () => {
+    const form = await getLoginForm();
+    const response = await submitLogin(form);
+
+    expect(response.status).toBe(303);
+    expect(response.headers.get("set-cookie")).not.toContain("Expires=");
   });
 
   test("sends doctors and administrators to their own protected pages", async () => {

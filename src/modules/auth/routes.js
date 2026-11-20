@@ -1,4 +1,5 @@
 const { Router } = require("express");
+const { REMEMBER_ME_DURATION_MS } = require("../../config/session");
 const { validatePatientRegistration } = require("./validators/patient-registration");
 const { registerPatient } = require("./services/patient-registration");
 const { authenticateUser } = require("./services/authentication");
@@ -68,7 +69,7 @@ function createAuthRouter({ sequelize = null, models = null, emailSender = null 
       request.session.userId = account.id;
       request.session.role = account.role;
       if (request.body.rememberMe === "on") {
-        request.session.cookie.maxAge = 30 * 24 * 60 * 60 * 1000;
+        request.session.cookie.maxAge = REMEMBER_ME_DURATION_MS;
       }
       await new Promise((resolve, reject) => {
         request.session.save((error) => (error ? reject(error) : resolve()));
