@@ -18,7 +18,6 @@ block content
           a(class="mt-5 inline-flex rounded-lg bg-medigo-blue px-4 py-2.5 text-sm font-semibold text-white hover:bg-medigo-navy", href="/mis-citas") Ir a mis citas
       else if result.status === "ready"
         dialog(open, aria-labelledby="cancel-title", class="relative mt-5 w-full max-w-none rounded-2xl border border-slate-200 bg-white p-6 text-slate-800 shadow-sm")
-          p(class="text-sm font-semibold uppercase tracking-wide text-medigo-blue") MediGo · Área de paciente
           h1#cancel-title(class="mt-1 text-2xl font-bold text-medigo-navy") ¿Cancelar esta cita?
           article(class="mt-4 rounded-xl bg-sky-50 p-4")
             h2(class="font-bold text-medigo-navy") #{result.appointment.specialtyName} · Dr(a). #{result.appointment.doctorName}

@@ -299,7 +299,7 @@ function createPatientRouter({ sequelize = null, models, emailSender = null, wha
         : result.status === "not_found" ? 404
           : ["error", "unavailable"].includes(result.status) ? 503 : 200;
       return response.status(statusCode).render("patient/views/my-appointments", {
-        title: "Mis citas",
+        title: result.filter === "anteriores" ? "Historial de citas" : "Mis citas",
         result
       });
     }
