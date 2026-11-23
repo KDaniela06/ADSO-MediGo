@@ -3,7 +3,7 @@ const { Router } = require("express");
 const router = Router();
 
 router.get("/", (request, response) => {
-  response.render("home/views/home", { title: "Inicio" });
+  response.redirect(303, "/iniciar-sesion");
 });
 
 module.exports = router;
