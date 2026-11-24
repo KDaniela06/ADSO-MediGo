@@ -12,6 +12,7 @@ describe("navegación global", () => {
   ])("muestra solo las opciones del rol %s", (role, homePath, expectedLabel, expectedPath, forbiddenPath) => {
     const html = renderNavigation({
       currentUser: { role, firstName: "Alex" },
+      title: "Mi perfil",
       appNavigationItems,
       activeAppNavigationItem: appNavigationItems[role][0].id,
       csrfToken: "csrf-test"
@@ -32,10 +33,28 @@ describe("navegación global", () => {
   test("no falla si la lista de navegación no está presente en los datos de la vista", () => {
     const html = renderNavigation({
       currentUser: { role: "PATIENT", firstName: "Alex" },
+      title: "Mi perfil",
       csrfToken: "csrf-test"
     });
 
-    expect(html).toContain("Menú principal");
+    expect(html).toContain("Navegación");
     expect(html).not.toMatch(/class="app-navigation-link(?: |")/);
+  });
+
+  test("muestra al paciente la barra lateral fija y el botón hamburguesa inicia abierta", () => {
+    const html = renderNavigation({
+      currentUser: { role: "PATIENT", firstName: "Alex", lastName: "Pérez" },
+      title: "Mi perfil",
+      appNavigationItems,
+      activeAppNavigationItem: "patient-profile",
+      csrfToken: "csrf-test"
+    });
+
+    expect(html).toContain('class="app-navigation patient-app-navigation"');
+    expect(html).toContain('aria-expanded="true"');
+    expect(html).toContain('class="patient-sidebar-brand"');
+    expect(html).toContain("Mi perfil – Paciente");
+    expect(html).toContain('aria-current="page"');
+    expect(html).toContain('action="/cerrar-sesion"');
   });
 });
