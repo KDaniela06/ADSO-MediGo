@@ -6,12 +6,12 @@ html(lang="es")
     meta(name="description", content="MediGo: gestiÃ³n de citas mÃ©dicas.")
     title #{title} | MediGo
     link(rel="stylesheet", href="/css/app.css")
-  body(data-patient-app=typeof currentUser !== "undefined" && currentUser && currentUser.role === "PATIENT" ? "true" : undefined)
-    if typeof currentUser !== "undefined" && currentUser && currentUser.role === "PATIENT"
-      include ../../modules/patient/views/patient-sidebar.pug
-    div(class=typeof currentUser !== "undefined" && currentUser && currentUser.role === "PATIENT" ? "patient-page-content" : undefined)
+  body(data-app-role=typeof currentUser !== "undefined" && currentUser ? currentUser.role : undefined)
+    if typeof currentUser !== "undefined" && currentUser
+      include app-navigation.pug
+      .app-content
+        block content
+      script(src="/js/app-navigation.js", defer)
+    else
       block content
-    if typeof currentUser !== "undefined" && currentUser && currentUser.role === "PATIENT"
-      include ../../modules/patient/views/patient-logout-dialog.pug
-      script(src="/js/patient-shell.js", defer)
 
