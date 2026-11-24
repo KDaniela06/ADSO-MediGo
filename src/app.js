@@ -11,26 +11,56 @@ const { createDoctorRouter } = require("./modules/doctor/routes");
 const { createAdminRouter } = require("./modules/admin/routes");
 const { createWhatsAppWebhookRouter } = require("./modules/whatsapp/routes");
 
-const patientNavigationItems = [
-  { id: "home", label: "Inicio", href: "/paciente", icon: "home" },
-  { id: "booking", label: "Reservar cita", href: "/citas/reservar", icon: "calendar" },
-  { id: "appointments", label: "Mis citas", href: "/mis-citas", icon: "appointments" },
-  { id: "history", label: "Historial", href: "/historial", icon: "history" },
-  { id: "profile", label: "Mi perfil", href: "/perfil", icon: "profile" },
-  { id: "whatsapp", label: "WhatsApp", href: "/whatsapp/vincular", icon: "whatsapp" }
-];
+const appNavigationItems = {
+  PATIENT: [
+    { id: "patient-home", label: "Inicio", href: "/paciente" },
+    { id: "patient-booking", label: "Reservar cita", href: "/citas/reservar" },
+    { id: "patient-appointments", label: "Mis citas", href: "/mis-citas" },
+    { id: "patient-history", label: "Historial", href: "/historial" },
+    { id: "patient-profile", label: "Mi perfil", href: "/perfil" },
+    { id: "patient-whatsapp", label: "WhatsApp", href: "/whatsapp/vincular" }
+  ],
+  DOCTOR: [
+    { id: "doctor-home", label: "Inicio", href: "/medico" },
+    { id: "doctor-appointments", label: "Mis citas", href: "/medico/citas" },
+    { id: "doctor-patients", label: "Mis pacientes", href: "/medico/pacientes" },
+    { id: "doctor-schedule", label: "Mi agenda", href: "/medico/agenda" },
+    { id: "doctor-profile", label: "Mi perfil", href: "/medico/perfil" }
+  ],
+  ADMIN: [
+    { id: "admin-home", label: "Inicio", href: "/administrador" },
+    { id: "admin-appointments", label: "Citas", href: "/administrador/citas" },
+    { id: "admin-patients", label: "Pacientes", href: "/administrador/pacientes" },
+    { id: "admin-doctors", label: "Médicos", href: "/administrador/medicos" },
+    { id: "admin-specialties", label: "Especialidades", href: "/administrador/especialidades" },
+    { id: "admin-schedules", label: "Horarios", href: "/administrador/horarios" },
+    { id: "admin-exceptions", label: "Excepciones de agenda", href: "/administrador/excepciones" },
+    { id: "admin-account", label: "Mi cuenta", href: "/administrador/mi-cuenta" }
+  ]
+};
 
-function getPatientActivePage(request) {
+function getActiveAppNavigationItem(request) {
   const currentPath = request.path;
 
-  if (currentPath === "/paciente") return "home";
-  if (currentPath.startsWith("/citas/reservar")) return "booking";
-  if (currentPath === "/historial") return "history";
-  if (currentPath === "/mis-citas" && request.query.filtro === "anteriores") return "history";
-  if (currentPath === "/mis-citas" || currentPath.startsWith("/citas/")) return "appointments";
-  if (currentPath === "/perfil" || currentPath === "/cambiar-contrasena") return "profile";
-  if (currentPath.startsWith("/whatsapp/")) return "whatsapp";
-
+  if (currentPath === "/paciente") return "patient-home";
+  if (currentPath.startsWith("/citas/reservar")) return "patient-booking";
+  if (currentPath === "/historial" || (currentPath === "/mis-citas" && request.query.filtro === "anteriores")) return "patient-history";
+  if (currentPath === "/mis-citas" || currentPath.startsWith("/citas/")) return "patient-appointments";
+  if (currentPath === "/perfil" || currentPath === "/cambiar-contrasena") return "patient-profile";
+  if (currentPath.startsWith("/whatsapp/")) return "patient-whatsapp";
+  if (currentPath === "/medico") return "doctor-home";
+  if (currentPath.startsWith("/medico/citas")) return "doctor-appointments";
+  if (currentPath.startsWith("/medico/pacientes")) return "doctor-patients";
+  if (currentPath.startsWith("/medico/agenda")) return "doctor-schedule";
+  if (currentPath === "/medico/perfil" || currentPath === "/medico/cambiar-contrasena") return "doctor-profile";
+  if (currentPath === "/administrador") return "admin-home";
+  if (currentPath.startsWith("/administrador/citas")) return "admin-appointments";
+  if (currentPath.startsWith("/administrador/pacientes")) return "admin-patients";
+  if (currentPath.startsWith("/administrador/medicos")) return "admin-doctors";
+  if (currentPath.startsWith("/administrador/especialidades")) return "admin-specialties";
+  if (currentPath.startsWith("/administrador/horarios")) return "admin-schedules";
+  if (currentPath.startsWith("/administrador/excepciones")) return "admin-exceptions";
+  if (currentPath.startsWith("/administrador/mi-cuenta") || currentPath === "/administrador/cambiar-contrasena") return "admin-account";
   return "";
 }
 
@@ -55,8 +85,8 @@ function createApp({
   app.use(csrfSynchronisedProtection);
   app.use((request, response, next) => {
     response.locals.csrfToken = generateToken(request);
-    response.locals.activePatientPage = getPatientActivePage(request);
-    response.locals.patientNavigationItems = patientNavigationItems;
+    response.locals.activeAppNavigationItem = getActiveAppNavigationItem(request);
+    response.locals.appNavigationItems = appNavigationItems;
     next();
   });
 
@@ -77,4 +107,4 @@ function createApp({
   return app;
 }
 
-module.exports = { createApp };
+module.exports = { appNavigationItems, createApp, getActiveAppNavigationItem };
