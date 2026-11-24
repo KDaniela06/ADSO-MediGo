@@ -35,6 +35,10 @@ const migrations = [
   {
     name: "202611170003-add-patient-whatsapp-verification",
     migration: require("../src/database/migrations/202611170003-add-patient-whatsapp-verification")
+  },
+  {
+    name: "202611240001-create-whatsapp-conversations",
+    migration: require("../src/database/migrations/202611240001-create-whatsapp-conversations")
   }
 ];
 

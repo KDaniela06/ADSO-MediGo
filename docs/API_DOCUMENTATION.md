@@ -283,3 +283,14 @@ La invitación se almacena como hash SHA-256, es de un solo uso y vence en 24 ho
 - El webhook de WhatsApp debe validar la firma del proveedor oficial.
 - No devolver información clínica en el historial del paciente ni detalles no autorizados.
 
+
+## Gestionar citas por WhatsApp — issue #25
+
+| Método y ruta | Acceso | Comportamiento |
+|---|---|---|
+| `GET /webhooks/whatsapp?hub.mode=subscribe&hub.verify_token=...&hub.challenge=...` | Verificación de Meta | Comprueba `WHATSAPP_WEBHOOK_VERIFY_TOKEN` y devuelve el reto de Meta. |
+| `POST /webhooks/whatsapp` | Webhook firmado de Meta | Valida `X-Hub-Signature-256` con `WHATSAPP_APP_SECRET`, deduplica mensajes y atiende mensajes de texto entrantes. |
+
+El bot acepta solo números ya vinculados y verificados. Al iniciar o vencer una conversación, pide el documento y lo compara con la cuenta sin guardarlo. Después presenta opciones para reservar, consultar, cancelar o reprogramar, reutilizando las reglas de citas de la web. La conversación vence tras 15 minutos de inactividad y conserva solo identificadores de selección. Las respuestas se envían cuando el paciente escribe; no hay mensajes proactivos.
+
+Para activar Meta, configura `WHATSAPP_WEBHOOK_VERIFY_TOKEN`, `WHATSAPP_APP_SECRET`, `WHATSAPP_ACCESS_TOKEN` y `WHATSAPP_PHONE_NUMBER_ID`; publica `/webhooks/whatsapp` con HTTPS y suscribe la aplicación al campo `messages`. Aplica la migración con `npm run db:migrate`. Meta no puede llamar directamente a `localhost` sin un túnel HTTPS de desarrollo.

@@ -43,3 +43,5 @@ La aplicación incluye Jest y pruebas HTTP de humo para la página inicial y los
 Probar resultados esperados y límites temporales; fijar reloj en casos dependientes de hora; asegurar transacciones y concurrencia en integración; mantener mensajes visibles en español y nombres técnicos en inglés. El repositorio incluye Jest y `package-lock.json`. CI usa `npm ci` para instalar las mismas versiones en cada ejecución y luego ejecuta `npm test`. Para repetir estos pasos localmente, ejecuta `npm ci` y después `npm test`.
 
 
+
+Para el chatbot de WhatsApp, se cubren la validación documental sin almacenamiento, el vencimiento de sesión tras 15 minutos, la deduplicación del webhook y la firma HMAC de Meta.
