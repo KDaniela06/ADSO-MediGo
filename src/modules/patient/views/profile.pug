@@ -1,84 +1,85 @@
 extends ../../../views/shared/layout.pug
 
 block content
-  main(class="min-h-screen bg-slate-50")
-    section(class="min-w-0")
-      div(class="mx-auto max-w-5xl px-4 py-8 sm:px-8")
-        div(class="mb-6 flex items-center gap-3")
-          span(class="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-sky-100 to-cyan-100 text-medigo-blue shadow-sm", aria-hidden="true")
-            svg(xmlns="http://www.w3.org/2000/svg", viewBox="0 0 24 24", fill="none", stroke="currentColor", stroke-width="1.8", stroke-linecap="round", stroke-linejoin="round", class="h-6 w-6")
-              circle(cx="12", cy="8", r="4")
-              path(d="M4 21a8 8 0 0 1 16 0")
-          div
-            h1(class="text-2xl font-bold text-medigo-navy") Mi Perfil
-            p(class="mt-1 text-sm text-slate-600") Consulta y actualiza tu información.
-        section(class="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 sm:p-8")
-          if message
-            p(class="mb-5 rounded-lg bg-sky-50 px-4 py-3 text-sm text-sky-900", role="status")= message
-          if profile.pendingEmail
-            p(class="mb-5 rounded-lg bg-amber-50 px-4 py-3 text-sm text-amber-900") Tienes pendiente confirmar #{profile.pendingEmail}. Tu correo actual sigue activo hasta que confirmes el enlace.
-          div(class="mb-7 flex items-center gap-5 border-b border-slate-100 pb-6")
-            div(class="relative flex h-24 w-24 shrink-0 items-center justify-center rounded-full border-4 border-white bg-gradient-to-br from-sky-100 to-cyan-100 text-4xl font-semibold text-medigo-blue shadow-md ring-1 ring-sky-200", aria-label="Foto de perfil")
-              span(aria-hidden="true") #{(profile.firstName || "P")[0]}#{(profile.lastName || "")[0] || ""}
-            div
-              h2(class="text-xl font-bold text-medigo-navy") #{profile.firstName || ""} #{profile.lastName || ""}
-              p(class="mt-1 inline-flex items-center gap-1.5 text-sm text-emerald-700")
-                span(class="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-100", aria-hidden="true")
-                  svg(xmlns="http://www.w3.org/2000/svg", viewBox="0 0 24 24", fill="none", stroke="currentColor", stroke-width="2.5", stroke-linecap="round", stroke-linejoin="round", class="h-3.5 w-3.5")
-                    path(d="m5 12 4 4L19 6")
-                span Cuenta verificada
-          form(action="/perfil", method="post")
-            input(type="hidden", name="_csrf", value=csrfToken)
-            div(class="grid gap-x-10 gap-y-7 md:grid-cols-2")
-              fieldset
-                legend(class="mb-3 text-base font-bold text-medigo-navy") Información personal
-                div(class="space-y-3")
-                  div(class="grid grid-cols-[130px_1fr] items-center gap-3")
-                    label(class="text-sm text-slate-700", for="firstName") Nombres
-                    div
-                      input(class="w-full border-0 border-b border-slate-200 bg-transparent px-1 py-1 text-sm text-medigo-navy outline-none focus:border-medigo-blue focus:ring-0", id="firstName", name="firstName", value=values.firstName || "", required, maxlength="100", autocomplete="given-name")
-                      if errors.firstName
-                        p(class="mt-1 text-xs text-rose-700", role="alert")= errors.firstName
-                  div(class="grid grid-cols-[130px_1fr] items-center gap-3")
-                    label(class="text-sm text-slate-700", for="lastName") Apellidos
-                    div
-                      input(class="w-full border-0 border-b border-slate-200 bg-transparent px-1 py-1 text-sm text-medigo-navy outline-none focus:border-medigo-blue focus:ring-0", id="lastName", name="lastName", value=values.lastName || "", required, maxlength="100", autocomplete="family-name")
-                      if errors.lastName
-                        p(class="mt-1 text-xs text-rose-700", role="alert")= errors.lastName
-                  div(class="grid grid-cols-[130px_1fr] items-center gap-3")
-                    span(class="text-sm text-slate-700") Documento
-                    span(class="text-sm text-medigo-navy") #{profile.documentType || ""} · #{profile.documentNumber || ""}
-                  div(class="grid grid-cols-[130px_1fr] items-center gap-3")
-                    span(class="text-sm text-slate-700") Fecha de nacimiento
-                    span(class="text-sm text-medigo-navy") #{profile.dateOfBirth ? profile.dateOfBirth.split("-").reverse().join("/") : ""}
-              fieldset
-                legend(class="mb-3 text-base font-bold text-medigo-navy") Información de contacto
-                div(class="overflow-hidden rounded-xl border border-slate-200")
-                  div(class="grid grid-cols-[130px_1fr] items-center gap-3 border-b border-slate-100 px-3 py-3")
-                    label(class="text-sm text-slate-700", for="email") Correo electrónico
-                    div
-                      input(class="w-full rounded-md border border-slate-200 px-2 py-1.5 text-sm text-medigo-navy outline-none focus:border-medigo-blue focus:ring-2 focus:ring-medigo-blue/20", id="email", name="email", type="email", value=values.email || "", required, maxlength="254", autocomplete="email")
-                      if errors.email
-                        p(class="mt-1 text-xs text-rose-700", role="alert")= errors.email
-                  div(class="grid grid-cols-[130px_1fr] items-center gap-3 border-b border-slate-100 px-3 py-3")
-                    label(class="text-sm text-slate-700", for="phone") Celular
-                    div
-                      input(class="w-full rounded-md border border-slate-200 px-2 py-1.5 text-sm text-medigo-navy outline-none focus:border-medigo-blue focus:ring-2 focus:ring-medigo-blue/20", id="phone", name="phone", type="tel", value=values.phone || "", required, maxlength="30", autocomplete="tel")
-                      if errors.phone
-                        p(class="mt-1 text-xs text-rose-700", role="alert")= errors.phone
-                  div(class="grid grid-cols-[130px_1fr] items-center gap-3 px-3 py-3")
-                    label(class="text-sm text-slate-700", for="city") Ciudad (opcional)
-                    div
-                      input(class="w-full rounded-md border border-slate-200 px-2 py-1.5 text-sm text-medigo-navy outline-none focus:border-medigo-blue focus:ring-2 focus:ring-medigo-blue/20", id="city", name="city", value=values.city || "", maxlength="100", autocomplete="address-level2")
-                      if errors.city
-                        p(class="mt-1 text-xs text-rose-700", role="alert")= errors.city
-            button(class="mt-7 w-full rounded-lg bg-medigo-blue px-4 py-3 text-sm font-semibold text-white shadow-sm hover:bg-medigo-navy focus:outline-none focus:ring-2 focus:ring-medigo-blue focus:ring-offset-2", type="submit") Guardar cambios
-          a(class="mt-4 flex w-full items-center justify-between rounded-xl border border-slate-200 px-4 py-3 text-left text-sm font-semibold text-medigo-navy hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-medigo-blue focus:ring-offset-2", href="/cambiar-contrasena")
-            span(class="flex items-center gap-3")
-              span(class="flex h-9 w-9 items-center justify-center rounded-xl bg-sky-50 text-medigo-blue", aria-hidden="true")
-                svg(xmlns="http://www.w3.org/2000/svg", viewBox="0 0 24 24", fill="none", stroke="currentColor", stroke-width="1.8", stroke-linecap="round", stroke-linejoin="round", class="h-5 w-5")
-                  rect(x="4", y="10", width="16", height="11", rx="2")
-                  path(d="M8 10V7a4 4 0 1 1 8 0v3m-4 4v3")
-              span Cambiar contraseña
-            svg(xmlns="http://www.w3.org/2000/svg", viewBox="0 0 24 24", fill="none", stroke="currentColor", stroke-width="1.8", stroke-linecap="round", stroke-linejoin="round", class="h-5 w-5 text-slate-400", aria-hidden="true")
-              path(d="m9 18 6-6-6-6")
+  main.patient-profile-page
+    section.patient-profile-card(aria-labelledby="patient-profile-title")
+      header.patient-profile-heading
+        span.patient-profile-heading-icon(aria-hidden="true")
+          svg(xmlns="http://www.w3.org/2000/svg", viewBox="0 0 24 24", fill="none", stroke="currentColor", stroke-width="1.8", stroke-linecap="round", stroke-linejoin="round")
+            rect(x="3", y="4", width="18", height="16", rx="2")
+            path(d="M7 8h4m-4 4h10m-10 4h7")
+        div
+          h2#patient-profile-title Mi Perfil
+          p Consulta y actualiza tu información.
+
+      if message
+        p.patient-profile-message(role="status")= message
+      if profile.pendingEmail
+        p.patient-profile-pending Tienes pendiente confirmar #{profile.pendingEmail}. Tu correo actual sigue activo hasta que confirmes el enlace.
+
+      .patient-profile-person
+        .patient-profile-avatar(aria-label="Iniciales del paciente")
+          span(aria-hidden="true") #{(profile.firstName || "P")[0]}#{(profile.lastName || "")[0] || ""}
+        div
+          h3 #{profile.firstName || ""} #{profile.lastName || ""}
+          p.patient-profile-verified
+            span.patient-profile-check(aria-hidden="true") ✓
+            span Cuenta verificada
+
+      form(action="/perfil", method="post")
+        input(type="hidden", name="_csrf", value=csrfToken)
+        .patient-profile-form
+          fieldset
+            legend Información personal
+            .patient-profile-fields
+              div.patient-profile-field
+                label(for="firstName") Nombres
+                div
+                  input#firstName(name="firstName", value=values.firstName || "", required, maxlength="100", autocomplete="given-name")
+                  if errors.firstName
+                    p.patient-profile-error(role="alert")= errors.firstName
+              div.patient-profile-field
+                label(for="lastName") Apellidos
+                div
+                  input#lastName(name="lastName", value=values.lastName || "", required, maxlength="100", autocomplete="family-name")
+                  if errors.lastName
+                    p.patient-profile-error(role="alert")= errors.lastName
+              div.patient-profile-field
+                span Documento
+                span.patient-profile-readonly #{profile.documentType || ""} · #{profile.documentNumber || ""}
+              div.patient-profile-field
+                span Fecha de nacimiento
+                span.patient-profile-readonly #{profile.dateOfBirth ? profile.dateOfBirth.split("-").reverse().join("/") : ""}
+
+          fieldset.patient-contact-fieldset
+            legend Información de contacto
+            .patient-contact-fields
+              div.patient-profile-field
+                label(for="email") Correo electrónico
+                div
+                  input#email(name="email", type="email", value=values.email || "", required, maxlength="254", autocomplete="email")
+                  if errors.email
+                    p.patient-profile-error(role="alert")= errors.email
+              div.patient-profile-field
+                label(for="phone") Celular
+                div
+                  input#phone(name="phone", type="tel", value=values.phone || "", required, maxlength="30", autocomplete="tel")
+                  if errors.phone
+                    p.patient-profile-error(role="alert")= errors.phone
+              div.patient-profile-field
+                label(for="city") Ciudad (opcional)
+                div
+                  input#city(name="city", value=values.city || "", maxlength="100", autocomplete="address-level2")
+                  if errors.city
+                    p.patient-profile-error(role="alert")= errors.city
+
+        button.patient-profile-save(type="submit") Guardar cambios
+
+      a.patient-profile-password(href="/cambiar-contrasena")
+        span.patient-profile-password-icon(aria-hidden="true")
+          svg(xmlns="http://www.w3.org/2000/svg", viewBox="0 0 24 24", fill="none", stroke="currentColor", stroke-width="1.8", stroke-linecap="round", stroke-linejoin="round")
+            rect(x="4", y="10", width="16", height="11", rx="2")
+            path(d="M8 10V7a4 4 0 1 1 8 0v3m-4 4v3")
+        span Cambiar contraseña
+        svg.patient-profile-password-arrow(xmlns="http://www.w3.org/2000/svg", viewBox="0 0 24 24", fill="none", stroke="currentColor", stroke-width="2", stroke-linecap="round", stroke-linejoin="round", aria-hidden="true")
+          path(d="m9 18 6-6-6-6")
