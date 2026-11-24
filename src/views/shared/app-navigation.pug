@@ -1,28 +1,78 @@
-header.app-topbar
-  button.app-navigation-toggle(type="button", data-app-navigation-toggle, aria-controls="app-navigation", aria-expanded="false", aria-label="Abrir menú de navegación")
+- const isPatientShell = currentUser.role === "PATIENT"
+- const navigationItems = typeof appNavigationItems === "undefined" ? [] : (appNavigationItems[currentUser.role] || [])
+- const activeNavigationItem = typeof activeAppNavigationItem === "undefined" ? "" : activeAppNavigationItem
+
+header.app-topbar(class=isPatientShell ? "patient-topbar" : "")
+  button.app-navigation-toggle(type="button", data-app-navigation-toggle, aria-controls="app-navigation", aria-expanded=isPatientShell ? "true" : "false", aria-label=isPatientShell ? "Ocultar menú de navegación" : "Abrir menú de navegación")
     svg(xmlns="http://www.w3.org/2000/svg", viewBox="0 0 24 24", fill="none", stroke="currentColor", stroke-width="2", stroke-linecap="round", aria-hidden="true")
       path(d="M4 6h16M4 12h16M4 18h16")
-  a.app-topbar-brand(href=currentUser.role === "PATIENT" ? "/paciente" : currentUser.role === "DOCTOR" ? "/medico" : "/administrador", aria-label="MediGo, inicio") Medi#[span(class="text-medigo-cyan") Go]
+  if isPatientShell
+    h1.patient-topbar-title #{title} – Paciente
+  else
+    a.app-topbar-brand(href=currentUser.role === "DOCTOR" ? "/medico" : "/administrador", aria-label="MediGo, inicio") Medi#[span(class="text-medigo-cyan") Go]
 
 button.app-navigation-backdrop.hidden(type="button", data-app-navigation-backdrop, aria-label="Cerrar menú de navegación")
-aside#app-navigation.app-navigation(data-app-navigation, role="dialog", aria-modal="true", aria-labelledby="app-navigation-title", aria-hidden="true", inert)
-  .app-navigation-heading
-    div
-      p.app-navigation-eyebrow Navegación
-      h2#app-navigation-title.app-navigation-title Menú principal
-    button.app-navigation-close(type="button", data-app-navigation-close, aria-label="Cerrar menú de navegación")
-      svg(xmlns="http://www.w3.org/2000/svg", viewBox="0 0 24 24", fill="none", stroke="currentColor", stroke-width="2", stroke-linecap="round", aria-hidden="true")
-        path(d="m6 6 12 12M18 6 6 18")
-  p.app-navigation-greeting Hola, #{currentUser.firstName}
-  - const navigationItems = typeof appNavigationItems === "undefined" ? [] : (appNavigationItems[currentUser.role] || [])
-  - const activeNavigationItem = typeof activeAppNavigationItem === "undefined" ? "" : activeAppNavigationItem
+aside#app-navigation.app-navigation(class=isPatientShell ? "patient-app-navigation" : "", data-app-navigation, role=isPatientShell ? "navigation" : "dialog", aria-modal=isPatientShell ? undefined : "true", aria-labelledby="app-navigation-title", aria-hidden=isPatientShell ? "false" : "true", inert=!isPatientShell)
+  if isPatientShell
+    a.patient-sidebar-brand(href="/paciente", aria-label="MediGo, inicio")
+      span.patient-sidebar-logo(aria-hidden="true") ✚
+      span.patient-sidebar-brand-name Medi#[span(class="text-medigo-cyan") Go]
+      span.patient-sidebar-tagline Tu salud, en buenas manos
+  else
+    .app-navigation-heading
+      div
+        p.app-navigation-eyebrow Navegación
+        h2#app-navigation-title.app-navigation-title Menú principal
+      button.app-navigation-close(type="button", data-app-navigation-close, aria-label="Cerrar menú de navegación")
+        svg(xmlns="http://www.w3.org/2000/svg", viewBox="0 0 24 24", fill="none", stroke="currentColor", stroke-width="2", stroke-linecap="round", aria-hidden="true")
+          path(d="m6 6 12 12M18 6 6 18")
+  if isPatientShell
+    h2#app-navigation-title.patient-sidebar-caption Navegación
+  p.app-navigation-greeting(class=isPatientShell ? "patient-sidebar-greeting" : "") Hola, #{currentUser.firstName}
   nav.app-navigation-links(aria-label="Secciones de MediGo")
     each item in navigationItems
-      a.app-navigation-link(class=item.id === activeNavigationItem ? "is-active" : "", href=item.href, aria-current=item.id === activeNavigationItem ? "page" : undefined)
-        span.app-navigation-link-mark(aria-hidden="true")
+      a.app-navigation-link(class=[item.id === activeNavigationItem ? "is-active" : "", isPatientShell ? "patient-navigation-link" : ""].filter(Boolean).join(" "), href=item.href, aria-current=item.id === activeNavigationItem ? "page" : undefined)
+        if isPatientShell
+          span.patient-navigation-icon(aria-hidden="true")
+            if item.id === "patient-home"
+              svg(xmlns="http://www.w3.org/2000/svg", viewBox="0 0 24 24", fill="none", stroke="currentColor", stroke-width="1.8", stroke-linecap="round", stroke-linejoin="round")
+                path(d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1Z")
+            else if item.id === "patient-appointments" || item.id === "patient-booking"
+              svg(xmlns="http://www.w3.org/2000/svg", viewBox="0 0 24 24", fill="none", stroke="currentColor", stroke-width="1.8", stroke-linecap="round", stroke-linejoin="round")
+                rect(x="3", y="5", width="18", height="16", rx="2")
+                path(d="M16 3v4M8 3v4M3 10h18M8 14h.01M12 14h.01M16 14h.01")
+            else if item.id === "patient-history"
+              svg(xmlns="http://www.w3.org/2000/svg", viewBox="0 0 24 24", fill="none", stroke="currentColor", stroke-width="1.8", stroke-linecap="round", stroke-linejoin="round")
+                circle(cx="12", cy="12", r="9")
+                path(d="M12 7v5l3 2")
+            else if item.id === "patient-profile"
+              svg(xmlns="http://www.w3.org/2000/svg", viewBox="0 0 24 24", fill="none", stroke="currentColor", stroke-width="1.8", stroke-linecap="round", stroke-linejoin="round")
+                circle(cx="12", cy="8", r="4")
+                path(d="M4 21a8 8 0 0 1 16 0")
+            else if item.id === "patient-whatsapp"
+              svg(xmlns="http://www.w3.org/2000/svg", viewBox="0 0 24 24", fill="none", stroke="currentColor", stroke-width="1.8", stroke-linecap="round", stroke-linejoin="round")
+                path(d="M20 11.5a8 8 0 0 1-11.8 7L4 20l1.5-4.1A8 8 0 1 1 20 11.5Z")
+                path(d="M9 9.5c.5 2 2 3.5 4 4l1-1 2 1")
+            else
+              span.patient-navigation-icon-fallback
+        else
+          span.app-navigation-link-mark(aria-hidden="true")
         span= item.label
-  .app-navigation-footer
-    p.app-navigation-footer-note Tu salud, en buenas manos
+  .app-navigation-footer(class=isPatientShell ? "patient-sidebar-footer" : "")
+    if !isPatientShell
+      p.app-navigation-footer-note Tu salud, en buenas manos
     form(action="/cerrar-sesion", method="post")
       input(type="hidden", name="_csrf", value=csrfToken)
-      button.app-navigation-logout(type="submit") Cerrar sesión
+      button.app-navigation-logout(class=isPatientShell ? "patient-sidebar-logout" : "", type="submit") Cerrar sesión
+
+if isPatientShell
+  .patient-account-bar
+    span.patient-account-notification(aria-label="Notificaciones", title="Notificaciones")
+      svg(xmlns="http://www.w3.org/2000/svg", viewBox="0 0 24 24", fill="none", stroke="currentColor", stroke-width="1.8", stroke-linecap="round", stroke-linejoin="round", aria-hidden="true")
+        path(d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9")
+        path(d="M10 21h4")
+    span.patient-account-avatar(aria-hidden="true") #{(currentUser.firstName || "P")[0]}#{(currentUser.lastName || "")[0] || ""}
+    span.patient-account-name #{currentUser.firstName || "Paciente"} #{currentUser.lastName || ""}
+    a.patient-account-profile(href="/perfil", aria-label="Ir a mi perfil")
+      svg(xmlns="http://www.w3.org/2000/svg", viewBox="0 0 24 24", fill="none", stroke="currentColor", stroke-width="2", stroke-linecap="round", stroke-linejoin="round", aria-hidden="true")
+        path(d="m7 10 5 5 5-5")
