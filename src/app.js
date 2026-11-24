@@ -14,9 +14,7 @@ const { createWhatsAppWebhookRouter } = require("./modules/whatsapp/routes");
 const appNavigationItems = {
   PATIENT: [
     { id: "patient-home", label: "Inicio", href: "/paciente" },
-    { id: "patient-booking", label: "Reservar cita", href: "/citas/reservar" },
     { id: "patient-appointments", label: "Mis citas", href: "/mis-citas" },
-    { id: "patient-history", label: "Historial", href: "/historial" },
     { id: "patient-profile", label: "Mi perfil", href: "/perfil" },
     { id: "patient-whatsapp", label: "WhatsApp", href: "/whatsapp/vincular" }
   ],
