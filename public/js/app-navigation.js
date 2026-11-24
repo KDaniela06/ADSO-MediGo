@@ -6,6 +6,31 @@ document.addEventListener("DOMContentLoaded", function () {
 
   if (!toggle || !drawer || !backdrop) return;
 
+  if (document.body.dataset.appRole === "PATIENT") {
+    function setPatientNavigationOpen(isOpen, { restoreFocus = false } = {}) {
+      document.body.classList.toggle("patient-navigation-collapsed", !isOpen);
+      drawer.setAttribute("aria-hidden", String(!isOpen));
+      if (isOpen) drawer.removeAttribute("inert");
+      else drawer.setAttribute("inert", "");
+      toggle.setAttribute("aria-expanded", String(isOpen));
+      toggle.setAttribute("aria-label", isOpen ? "Ocultar menú de navegación" : "Mostrar menú de navegación");
+      if (restoreFocus) toggle.focus();
+    }
+
+    toggle.addEventListener("click", function () {
+      setPatientNavigationOpen(toggle.getAttribute("aria-expanded") !== "true");
+    });
+
+    document.addEventListener("keydown", function (event) {
+      if (event.key === "Escape" && toggle.getAttribute("aria-expanded") === "true") {
+        event.preventDefault();
+        setPatientNavigationOpen(false, { restoreFocus: true });
+      }
+    });
+
+    return;
+  }
+
   function getFocusableElements() {
     return Array.from(drawer.querySelectorAll('a[href], button:not([disabled]), input:not([disabled])'));
   }
