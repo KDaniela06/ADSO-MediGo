@@ -1,5 +1,7 @@
 - const isPatientShell = currentUser.role === "PATIENT"
-- const navigationItems = typeof appNavigationItems === "undefined" ? [] : (appNavigationItems[currentUser.role] || [])
+- const patientFallbackItems = [{ id: "patient-home", label: "Inicio", href: "/paciente" }, { id: "patient-appointments", label: "Mis citas", href: "/mis-citas" }, { id: "patient-profile", label: "Mi perfil", href: "/perfil" }, { id: "patient-whatsapp", label: "WhatsApp", href: "/whatsapp/vincular" }]
+- const configuredNavigationItems = typeof appNavigationItems === "undefined" ? [] : (appNavigationItems[currentUser.role] || [])
+- const navigationItems = configuredNavigationItems.length > 0 ? configuredNavigationItems : (currentUser.role === "PATIENT" ? patientFallbackItems : [])
 - const activeNavigationItem = typeof activeAppNavigationItem === "undefined" ? "" : activeAppNavigationItem
 
 header.app-topbar(class=isPatientShell ? "patient-topbar" : "")
