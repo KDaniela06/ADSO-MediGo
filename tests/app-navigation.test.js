@@ -6,7 +6,7 @@ const renderNavigation = pug.compileFile(path.join(__dirname, "../src/views/shar
 
 describe("navegación global", () => {
   test.each([
-    ["PATIENT", "/paciente", "Inicio", "/whatsapp/vincular", "/medico/pacientes"],
+    ["PATIENT", "/paciente", "WhatsApp", "/whatsapp/vincular", "/medico/pacientes"],
     ["DOCTOR", "/medico", "Mis pacientes", "/medico/pacientes", "/administrador/medicos"],
     ["ADMIN", "/administrador", "Excepciones de agenda", "/administrador/excepciones", "/paciente"]
   ])("muestra solo las opciones del rol %s", (role, homePath, expectedLabel, expectedPath, forbiddenPath) => {
@@ -30,7 +30,7 @@ describe("navegación global", () => {
     expect(getActiveAppNavigationItem({ path: "/administrador/medicos/nuevo", query: {} })).toBe("admin-doctors");
   });
 
-  test("no falla si la lista de navegación no está presente en los datos de la vista", () => {
+  test("conserva las opciones del paciente si faltan los datos de navegación", () => {
     const html = renderNavigation({
       currentUser: { role: "PATIENT", firstName: "Alex" },
       title: "Mi perfil",
@@ -38,9 +38,11 @@ describe("navegación global", () => {
     });
 
     expect(html).toContain("Navegación");
-    expect(html).not.toMatch(/class="app-navigation-link(?: |")/);
+    expect(html).toContain('href="/paciente"');
+    expect(html).toContain('href="/mis-citas"');
+    expect(html).toContain('href="/perfil"');
+    expect(html).toContain('href="/whatsapp/vincular"');
   });
-
   test("muestra al paciente la barra lateral fija y el botón hamburguesa inicia abierta", () => {
     const html = renderNavigation({
       currentUser: { role: "PATIENT", firstName: "Alex", lastName: "Pérez" },
