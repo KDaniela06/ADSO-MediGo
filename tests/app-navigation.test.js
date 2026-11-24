@@ -28,4 +28,14 @@ describe("navegación global", () => {
     expect(getActiveAppNavigationItem({ path: "/medico/citas/18", query: {} })).toBe("doctor-appointments");
     expect(getActiveAppNavigationItem({ path: "/administrador/medicos/nuevo", query: {} })).toBe("admin-doctors");
   });
+
+  test("no falla si la lista de navegación no está presente en los datos de la vista", () => {
+    const html = renderNavigation({
+      currentUser: { role: "PATIENT", firstName: "Alex" },
+      csrfToken: "csrf-test"
+    });
+
+    expect(html).toContain("Menú principal");
+    expect(html).not.toMatch(/class="app-navigation-link(?: |")/);
+  });
 });

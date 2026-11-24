@@ -77,6 +77,8 @@ function createApp({
 
   app.set("view engine", "pug");
   app.set("views", [path.join(__dirname, "modules"), path.join(__dirname, "views")]);
+  app.locals.appNavigationItems = appNavigationItems;
+  app.locals.activeAppNavigationItem = "";
   app.use("/webhooks/whatsapp", createWhatsAppWebhookRouter({ models: authModels, sequelize, emailSender }));
   app.use(express.urlencoded({ extended: false }));
   app.use(express.json());

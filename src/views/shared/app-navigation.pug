@@ -14,9 +14,11 @@ aside#app-navigation.app-navigation(data-app-navigation, role="dialog", aria-mod
       svg(xmlns="http://www.w3.org/2000/svg", viewBox="0 0 24 24", fill="none", stroke="currentColor", stroke-width="2", stroke-linecap="round", aria-hidden="true")
         path(d="m6 6 12 12M18 6 6 18")
   p.app-navigation-greeting Hola, #{currentUser.firstName}
+  - const navigationItems = typeof appNavigationItems === "undefined" ? [] : (appNavigationItems[currentUser.role] || [])
+  - const activeNavigationItem = typeof activeAppNavigationItem === "undefined" ? "" : activeAppNavigationItem
   nav.app-navigation-links(aria-label="Secciones de MediGo")
-    each item in appNavigationItems[currentUser.role] || []
-      a.app-navigation-link(class=item.id === activeAppNavigationItem ? "is-active" : "", href=item.href, aria-current=item.id === activeAppNavigationItem ? "page" : undefined)
+    each item in navigationItems
+      a.app-navigation-link(class=item.id === activeNavigationItem ? "is-active" : "", href=item.href, aria-current=item.id === activeNavigationItem ? "page" : undefined)
         span.app-navigation-link-mark(aria-hidden="true")
         span= item.label
   .app-navigation-footer
