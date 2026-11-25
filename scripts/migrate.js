@@ -25,6 +25,22 @@ const migrations = [
     migration: require("../src/database/migrations/202611100004-create-doctor-appointments")
   },
   {
+    name: "202611100005-create-audit-logs",
+    migration: require("../src/database/migrations/202611100005-create-audit-logs")
+  },
+  {
+    name: "202611110001-enable-doctor-invitations",
+    migration: require("../src/database/migrations/202611110001-enable-doctor-invitations")
+  },
+  {
+    name: "202611120001-create-doctor-weekly-schedules",
+    migration: require("../src/database/migrations/202611120001-create-doctor-weekly-schedules")
+  },
+  {
+    name: "202611160001-create-doctor-schedule-exceptions",
+    migration: require("../src/database/migrations/202611160001-create-doctor-schedule-exceptions")
+  },
+  {
     name: "202611170001-create-consultations",
     migration: require("../src/database/migrations/202611170001-create-consultations")
   },
