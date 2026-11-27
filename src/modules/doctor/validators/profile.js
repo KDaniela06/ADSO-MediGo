@@ -1,3 +1,5 @@
+const { isValidPhone } = require("../../phone");
+
 function validateDoctorProfile(input) {
   const values = {
     phone: String(input.phone || "").trim(),
@@ -7,7 +9,7 @@ function validateDoctorProfile(input) {
   const errors = {};
 
   if (!values.phone) errors.phone = "Este campo es obligatorio.";
-  if (values.phone && !/^\d{7,10}$/.test(values.phone)) {
+  if (values.phone && !isValidPhone(values.phone)) {
     errors.phone = "Ingresa un teléfono válido.";
   }
   if (values.professionalDescription.length > 2000) {
