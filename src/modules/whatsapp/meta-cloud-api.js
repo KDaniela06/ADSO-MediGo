@@ -59,7 +59,7 @@ function createMetaWhatsAppCloudApi({
       if (!response.ok) return { status: "failed" };
       const payload = await response.json();
       return Array.isArray(payload.messages) && payload.messages[0]?.id
-        ? { status: "sent" }
+        ? { status: "sent", messageId: payload.messages[0].id }
         : { status: "failed" };
     } catch {
       return { status: "failed" };
