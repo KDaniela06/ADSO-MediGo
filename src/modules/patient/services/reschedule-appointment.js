@@ -162,7 +162,7 @@ async function reschedulePatientAppointment({
         startsAt: appointment.startsAt,
         endsAt: appointment.endsAt
       };
-      await record.update({ startsAt, endsAt, updatedAt: now }, { transaction });
+      if (models.WhatsAppAppointmentReminder?.update) {\n        const reminderAt = new Date(startsAt.getTime() - 24 * 60 * 60 * 1000);\n        await models.WhatsAppAppointmentReminder.update({\n          scheduledAt: reminderAt,\n          status: reminderAt.getTime() > now.getTime() ? "PENDING" : "CANCELLED",\n          sentAt: null, attemptCount: 0, lastAttemptAt: null, providerMessageId: null, updatedAt: now\n        }, { where: { appointmentId: appointment.id, status: { [Op.ne]: "CANCELLED" } }, transaction });\n      }\n      await record.update({ startsAt, endsAt, updatedAt: now }, { transaction });
       await models.AuditLog.create({
         actorUserId: userId,
         action: "PATIENT_APPOINTMENT_RESCHEDULED",
