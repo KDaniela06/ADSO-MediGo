@@ -35,17 +35,17 @@ block content
                 p(class="mt-1 text-sm text-rose-700", role="alert")= errors.documentType
             div
               label(class="mb-1 block text-sm font-semibold", for="documentNumber") Número de documento
-              input#documentNumber(class="w-full rounded-lg border border-slate-300 px-3 py-2", name="documentNumber", value=values.documentNumber || "", maxlength="30", required)
+              input#documentNumber(class="w-full rounded-lg border border-slate-300 px-3 py-2", name="documentNumber", value=values.documentNumber || "", maxlength="10", required)
               if errors.documentNumber
                 p(class="mt-1 text-sm text-rose-700", role="alert")= errors.documentNumber
             div
               label(class="mb-1 block text-sm font-semibold", for="email") Correo electrónico
-              input#email(class="w-full rounded-lg border border-slate-300 px-3 py-2", name="email", type="email", value=values.email || "", maxlength="254", autocomplete="email", required)
+              input#email(class="w-full rounded-lg border border-slate-300 px-3 py-2", name="email", type="email", value=values.email || "", maxlength="300", autocomplete="email", required)
               if errors.email
                 p(class="mt-1 text-sm text-rose-700", role="alert")= errors.email
             div
               label(class="mb-1 block text-sm font-semibold", for="phone") Teléfono
-              input#phone(class="w-full rounded-lg border border-slate-300 px-3 py-2", name="phone", type="tel", value=values.phone || "", maxlength="30", autocomplete="tel", required)
+              input#phone(class="w-full rounded-lg border border-slate-300 px-3 py-2", name="phone", type="tel", value=values.phone || "", maxlength="10", autocomplete="tel", required)
               if errors.phone
                 p(class="mt-1 text-sm text-rose-700", role="alert")= errors.phone
         fieldset

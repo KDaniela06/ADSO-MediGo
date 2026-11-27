@@ -15,12 +15,12 @@ function validateDoctorRegistration(input = {}) {
   for (const field of ["firstName", "lastName", "documentType", "documentNumber", "email", "phone", "specialtyId", "professionalRegistration"]) {
     if (!values[field]) errors[field] = "Este campo es obligatorio.";
   }
-  for (const [field, length] of [["firstName", 100], ["lastName", 100], ["documentNumber", 30], ["email", 254], ["phone", 30], ["professionalRegistration", 80]]) {
+  for (const [field, length] of [["firstName", 100], ["lastName", 100], ["documentNumber", 10], ["email", 300], ["phone", 10], ["professionalRegistration", 80]]) {
     if (values[field].length > length) errors[field] = `Este campo no puede superar ${length} caracteres.`;
   }
   if (values.documentType && !DOCUMENT_TYPES.has(values.documentType)) errors.documentType = "Selecciona un tipo de documento válido.";
   if (values.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email)) errors.email = "Ingresa un correo electrónico válido.";
-  if (values.phone && (!/^\+?[0-9\s().-]{7,30}$/.test(values.phone) || values.phone.replace(/\D/g, "").length < 7)) errors.phone = "Ingresa un teléfono válido.";
+  if (values.phone && !/^\d{7,10}$/.test(values.phone)) errors.phone = "Ingresa un teléfono válido.";
   if (values.specialtyId && !/^\d+$/.test(values.specialtyId)) errors.specialtyId = "Selecciona una especialidad válida.";
   return { values, errors, isValid: Object.keys(errors).length === 0 };
 }

@@ -8,6 +8,7 @@ function validatePasswordChange(input = {}) {
 
   if (!values.currentPassword) errors.currentPassword = "Escribe tu contraseña actual.";
   if (values.newPassword.length < 8) errors.newPassword = "La nueva contraseña debe tener al menos 8 caracteres.";
+  if (values.newPassword.length > 16) errors.newPassword = "La nueva contraseña no puede superar 16 caracteres.";
   if (values.passwordConfirmation !== values.newPassword) {
     errors.passwordConfirmation = "La confirmación no coincide con la nueva contraseña.";
   }
