@@ -36,7 +36,7 @@ function createAuthRouter({ sequelize = null, models = null, emailSender = null 
     response.set("Cache-Control", "no-store");
     const email = String(request.body?.email || "").trim().toLowerCase();
     const password = String(request.body?.password || "");
-    const validEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    const validEmail = email.length <= 300 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
     if (!validEmail || !password) {
       return response.status(401).render("auth/views/login", {
@@ -115,7 +115,7 @@ function createAuthRouter({ sequelize = null, models = null, emailSender = null 
   router.post("/recuperar-contrasena", async (request, response) => {
     response.set({ "Cache-Control": "no-store", "Referrer-Policy": "no-referrer" });
     const email = String(request.body?.email || "").trim().toLowerCase();
-    if (sequelize && models && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    if (sequelize && models && email.length <= 300 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       try {
         await requestPasswordReset({
           sequelize,
@@ -152,6 +152,7 @@ function createAuthRouter({ sequelize = null, models = null, emailSender = null 
     const passwordConfirmation = String(request.body?.passwordConfirmation || "");
     const errors = {};
     if (password.length < 8) errors.password = "La contraseña debe tener al menos 8 caracteres.";
+    if (password.length > 16) errors.password = "La contraseña no puede superar 16 caracteres.";
     if (passwordConfirmation !== password) errors.passwordConfirmation = "Las contraseñas no coinciden.";
 
     if (Object.keys(errors).length) {
@@ -320,7 +321,7 @@ function createAuthRouter({ sequelize = null, models = null, emailSender = null 
   router.post("/verificar-correo/reenviar", async (request, response) => {
     response.set({ "Cache-Control": "no-store", "Referrer-Policy": "no-referrer" });
     const email = String(request.body.email || "").trim().toLowerCase();
-    if (sequelize && models && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    if (sequelize && models && email.length <= 300 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       try {
         await requestEmailVerification({
           sequelize,

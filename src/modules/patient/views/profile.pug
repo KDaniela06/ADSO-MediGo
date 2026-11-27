@@ -57,13 +57,13 @@ block content
               div.patient-profile-field
                 label(for="email") Correo electrónico
                 div
-                  input#email(name="email", type="email", value=values.email || "", required, maxlength="254", autocomplete="email")
+                  input#email(name="email", type="email", value=values.email || "", required, maxlength="300", autocomplete="email")
                   if errors.email
                     p.patient-profile-error(role="alert")= errors.email
               div.patient-profile-field
                 label(for="phone") Celular
                 div
-                  input#phone(name="phone", type="tel", value=values.phone || "", required, maxlength="30", autocomplete="tel")
+                  input#phone(name="phone", type="tel", value=values.phone || "", required, maxlength="10", autocomplete="tel")
                   if errors.phone
                     p.patient-profile-error(role="alert")= errors.phone
               div.patient-profile-field

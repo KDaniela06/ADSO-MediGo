@@ -47,7 +47,7 @@ block content
             if errors && errors.documentType
               p(class="text-xs text-rose-700", role="alert")= errors.documentType
             label(class="sr-only", for="documentNumber") Número de documento
-            input(class="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm outline-none placeholder:text-slate-600 focus:border-medigo-blue focus:ring-2 focus:ring-medigo-blue/20", id="documentNumber", name="documentNumber", placeholder="Número de documento", autocomplete="off", required, value=values && values.documentNumber)
+            input(class="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm outline-none placeholder:text-slate-600 focus:border-medigo-blue focus:ring-2 focus:ring-medigo-blue/20", id="documentNumber", name="documentNumber", placeholder="Número de documento", autocomplete="off", required, value=values && values.documentNumber, maxlength="10")
             if errors && errors.documentNumber
               p(class="text-xs text-rose-700", role="alert")= errors.documentNumber
             label(class="sr-only", for="dateOfBirth") Fecha de nacimiento
@@ -55,19 +55,19 @@ block content
             if errors && errors.dateOfBirth
               p(class="text-xs text-rose-700", role="alert")= errors.dateOfBirth
             label(class="sr-only", for="email") Correo electrónico
-            input(class="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm outline-none placeholder:text-slate-600 focus:border-medigo-blue focus:ring-2 focus:ring-medigo-blue/20", id="email", name="email", type="email", placeholder="✉  Correo electrónico", autocomplete="email", required, value=values && values.email)
+            input(class="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm outline-none placeholder:text-slate-600 focus:border-medigo-blue focus:ring-2 focus:ring-medigo-blue/20", id="email", name="email", type="email", placeholder="✉  Correo electrónico", autocomplete="email", required, value=values && values.email, maxlength="300")
             if errors && errors.email
               p(class="text-xs text-rose-700", role="alert")= errors.email
             label(class="sr-only", for="phone") Teléfono
-            input(class="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm outline-none placeholder:text-slate-600 focus:border-medigo-blue focus:ring-2 focus:ring-medigo-blue/20", id="phone", name="phone", type="tel", placeholder="☎  Teléfono", autocomplete="tel", required, value=values && values.phone)
+            input(class="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm outline-none placeholder:text-slate-600 focus:border-medigo-blue focus:ring-2 focus:ring-medigo-blue/20", id="phone", name="phone", type="tel", placeholder="☎  Teléfono", autocomplete="tel", required, value=values && values.phone, maxlength="10")
             if errors && errors.phone
               p(class="text-xs text-rose-700", role="alert")= errors.phone
             label(class="sr-only", for="password") Contraseña
-            input(class="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm outline-none placeholder:text-slate-600 focus:border-medigo-blue focus:ring-2 focus:ring-medigo-blue/20", id="password", name="password", type="password", placeholder="Contraseña", autocomplete="new-password", required)
+            input(class="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm outline-none placeholder:text-slate-600 focus:border-medigo-blue focus:ring-2 focus:ring-medigo-blue/20", id="password", name="password", type="password", placeholder="Contraseña", autocomplete="new-password", required, maxlength="16")
             if errors && errors.password
               p(class="text-xs text-rose-700", role="alert")= errors.password
             label(class="sr-only", for="passwordConfirmation") Confirmar contraseña
-            input(class="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm outline-none placeholder:text-slate-600 focus:border-medigo-blue focus:ring-2 focus:ring-medigo-blue/20", id="passwordConfirmation", name="passwordConfirmation", type="password", placeholder="Confirmar contraseña", autocomplete="new-password", required)
+            input(class="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm outline-none placeholder:text-slate-600 focus:border-medigo-blue focus:ring-2 focus:ring-medigo-blue/20", id="passwordConfirmation", name="passwordConfirmation", type="password", placeholder="Confirmar contraseña", autocomplete="new-password", required, maxlength="16")
             if errors && errors.passwordConfirmation
               p(class="text-xs text-rose-700", role="alert")= errors.passwordConfirmation
             div(class="pt-1")

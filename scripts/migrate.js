@@ -55,6 +55,10 @@ const migrations = [
   {
     name: "202611240001-create-whatsapp-conversations",
     migration: require("../src/database/migrations/202611240001-create-whatsapp-conversations")
+  },
+  {
+    name: "202611260001-expand-email-fields",
+    migration: require("../src/database/migrations/202611260001-expand-email-fields")
   }
 ];
 

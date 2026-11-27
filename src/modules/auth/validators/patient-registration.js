@@ -1,4 +1,5 @@
 const DOCUMENT_TYPES = new Set(["CC", "CE", "PASSPORT"]);
+const { isValidPhone } = require("../../phone");
 
 function getAge(dateOfBirth, today = new Date()) {
   const birthDate = new Date(`${dateOfBirth}T00:00:00`);
@@ -30,7 +31,7 @@ function validatePatientRegistration(input, today = new Date()) {
   for (const field of ["firstName", "lastName", "documentType", "documentNumber", "dateOfBirth", "email", "phone", "password", "passwordConfirmation"]) {
     if (!values[field]) errors[field] = "Este campo es obligatorio.";
   }
-  for (const [field, maxLength] of [["firstName", 100], ["lastName", 100], ["documentNumber", 30], ["email", 254], ["phone", 30]]) {
+  for (const [field, maxLength] of [["firstName", 100], ["lastName", 100], ["documentNumber", 10], ["email", 300]]) {
     if (values[field].length > maxLength) errors[field] = `Este campo no puede superar ${maxLength} caracteres.`;
   }
   if (values.documentType && !DOCUMENT_TYPES.has(values.documentType)) {
@@ -39,7 +40,7 @@ function validatePatientRegistration(input, today = new Date()) {
   if (values.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email)) {
     errors.email = "Ingresa un correo electrónico válido.";
   }
-  if (values.phone && (!/^\+?[0-9\s().-]{7,30}$/.test(values.phone) || values.phone.replace(/\D/g, "").length < 7)) {
+  if (values.phone && !isValidPhone(values.phone)) {
     errors.phone = "Ingresa un teléfono válido.";
   }
   if (values.dateOfBirth) {
@@ -51,6 +52,9 @@ function validatePatientRegistration(input, today = new Date()) {
   }
   if (values.password && values.password.length < 8) {
     errors.password = "La contraseña debe tener al menos 8 caracteres.";
+  }
+  if (values.password.length > 16) {
+    errors.password = "La contraseña no puede superar 16 caracteres.";
   }
   if (values.passwordConfirmation && values.password !== values.passwordConfirmation) {
     errors.passwordConfirmation = "Las contraseñas no coinciden.";

@@ -6,6 +6,7 @@ function validateDoctorAccountSetup(input = {}) {
   const errors = {};
   if (!values.password) errors.password = "Este campo es obligatorio.";
   else if (values.password.length < 8) errors.password = "La contraseña debe tener al menos 8 caracteres.";
+  if (values.password.length > 16) errors.password = "La contraseña no puede superar 16 caracteres.";
   if (values.passwordConfirmation !== values.password) errors.passwordConfirmation = "Las contraseñas no coinciden.";
   return { values, errors, isValid: Object.keys(errors).length === 0 };
 }

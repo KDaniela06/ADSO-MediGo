@@ -24,7 +24,7 @@ block content
               p(class="mt-1 text-sm text-rose-700")= errors.lastName
           div
             label(class="mb-1 block text-sm font-semibold", for="phone") Teléfono
-            input#phone(class="w-full rounded-lg border border-slate-300 px-3 py-2", name="phone", value=values.phone, type="tel", maxlength="30", required)
+            input#phone(class="w-full rounded-lg border border-slate-300 px-3 py-2", name="phone", value=values.phone, type="tel", maxlength="10", required)
             if errors.phone
               p(class="mt-1 text-sm text-rose-700")= errors.phone
           div
