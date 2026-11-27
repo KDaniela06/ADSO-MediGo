@@ -75,7 +75,7 @@ El token aleatorio se guarda solo como hash SHA-256, vence en 30 minutos y se in
 | `GET /whatsapp/vincular/desvincular` | Paciente autenticado | Presenta la confirmación para desvincular. |
 | `POST /whatsapp/vincular/desvincular` | Paciente autenticado y CSRF | Quita el número vinculado después de la confirmación. |
 
-El número se guarda en formato internacional y es único por paciente. Se persiste únicamente un HMAC SHA-256 del código; el secreto `WHATSAPP_VERIFICATION_SECRET` debe configurarse en el entorno. El envío usa `WHATSAPP_ACCESS_TOKEN`, `WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_VERIFICATION_TEMPLATE`, `WHATSAPP_VERIFICATION_TEMPLATE_LANGUAGE` y `WHATSAPP_GRAPH_API_VERSION`. La plantilla debe estar aprobada en Meta e incluir el código como una variable del cuerpo. Si faltan credenciales o falla Meta, no se informa que el código fue enviado.
+El número se guarda en formato internacional y es único por paciente. Se persiste únicamente un HMAC SHA-256 del código; el secreto `WHATSAPP_VERIFICATION_SECRET` debe configurarse en el entorno. El envío usa `META_WHATSAPP_ACCESS_TOKEN` (con compatibilidad temporal con el nombre anterior), `META_WHATSAPP_PHONE_NUMBER_ID` (con compatibilidad temporal con el nombre anterior), `META_WHATSAPP_VERIFICATION_TEMPLATE_NAME` (con compatibilidad temporal con el nombre anterior), `META_WHATSAPP_TEMPLATE_LANGUAGE` (idioma por defecto `es_CO`) y `META_WHATSAPP_API_VERSION` (valor de ejemplo `v25.0`). La plantilla debe estar aprobada en Meta e incluir el código como una variable del cuerpo. Si faltan credenciales o falla Meta, no se informa que el código fue enviado.
 
 No se envían mensajes proactivos. Esta pantalla solicita el envío como parte de una acción iniciada por el paciente. La recepción y gestión de conversaciones corresponde a la issue #25.
 
@@ -288,9 +288,9 @@ La invitación se almacena como hash SHA-256, es de un solo uso y vence en 24 ho
 
 | Método y ruta | Acceso | Comportamiento |
 |---|---|---|
-| `GET /webhooks/whatsapp?hub.mode=subscribe&hub.verify_token=...&hub.challenge=...` | Verificación de Meta | Comprueba `WHATSAPP_WEBHOOK_VERIFY_TOKEN` y devuelve el reto de Meta. |
-| `POST /webhooks/whatsapp` | Webhook firmado de Meta | Valida `X-Hub-Signature-256` con `WHATSAPP_APP_SECRET`, deduplica mensajes y atiende mensajes de texto entrantes. |
+| `GET /webhooks/whatsapp?hub.mode=subscribe&hub.verify_token=...&hub.challenge=...` | Verificación de Meta | Comprueba `META_WHATSAPP_WEBHOOK_VERIFY_TOKEN` (con compatibilidad temporal con el nombre anterior) y devuelve el reto de Meta. |
+| `POST /webhooks/whatsapp` | Webhook firmado de Meta | Valida `X-Hub-Signature-256` con `META_WHATSAPP_APP_SECRET` (con compatibilidad temporal con el nombre anterior), deduplica mensajes y atiende mensajes de texto entrantes. |
 
 El bot acepta solo números ya vinculados y verificados. Al iniciar o vencer una conversación, pide el documento y lo compara con la cuenta sin guardarlo. Después presenta opciones para reservar, consultar, cancelar o reprogramar, reutilizando las reglas de citas de la web. La conversación vence tras 15 minutos de inactividad y conserva solo identificadores de selección. Las respuestas se envían cuando el paciente escribe; no hay mensajes proactivos.
 
-Para activar Meta, configura `WHATSAPP_WEBHOOK_VERIFY_TOKEN`, `WHATSAPP_APP_SECRET`, `WHATSAPP_ACCESS_TOKEN` y `WHATSAPP_PHONE_NUMBER_ID`; publica `/webhooks/whatsapp` con HTTPS y suscribe la aplicación al campo `messages`. Aplica la migración con `npm run db:migrate`. Meta no puede llamar directamente a `localhost` sin un túnel HTTPS de desarrollo.
+Para activar Meta, configura las variables `META_WHATSAPP_*` en `.env`; publica `/webhooks/whatsapp` con HTTPS y suscribe la aplicación al campo `messages`. La configuración paso a paso está en [Configurar Meta WhatsApp Cloud API](WHATSAPP_META_SETUP.md). Meta no puede llamar directamente a `localhost` sin un túnel HTTPS de desarrollo.

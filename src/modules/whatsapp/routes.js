@@ -5,17 +5,20 @@ const { handleIncomingWhatsAppMessage } = require("./conversation-service");
 function createWhatsAppWebhookRouter({ models, sequelize, emailSender, sender, environment = process.env } = {}) {
   const router = Router();
   const api = sender || createMetaWhatsAppCloudApi({ environment });
+  const verificationToken = environment.META_WHATSAPP_WEBHOOK_VERIFY_TOKEN
+    || environment.WHATSAPP_WEBHOOK_VERIFY_TOKEN;
+  const appSecret = environment.META_WHATSAPP_APP_SECRET || environment.WHATSAPP_APP_SECRET;
 
   router.get("/", (request, response) => {
     const valid = request.query["hub.mode"] === "subscribe"
       && request.query["hub.verify_token"]
-      && request.query["hub.verify_token"] === environment.WHATSAPP_WEBHOOK_VERIFY_TOKEN;
+      && request.query["hub.verify_token"] === verificationToken;
     if (!valid) return response.sendStatus(403);
     return response.type("text/plain").status(200).send(request.query["hub.challenge"]);
   });
 
   router.post("/", require("express").raw({ type: "application/json", limit: "1mb" }), async (request, response) => {
-    if (!isValidMetaSignature(request.body, request.get("x-hub-signature-256"), environment.WHATSAPP_APP_SECRET)) {
+    if (!isValidMetaSignature(request.body, request.get("x-hub-signature-256"), appSecret)) {
       return response.sendStatus(401);
     }
     let payload;
