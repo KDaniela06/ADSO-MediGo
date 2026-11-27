@@ -115,7 +115,7 @@ function createAuthRouter({ sequelize = null, models = null, emailSender = null 
   router.post("/recuperar-contrasena", async (request, response) => {
     response.set({ "Cache-Control": "no-store", "Referrer-Policy": "no-referrer" });
     const email = String(request.body?.email || "").trim().toLowerCase();
-    if (sequelize && models && /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) {
+    if (sequelize && models && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       try {
         await requestPasswordReset({
           sequelize,
