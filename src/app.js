@@ -68,6 +68,7 @@ function createApp({
   sequelize: providedSequelize,
   models: providedModels,
   emailSender: providedEmailSender,
+  whatsAppSender: providedWhatsAppSender,
   sessionStore
 } = {}) {
   const app = express();
