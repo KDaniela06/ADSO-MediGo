@@ -10,6 +10,8 @@ const { createPatientRouter } = require("./modules/patient/routes");
 const { createDoctorRouter } = require("./modules/doctor/routes");
 const { createAdminRouter } = require("./modules/admin/routes");
 const { createWhatsAppWebhookRouter } = require("./modules/whatsapp/routes");
+const { createMetaWhatsAppCloudApi } = require("./modules/whatsapp/meta-cloud-api");
+const { createWhatsAppReminderScheduler } = require("./modules/whatsapp/services/appointment-reminders");
 
 const appNavigationItems = {
   PATIENT: [
@@ -66,18 +68,22 @@ function createApp({
   sequelize: providedSequelize,
   models: providedModels,
   emailSender: providedEmailSender,
+  whatsAppSender: providedWhatsAppSender,
   sessionStore
 } = {}) {
   const app = express();
   const sequelize = providedSequelize || createDatabaseConnection();
   const authModels = providedModels || (sequelize ? initializeAuthModels(sequelize) : null);
   const emailSender = providedEmailSender || createEmailSender();
+  const whatsAppSender = providedWhatsAppSender || createMetaWhatsAppCloudApi();
+  const whatsAppReminderScheduler = createWhatsAppReminderScheduler({ models: authModels, sender: whatsAppSender });
+  app.locals.whatsAppReminderScheduler = whatsAppReminderScheduler;
 
   app.set("view engine", "pug");
   app.set("views", [path.join(__dirname, "modules"), path.join(__dirname, "views")]);
   app.locals.appNavigationItems = appNavigationItems;
   app.locals.activeAppNavigationItem = "";
-  app.use("/webhooks/whatsapp", createWhatsAppWebhookRouter({ models: authModels, sequelize, emailSender }));
+  app.use("/webhooks/whatsapp", createWhatsAppWebhookRouter({ models: authModels, sequelize, emailSender, sender: whatsAppSender }));
   app.use(express.urlencoded({ extended: false }));
   app.use(express.json());
   app.use(express.static(path.join(__dirname, "..", "public")));

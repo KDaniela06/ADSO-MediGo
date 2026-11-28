@@ -7,5 +7,6 @@ const app = createApp();
 
 app.listen(port, () => {
   console.log(`MediGo is running at http://localhost:${port}`);
+  app.locals.whatsAppReminderScheduler?.start();
 });
 

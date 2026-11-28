@@ -173,6 +173,17 @@ function initializeAuthModels(sequelize) {
     cancellationReason: { type: DataTypes.STRING(255), allowNull: true, field: "cancellation_reason" }
   }, { tableName: "appointments", underscored: true });
 
+  const WhatsAppAppointmentReminder = sequelize.define("WhatsAppAppointmentReminder", {
+    id: { type: DataTypes.BIGINT.UNSIGNED, primaryKey: true, autoIncrement: true },
+    appointmentId: { type: DataTypes.BIGINT.UNSIGNED, allowNull: false, unique: true, field: "appointment_id" },
+    scheduledAt: { type: DataTypes.DATE(3), allowNull: false, field: "scheduled_at" },
+    status: { type: DataTypes.ENUM("PENDING", "SENDING", "SENT", "FAILED", "CANCELLED"), allowNull: false, defaultValue: "PENDING" },
+    sentAt: { type: DataTypes.DATE(3), allowNull: true, field: "sent_at" },
+    attemptCount: { type: DataTypes.TINYINT.UNSIGNED, allowNull: false, defaultValue: 0, field: "attempt_count" },
+    lastAttemptAt: { type: DataTypes.DATE(3), allowNull: true, field: "last_attempt_at" },
+    providerMessageId: { type: DataTypes.STRING(160), allowNull: true, field: "provider_message_id" }
+  }, { tableName: "whatsapp_appointment_reminders", underscored: true });
+
   const Consultation = sequelize.define("Consultation", {
     id: { type: DataTypes.BIGINT.UNSIGNED, primaryKey: true, autoIncrement: true },
     appointmentId: { type: DataTypes.BIGINT.UNSIGNED, allowNull: false, unique: true, field: "appointment_id" },
@@ -215,6 +226,8 @@ function initializeAuthModels(sequelize) {
   Doctor.hasMany(Appointment, { foreignKey: "doctorId", as: "appointments" });
   Specialty.hasMany(Appointment, { foreignKey: "specialtyId", as: "appointments" });
   Appointment.belongsTo(Patient, { foreignKey: "patientId", as: "patient" });
+  Appointment.hasOne(WhatsAppAppointmentReminder, { foreignKey: "appointmentId", as: "whatsappReminder" });
+  WhatsAppAppointmentReminder.belongsTo(Appointment, { foreignKey: "appointmentId", as: "appointment" });
   Appointment.belongsTo(Doctor, { foreignKey: "doctorId", as: "doctor" });
   Appointment.belongsTo(Specialty, { foreignKey: "specialtyId", as: "specialty" });
   Appointment.hasOne(Consultation, { foreignKey: "appointmentId", as: "consultation" });
@@ -230,7 +243,7 @@ function initializeAuthModels(sequelize) {
   AccountToken.hasOne(NotificationOutbox, { foreignKey: "accountTokenId", as: "notification" });
   NotificationOutbox.belongsTo(AccountToken, { foreignKey: "accountTokenId", as: "accountToken" });
 
-  return { User, Patient, Doctor, Specialty, Appointment, Consultation, ConsultationAddendum, DoctorWeeklySchedule, DoctorWeeklyScheduleBlock, DoctorScheduleException, WhatsAppConversation, AccountToken, NotificationOutbox, AuditLog };
+  return { User, Patient, Doctor, Specialty, Appointment, WhatsAppAppointmentReminder, Consultation, ConsultationAddendum, DoctorWeeklySchedule, DoctorWeeklyScheduleBlock, DoctorScheduleException, WhatsAppConversation, AccountToken, NotificationOutbox, AuditLog };
 }
 
 module.exports = { initializeAuthModels };

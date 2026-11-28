@@ -106,6 +106,12 @@ async function cancelPatientAppointment({
         startsAt: appointment.startsAt,
         endsAt: appointment.endsAt
       };
+      if (models.WhatsAppAppointmentReminder?.update) {
+        await models.WhatsAppAppointmentReminder.update(
+          { status: "CANCELLED", updatedAt: now },
+          { where: { appointmentId: appointment.id, status: ["PENDING", "SENDING", "FAILED"] }, transaction }
+        );
+      }
       await record.update({
         status: "CANCELLED",
         cancelledAt: now,

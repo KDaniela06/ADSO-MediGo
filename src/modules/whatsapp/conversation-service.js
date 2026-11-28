@@ -3,9 +3,10 @@ const { getPatientBookingPage, bookPatientAppointment } = require("../patient/se
 const { getPatientAppointments } = require("../patient/services/my-appointments");
 const { cancelPatientAppointment } = require("../patient/services/cancel-appointment");
 const { getPatientReschedulePage, reschedulePatientAppointment } = require("../patient/services/reschedule-appointment");
+const { requestWhatsAppAppointmentReminder } = require("./services/appointment-reminders");
 
 const SESSION_MS = 15 * 60 * 1000;
-const MENU = "Responde con el número de la opción:\n1. Reservar cita\n2. Consultar mis citas\n3. Cancelar una cita\n4. Reprogramar una cita\n\nEscribe *menu* para ver estas opciones.";
+const MENU = "Responde con el número de la opción:\n1. Reservar cita\n2. Consultar mis citas\n3. Cancelar una cita\n4. Reprogramar una cita\n5. Recibir recordatorio de una cita\n\nEscribe *menu* para ver estas opciones.";
 
 function plain(value) { return value && typeof value.get === "function" ? value.get({ plain: true }) : value; }
 function formatAppointment(item, index) { return `${index + 1}. ${item.specialtyName} con ${item.doctorName}: ${item.date}, ${item.time}`; }
@@ -43,6 +44,17 @@ async function processMenuChoice({ text, userId, models, sequelize, emailSender,
   }
   if (choice === "2") {
     return { state: "MENU", contextJson: null, reply: menuAppointments(await getPatientAppointments({ models, userId, filter: "proximas", now })) };
+  }
+  if (choice === "5") {
+    const result = await getPatientAppointments({ models, userId, filter: "proximas", now });
+    if (result.status !== "ready") return { state: "MENU", contextJson: null, reply: "No pude consultar tus citas. Inténtalo más tarde.\n\n" + MENU };
+    const upcoming = result.appointments.filter((item) => item.canReschedule);
+    if (!upcoming.length) return { state: "MENU", contextJson: null, reply: "No tienes citas confirmadas con más de 24 horas de anticipación para recordar.\n\n" + MENU };
+    return {
+      state: "REMINDER_SELECT",
+      contextJson: { appointmentIds: upcoming.map((item) => String(item.id)) },
+      reply: "¿De cuál cita quieres recibir un recordatorio 24 horas antes?\n" + upcoming.map(formatAppointment).join("\n")
+    };
   }
   if (choice === "3" || choice === "4") {
     const result = await getPatientAppointments({ models, userId, filter: "proximas", now });
@@ -94,6 +106,19 @@ async function advanceConversation({ text, conversation, linked, models, sequeli
     const booked = await bookPatientAppointment({ sequelize, models, userId: linked.user.id, specialtyId: context.specialtyId, doctorId: context.doctorId, date: context.date, time, emailSender, now });
     if (booked.status !== "booked") return { state: "MENU", contextJson: null, reply: "Ese horario ya no está disponible o no se pudo confirmar.\n\n" + MENU };
     return { state: "MENU", contextJson: null, reply: `Tu cita quedó confirmada con ${booked.doctor.name}, el ${booked.appointment.date} a las ${booked.appointment.time}.\n\n${MENU}` };
+  }
+  if (state === "REMINDER_SELECT") {
+    const appointmentId = selectFrom(value, context.appointmentIds || []);
+    if (!appointmentId) return { state, contextJson: context, reply: "Elige un número de la lista de citas." };
+    const result = await requestWhatsAppAppointmentReminder({ sequelize, models, userId: linked.user.id, appointmentId, now });
+    const replies = {
+      scheduled: "Listo. Te enviaré por WhatsApp un recordatorio 24 horas antes de la cita.\n\n" + MENU,
+      already_scheduled: "Esa cita ya tiene un recordatorio programado.\n\n" + MENU,
+      already_sent: "El recordatorio de esa cita ya fue enviado.\n\n" + MENU,
+      too_late: "La cita es dentro de menos de 24 horas, así que ya no alcanza a programarse el recordatorio.\n\n" + MENU,
+      whatsapp_not_verified: "Primero vincula y verifica tu número de WhatsApp en MediGo para recibir recordatorios.\n\n" + MENU
+    };
+    return { state: "MENU", contextJson: null, reply: replies[result.status] || "No pude programar el recordatorio. Inténtalo más tarde.\n\n" + MENU };
   }
   if (state === "CANCEL_SELECT" || state === "RESCHEDULE_SELECT") {
     const appointmentId = selectFrom(value, context.appointmentIds || []);

@@ -59,6 +59,10 @@ const migrations = [
   {
     name: "202611260001-expand-email-fields",
     migration: require("../src/database/migrations/202611260001-expand-email-fields")
+  },
+  {
+    name: "202611270001-create-whatsapp-appointment-reminders",
+    migration: require("../src/database/migrations/202611270001-create-whatsapp-appointment-reminders")
   }
 ];
 

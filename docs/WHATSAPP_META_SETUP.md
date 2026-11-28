@@ -47,7 +47,7 @@ Crea y espera la aprobación de plantillas en WhatsApp Manager. El idioma config
 - `META_WHATSAPP_RESCHEDULE_TEMPLATE_NAME`: cita reprogramada.
 - `META_WHATSAPP_CANCELLATION_TEMPLATE_NAME`: cita cancelada.
 
-El código ya permite enviar estas plantillas mediante `sendAppointmentTemplate({ to, kind, parameters })`. Los valores de `kind` son `confirmation`, `reminder`, `reschedule` y `cancellation`; `parameters` debe seguir el orden de variables del cuerpo de la plantilla. La programación automática de recordatorios se configura en una tarea aparte; aquí queda listo el envío desde la API.
+El código envía estas plantillas mediante `sendAppointmentTemplate({ to, kind, parameters })`. Los valores de `kind` son `confirmation`, `reminder`, `reschedule` y `cancellation`; `parameters` sigue el orden de las variables del cuerpo.\n\nPara `META_WHATSAPP_REMINDER_TEMPLATE_NAME`, crea y espera la aprobación de una plantilla de utilidad en español con dos variables de cuerpo, por ejemplo: `Te recordamos tu cita en MediGo para el {{1}} a las {{2}}. Responde a este mensaje si necesitas cancelarla o reprogramarla.` La aplicación envía la fecha y la hora en America/Bogota.\n\nEl paciente solicita el aviso desde el menú de WhatsApp eligiendo una cita con al menos 24 horas de anticipación. MediGo registra su consentimiento y número verificado, programa el mensaje para 24 horas antes y lo envía con la plantilla aprobada. Si cancela la cita, el aviso pendiente se cancela; si la reprograma, el horario del aviso se recalcula. El servidor comprueba los avisos pendientes cada minuto, guarda el identificador que devuelve Meta y reintenta fallos hasta tres veces.
 
 ## 4. Aplicar y comprobar
 
