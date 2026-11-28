@@ -24,7 +24,7 @@ function createMetaWhatsAppCloudApi({
 } = {}) {
   const config = getMetaWhatsAppConfig(environment);
 
-  async function sendTemplateMessage({ to, templateName, language, parameters = [] } = {}) {
+  async function sendTemplateMessage({ to, templateName, language, parameters = [], includeMessageId = false } = {}) {
     if (!config.accessToken || !config.phoneNumberId || !templateName || !fetchImpl || !to || !Array.isArray(parameters)) {
       return { status: "unavailable" };
     }
@@ -59,7 +59,7 @@ function createMetaWhatsAppCloudApi({
       if (!response.ok) return { status: "failed" };
       const payload = await response.json();
       return Array.isArray(payload.messages) && payload.messages[0]?.id
-        ? { status: "sent", messageId: payload.messages[0].id }
+        ? (includeMessageId ? { status: "sent", messageId: payload.messages[0].id } : { status: "sent" })
         : { status: "failed" };
     } catch {
       return { status: "failed" };
@@ -85,7 +85,8 @@ function createMetaWhatsAppCloudApi({
     return sendTemplateMessage({
       to,
       templateName: environment[environmentKey],
-      parameters
+      parameters,
+      includeMessageId: true
     });
   }
 
