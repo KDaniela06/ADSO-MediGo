@@ -48,7 +48,7 @@ describe("Meta WhatsApp Cloud API", () => {
       to: "+573001234567",
       kind: "reminder",
       parameters: ["Karen", "27/11/2026", "10:00"]
-    })).resolves.toEqual({ status: "sent" });
+    })).resolves.toEqual({ status: "sent", messageId: "wamid.reminder" });
     const requestBody = JSON.parse(fetchImpl.mock.calls[0][1].body);
     expect(requestBody.template.name).toBe("medigo_recordatorio");
     expect(requestBody.template.components[0].parameters.map((item) => item.text)).toEqual(["Karen", "27/11/2026", "10:00"]);
