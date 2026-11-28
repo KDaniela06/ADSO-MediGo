@@ -2,9 +2,12 @@ jest.mock("../src/modules/patient/services/appointments", () => ({ getPatientBoo
 jest.mock("../src/modules/patient/services/my-appointments", () => ({ getPatientAppointments: jest.fn() }));
 jest.mock("../src/modules/patient/services/cancel-appointment", () => ({ cancelPatientAppointment: jest.fn() }));
 jest.mock("../src/modules/patient/services/reschedule-appointment", () => ({ getPatientReschedulePage: jest.fn(), reschedulePatientAppointment: jest.fn() }));
+jest.mock("../src/modules/whatsapp/services/appointment-reminders", () => ({ requestWhatsAppAppointmentReminder: jest.fn() }));
 
 const { advanceConversation, handleIncomingWhatsAppMessage } = require("../src/modules/whatsapp/conversation-service");
 const { getPatientBookingPage } = require("../src/modules/patient/services/appointments");
+const { getPatientAppointments } = require("../src/modules/patient/services/my-appointments");
+const { requestWhatsAppAppointmentReminder } = require("../src/modules/whatsapp/services/appointment-reminders");
 
 function setup(existing = null) {
   const patient = { id: 12, whatsappPhone: "+573001234567", whatsappVerifiedAt: new Date() };
@@ -57,6 +60,28 @@ describe("WhatsApp conversation flow", () => {
     const { models } = setup(old);
     await expect(handleIncomingWhatsAppMessage({ models, sender: "573001234567", text: "2", messageId: "wamid-dup", now })).resolves.toEqual({ status: "duplicate" });
     expect(old.update).not.toHaveBeenCalled();
+  });
+
+  test("lets the patient choose an appointment for a WhatsApp reminder", async () => {
+    getPatientAppointments.mockResolvedValue({
+      status: "ready",
+      appointments: [{ id: 31, status: "Confirmada", canReschedule: true, specialtyName: "Medicina general", doctorName: "Dra. Ruiz", date: "lunes 30 de noviembre", time: "9:00 a. m." }]
+    });
+    requestWhatsAppAppointmentReminder.mockResolvedValue({ status: "scheduled" });
+    const linked = { user: { id: 7 } };
+    const first = await advanceConversation({
+      text: "5", conversation: { state: "MENU", contextJson: null }, linked, models: {}, sequelize: {}, now
+    });
+    expect(first.state).toBe("REMINDER_SELECT");
+    const selected = await advanceConversation({
+      text: "1",
+      conversation: { state: first.state, contextJson: first.contextJson },
+      linked, models: {}, sequelize: {}, now
+    });
+    expect(selected.reply).toMatch(/24 horas antes/i);
+    expect(requestWhatsAppAppointmentReminder).toHaveBeenCalledWith({
+      sequelize: {}, models: {}, userId: 7, appointmentId: "31", now
+    });
   });
 
   test("shows human-readable appointment times and keeps the matching choices", async () => {
